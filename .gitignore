@@ -8,3 +8,5 @@ build
 *.d
 *.so
 *.pcm
+sftp.json
+settings.json
