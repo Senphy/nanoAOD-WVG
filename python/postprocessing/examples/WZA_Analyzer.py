@@ -63,7 +63,7 @@ class WZAAnalysis(Module):
                 for j in range(i+1,len(electrons)):
                     if electrons[i].pdgId == -electrons[j].pdgId:
                         # print electrons[i].mass," + ",electrons[j].mass," = ",electrons[i].mass+electrons[j].mass
-                        if (electrons[i].mass+electrons[j].mass)*1000 >= 60 and (electrons[i].mass+electrons[j].mass)*1000 <= 120:
+                        if abs(electrons[i].mass+electrons[j].mass)*1000 >= 60 and abs(electrons[i].mass+electrons[j].mass)*1000 <= 120:
                             dilepton = True                                                      #dilepton selection
                             break
 
@@ -74,7 +74,7 @@ class WZAAnalysis(Module):
             if i != len(muons) and dilepton == False:
                 for j in range(i+1,len(muons)):
                     if muons[i].pdgId == -muons[j].pdgId:
-                        if (muons[i].mass+muons[j].mass)*1000 >= 60 and (muons[i].mass+muons[j].mass)*1000 <= 120:
+                        if abs(muons[i].mass+muons[j].mass)*1000 >= 60 and abs(muons[i].mass+muons[j].mass)*1000 <= 120:
                             dilepton = True                                                      #dilepton selection
                             break
 
