@@ -37,6 +37,7 @@ class WZAAnalysis(Module):
         photons = Collection(event, "Photon")
         # jets = Collection(event, "Jet")
         # Jet_select = ROOT.TLorentzVector()
+        dileptonp4 = ROOT.TLorentzVector()
         photon_select = []
         electron_select = []
         muon_select = [] 
@@ -62,8 +63,13 @@ class WZAAnalysis(Module):
             if i != len(electrons) and dilepton == False:
                 for j in range(i+1,len(electrons)):
                     if electrons[i].pdgId == -electrons[j].pdgId:
-                        # print electrons[i].mass," + ",electrons[j].mass," = ",electrons[i].mass+electrons[j].mass
-                        if abs(electrons[i].mass+electrons[j].mass)*1000 >= 60 and abs(electrons[i].mass+electrons[j].mass)*1000 <= 120:
+                        dileptonp4.SetPtEtaPhiM(electrons[i].p4()[0]+electrons[j].p4()[0],electrons[i].p4()[1]+electrons[j].p4()[1],electrons[i].p4()[2]+electrons[j].p4()[2],electrons[i].p4()[3]+electrons[j].p4()[3])
+                        dileptonmass = -1.0
+                        try:
+                            dileptonmass = math.sqrt(math.pow(dileptonp4[3],2)-(math.pow(dileptonp4[0],2)+math.pow(dileptonp4[1],2)+math.pow(dileptonp4[2],2)))
+                        except OverflowError:
+                            print  event.event,"electronp4",dileptonp4[3]," ",dileptonp4[0]," ",dileptonp4[1]," ",dileptonp4[2]
+                        if dileptonmass >= 60 and dileptonmass <= 120:
                             dilepton = True                                                      #dilepton selection
                             break
 
@@ -74,7 +80,13 @@ class WZAAnalysis(Module):
             if i != len(muons) and dilepton == False:
                 for j in range(i+1,len(muons)):
                     if muons[i].pdgId == -muons[j].pdgId:
-                        if abs(muons[i].mass+muons[j].mass)*1000 >= 60 and abs(muons[i].mass+muons[j].mass)*1000 <= 120:
+                        dileptonp4.SetPtEtaPhiM(muons[i].p4()[0]+muons[j].p4()[0],muons[i].p4()[1]+muons[j].p4()[1],muons[i].p4()[2]+muons[j].p4()[2],muons[i].p4()[3]+muons[j].p4()[3])
+                        dileptonmass = -1.0
+                        try:
+                            dileptonmass = math.sqrt(math.pow(dileptonp4[3],2)-(math.pow(dileptonp4[0],2)+math.pow(dileptonp4[1],2)+math.pow(dileptonp4[2],2)))
+                        except OverflowError:
+                            print  event.event,"muonp4",dileptonp4[3]," ",dileptonp4[0]," ",dileptonp4[1]," ",dileptonp4[2]
+                        if dileptonmass >= 60 and dileptonmass <= 120:
                             dilepton = True                                                      #dilepton selection
                             break
 
