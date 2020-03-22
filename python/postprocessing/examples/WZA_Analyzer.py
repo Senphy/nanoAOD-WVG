@@ -10,6 +10,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
+MET_pass = 0
+photon_pass = 0
+electron_pass = 0
+muon_pass = 0
+dilepton_pass = 0
 class WZAAnalysis(Module):
     def __init__(self):
         pass
@@ -43,10 +48,16 @@ class WZAAnalysis(Module):
         muon_select = [] 
 
         dilepton = False
+        global MET_pass
+        global photon_pass
+        global electron_pass
+        global muon_pass
+        global dilepton_pass
 
         # selection on MET
-        if  event.MET_pt>20  and  event.MET_pt<30:
+        if  event.MET_pt>20:
             self.out.fillBranch("MET",event.MET_pt)
+            MET_pass += 1
         else:
             return False  
 
@@ -57,18 +68,13 @@ class WZAAnalysis(Module):
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            # print event.event
             if  electrons[i].pt>30  and  abs(electrons[i].eta)<2.5  and  electrons[i].cutBased>=3: #pt eta ID cut
                 electron_select.append(i)
             if i != len(electrons) and dilepton == False:
                 for j in range(i+1,len(electrons)):
                     if electrons[i].pdgId == -electrons[j].pdgId:
-                        dileptonp4.SetPtEtaPhiM(electrons[i].p4()[0]+electrons[j].p4()[0],electrons[i].p4()[1]+electrons[j].p4()[1],electrons[i].p4()[2]+electrons[j].p4()[2],electrons[i].p4()[3]+electrons[j].p4()[3])
                         dileptonmass = -1.0
-                        try:
-                            dileptonmass = math.sqrt(math.pow(dileptonp4[3],2)-(math.pow(dileptonp4[0],2)+math.pow(dileptonp4[1],2)+math.pow(dileptonp4[2],2)))
-                        except OverflowError:
-                            print  event.event,"electronp4",dileptonp4[3]," ",dileptonp4[0]," ",dileptonp4[1]," ",dileptonp4[2]
+                        dileptonmass = (electrons[i].p4()+electrons[j].p4()).M()
                         if dileptonmass >= 60 and dileptonmass <= 120:
                             dilepton = True                                                      #dilepton selection
                             break
@@ -80,19 +86,25 @@ class WZAAnalysis(Module):
             if i != len(muons) and dilepton == False:
                 for j in range(i+1,len(muons)):
                     if muons[i].pdgId == -muons[j].pdgId:
-                        dileptonp4.SetPtEtaPhiM(muons[i].p4()[0]+muons[j].p4()[0],muons[i].p4()[1]+muons[j].p4()[1],muons[i].p4()[2]+muons[j].p4()[2],muons[i].p4()[3]+muons[j].p4()[3])
                         dileptonmass = -1.0
-                        try:
-                            dileptonmass = math.sqrt(math.pow(dileptonp4[3],2)-(math.pow(dileptonp4[0],2)+math.pow(dileptonp4[1],2)+math.pow(dileptonp4[2],2)))
-                        except OverflowError:
-                            print  event.event,"muonp4",dileptonp4[3]," ",dileptonp4[0]," ",dileptonp4[1]," ",dileptonp4[2]
+                        dileptonmass = (muons[i].p4()+muons[j].p4()).M()
                         if dileptonmass >= 60 and dileptonmass <= 120:
                             dilepton = True                                                      #dilepton selection
                             break
-
-        if dilepton == False: return False        #reject events
-        if len(photon_select)==0: return False
-        if len(electron_select)==0 and len(muon_select)==0: return False
+                        
+        # Record the pass numbers for each cut. Noticed that for efficiency, those who can't pass the MET cut may not be counted because it will pass to another event directly.
+        if dilepton == False: 
+            return False        #reject events
+        else:
+            dilepton_pass += 1
+        if len(photon_select)==0:
+             return False
+        else:
+            photon_pass += 1
+        if len(electron_select)==0 and len(muon_select)==0:
+             return False
+        elif len(electron_select)!=0: electron_pass += 1
+        elif len(muon_select)!=0: muon_pass += 1
 
         for i in range(0,len(photon_select)):
             self.out.fillBranch("photon_pt",photons[photon_select[i]].pt)
@@ -114,3 +126,9 @@ class WZAAnalysis(Module):
 files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/356CFA55-E91B-1940-ACFC-FE3E769A44D5.root"]
 p=PostProcessor(".",files,branchsel="input_branch_sel.txt",modules=[WZAAnalysis()],provenance=True,outputbranchsel="output_branch_sel.txt")
 p.run()
+
+print "MET_pass","\t","=","\t",MET_pass
+print "photon_pass","\t","=","\t",photon_pass
+print "electron_pass","\t","=","\t",electron_pass
+print "muon_pass","\t","=","\t",muon_pass 
+print "dilepton_pass","\t","=","\t",dilepton_pass
