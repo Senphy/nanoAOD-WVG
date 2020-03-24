@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# Analyzer for WZG Analysis based on nanoAOD tools
+
 import os, sys
 import math
 import ROOT
@@ -54,7 +56,7 @@ class WZAAnalysis(Module):
         global muon_pass
         global dilepton_pass
 
-        # selection on MET
+        # selection on MET. Pass to next event directly if fail.
         if  event.MET_pt>20:
             self.out.fillBranch("MET",event.MET_pt)
             MET_pass += 1
@@ -92,17 +94,17 @@ class WZAAnalysis(Module):
                             dilepton = True                                                      #dilepton selection
                             break
                         
-        # Record the pass numbers for each cut. Noticed that for efficiency, those who can't pass the MET cut may not be counted because it will pass to another event directly.
+        # Record the pass numbers for each cut. Noticed that for efficiency, those who can't pass the MET cut may not be counted because it will pass to next event directly.
         if dilepton == False: 
-            return False        #reject events
+            return False                        #reject event if there are no di-leptons pass the selection in the event 
         else:
             dilepton_pass += 1
         if len(photon_select)==0:
-             return False
+            return False                        #reject event if there is no photon selected in the event
         else:
             photon_pass += 1
-        if len(electron_select)==0 and len(muon_select)==0:
-             return False
+        if len(electron_select)==0 and len(muon_select)==0:      #reject event if there is no lepton selected in the event
+            return False
         elif len(electron_select)!=0: electron_pass += 1
         elif len(muon_select)!=0: muon_pass += 1
 
@@ -123,7 +125,8 @@ class WZAAnalysis(Module):
         return True
 
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/EE33CA79-B0A1-1145-A457-FE7B7C1A03BC.root"]
-files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/356CFA55-E91B-1940-ACFC-FE3E769A44D5.root"]
+# files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/356CFA55-E91B-1940-ACFC-FE3E769A44D5.root"]
+files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv4/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/260000/FA76270A-417C-174F-B403-8FE5E5A3EFE4.root"]
 p=PostProcessor(".",files,branchsel="input_branch_sel.txt",modules=[WZAAnalysis()],provenance=True,outputbranchsel="output_branch_sel.txt")
 p.run()
 
