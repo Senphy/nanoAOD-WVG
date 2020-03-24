@@ -5,3 +5,4 @@ keep muon*
 keep photon*
 keep MET
 keep event
+keep dilepton*
