@@ -33,6 +33,7 @@ class WZAAnalysis(Module):
         self.out.branch("photon_phi",  "F")
         self.out.branch("electron_phi",  "F")
         self.out.branch("muon_phi",  "F")
+        self.out.branch("dilepton_mass",  "F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -79,6 +80,7 @@ class WZAAnalysis(Module):
                         dileptonmass = (electrons[i].p4()+electrons[j].p4()).M()
                         if dileptonmass >= 60 and dileptonmass <= 120:
                             dilepton = True                                                      #dilepton selection
+                            self.out.fillBranch("dilepton_mass",dileptonmass)
                             break
 
         #selection on muons
@@ -92,6 +94,7 @@ class WZAAnalysis(Module):
                         dileptonmass = (muons[i].p4()+muons[j].p4()).M()
                         if dileptonmass >= 60 and dileptonmass <= 120:
                             dilepton = True                                                      #dilepton selection
+                            self.out.fillBranch("dilepton_mass",dileptonmass)
                             break
                         
         # Record the pass numbers for each cut. Noticed that for efficiency, those who can't pass the MET cut may not be counted because it will pass to next event directly.
@@ -125,8 +128,8 @@ class WZAAnalysis(Module):
         return True
 
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/EE33CA79-B0A1-1145-A457-FE7B7C1A03BC.root"]
-# files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/356CFA55-E91B-1940-ACFC-FE3E769A44D5.root"]
-files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv4/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/260000/FA76270A-417C-174F-B403-8FE5E5A3EFE4.root"]
+files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/WZG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/260000/356CFA55-E91B-1940-ACFC-FE3E769A44D5.root"]
+# files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv4/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/260000/FA76270A-417C-174F-B403-8FE5E5A3EFE4.root"]
 p=PostProcessor(".",files,branchsel="input_branch_sel.txt",modules=[WZAAnalysis()],provenance=True,outputbranchsel="output_branch_sel.txt")
 p.run()
 
