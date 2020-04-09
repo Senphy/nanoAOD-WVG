@@ -1,0 +1,18 @@
+#!/bin/bash
+export SCRAM_ARCH=slc6_amd64_gcc481
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_7_1_20_patch3/src ] ; then 
+ echo release CMSSW_7_1_20_patch3 already exists
+else
+scram p CMSSW CMSSW_7_1_20_patch3
+fi
+cd CMSSW_7_1_20_patch3/src
+eval `scram runtime -sh`
+
+curl -s --insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/SMP-RunIISummer15GS-00062 --retry 2 --create-dirs -o Configuration/GenProduction/python/SMP-RunIISummer15GS-00062-fragment.py 
+[ -s Configuration/GenProduction/python/SMP-RunIISummer15GS-00062-fragment.py ] || exit $?;
+
+scram b
+cd ../../
+cmsDriver.py Configuration/GenProduction/python/SMP-RunIISummer15GS-00062-fragment.py --filein file:SMP-RunIIWinter15wmLHE-00070.root  --fileout file:SMP-RunIISummer15GS-00062.root --mc --eventcontent RAWSIM,DQM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,DQMIO --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM,VALIDATION:genvalid_all --magField 38T_PostLS1 --python_filename SMP-RunIISummer15GS-00062_1_cfg.py --no_exec -n 100 || exit $? ; 
+
