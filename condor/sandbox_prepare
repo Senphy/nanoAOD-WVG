@@ -16,7 +16,7 @@ cd ../../../
 # cmssw-sandbox create -a CMSSW_XXX
 
 # Not on cmsconnect (still testing if it could work)
-tar -zcvf CMSSW_XXX_XXX.tar.gz CMSSW_XXX
+python cmssw-sandbox.py create -a CMSSW-XXX
 
 # use eos on lxplus and stash on cmsconnect to store the environment sandbox
 cp XXX.tar.gz /eos/user/s/sdeng/WZG_analysis

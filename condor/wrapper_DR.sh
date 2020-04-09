@@ -19,7 +19,7 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
 # Download sandbox, replace it when you have different sandbox_name
-sandbox_name="CMSSW_8_0_21_DR.tar.gz"
+sandbox_name="sandbox-CMSSW_8_0_21-86a22fb.tar.bz2"
 # Change to your own http
 xrdcp -s root://eosuser.cern.ch///eos/user/s/sdeng/WZG_analysis/$sandbox_name .
 

@@ -8,5 +8,6 @@ RequestCpus = 4
 error = log/job_GS.err
 output = log/job_GS.out
 log = log/job_GS.log
+transfer_output_remaps  = "test.root"
 when_to_transfer_output = ON_EXIT
 queue 1 
