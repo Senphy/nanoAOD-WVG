@@ -24,8 +24,6 @@ define lep+ = e+ mu+ ta+
 define lep- = e- mu- ta-
 
 # specify the decay for the final state particles
-decay t > w+ b, w+ > all all
-decay t~ > w- b~, w- > all all
 decay z > lep+ lep-
 
 # running the actual code
