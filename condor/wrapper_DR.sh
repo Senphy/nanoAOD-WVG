@@ -40,5 +40,5 @@ cd -
 DATE=`date +%F | sed 's/-/_/g'`
 mkdir -p /eos/user/s/sdeng/WZG_analysis/$DATE
 cp $CMSSW_BASE/src/test/SMP-RunIISummer16DR80Premix-00005.root /eos/user/s/sdeng/WZG_analysis/$DATE
-cp $CMSSW_BASE/src/test/SMP-RunIISummer16DR80Premix-00005.root/-00062.root .
+cp $CMSSW_BASE/src/test/SMP-RunIISummer16DR80Premix-00005.root .
 rm $sandbox_name
