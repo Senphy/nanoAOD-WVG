@@ -1,0 +1,12 @@
+universe = vanilla
+executable = wrapper_DR.sh
+requirements = (OpSysAndVer =?= "SLCern6")
++JobFlavour = "testmatch"
+should_transfer_files = YES
+transfer_input_files = cmssw_setup.sh
+RequestCpus = 4
+error = log/job_DR.err
+output = log/job_DR.out
+log = log/job_DR.log
+when_to_transfer_output = ON_EXIT
+queue 1 

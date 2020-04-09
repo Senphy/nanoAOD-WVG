@@ -1,0 +1,22 @@
+cd CMSSW_7_1_20/src
+cmsenv
+
+# For pythia:
+git cms-addpkg GeneratorInterface/Pythia8Interface
+scram b -j16 
+
+# create a test folder and move cfg&root into it
+mkdir test
+cd test
+cp xxx/xxx_cfg.py .
+cp xxx/xxx.root .
+cd ../../../
+
+# On cmsconnect
+# cmssw-sandbox create -a CMSSW_XXX
+
+# Not on cmsconnect (still testing if it could work)
+tar -zcvf CMSSW_XXX_XXX.tar.gz CMSSW_XXX
+
+# use eos on lxplus and stash on cmsconnect to store the environment sandbox
+cp XXX.tar.gz /eos/user/s/sdeng/WZG_analysis
