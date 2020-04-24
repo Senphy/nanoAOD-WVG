@@ -5,3 +5,6 @@ keep Muon*
 keep Photon*
 keep *event*
 keep MET*
+keep *gen*
+keep *Gen*
+keep Jet*
