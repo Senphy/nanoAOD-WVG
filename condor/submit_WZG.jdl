@@ -1,0 +1,13 @@
+universe = vanilla
+executable = wrapper_WZG.sh
+requirements = (OpSysAndVer =?= "SLCern6")
++JobFlavour = "testmatch"
+should_transfer_files = YES
+transfer_input_files = cmssw_setup.sh,sandbox-CMSSW_7_1_20-4dd66ac.tar.bz2,sandbox-CMSSW_7_1_20_patch3-9e5cf1d.tar.bz2,sandbox-CMSSW_8_0_21-df507c8.tar.bz2,sandbox-CMSSW_9_4_9-24e4b50.tar.bz2,sandbox-CMSSW_10_2_18-fb0abee.tar.bz2
+RequestCpus = 4
+error = log/job_WZG.err_$(Cluster)-$(Process)
+output = log/job_WZG.out_$(Cluster)-$(Process)
+log = log/job_WZG.log_$(Cluster)-$(Process)
+transfer_output_remaps  = "SMP-RunIISummer16NanoAODv6-00310.root = WZG_bw15_$(Cluster)_$(Process).root"
+when_to_transfer_output = ON_EXIT
+queue 1000 
