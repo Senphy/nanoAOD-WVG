@@ -39,6 +39,9 @@ class WZAAnalysis(Module):
         self.out.branch("muon_phi",  "F")
         self.out.branch("dilepton_mass",  "F")
         self.out.branch("Generator_weight","F")
+        self.out.branch("max_CMVA","F")
+        self.out.branch("max_CSVV2","F")
+        self.out.branch("max_DeepB","F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -110,9 +113,10 @@ class WZAAnalysis(Module):
 
         # selection on b-tag jet
         for i in range(0,len(jets)): 
+             if jets[i].btagCMVA > -0.5884:  # cMVAv2L
             # if jets[i].btagCMVA > 0.4432:  # cMVAv2M
             # if jets[i].btagCSVV2 > 0.8484:  # CSVv2M
-            if jets[i].btagDeepB > 0.6324:  # DeepCSVM
+            # if jets[i].btagDeepB > 0.6324:  # DeepCSVM
                 if jets[i].pt<30:
                     continue
                 for j in range(0,len(photon_select)):
@@ -127,6 +131,17 @@ class WZAAnalysis(Module):
                     if deltaR(jets[i].eta,jets[i].phi,muons[muon_select[j]].eta,muons[muon_select[j]].phi) > 0.3:
                         btagjet_cut +=1
                         return False
+
+        # max_CMVA=-999
+        # max_CSVV2=-999
+        # max_DeepB=-999
+        # for i in range(0,len(jets)): 
+        #     if jets[i].btagCMVA > max_CMVA: max_CMVA = jets[i].btagCMVA
+        #     if jets[i].btagCSVV2 > max_CSVV2: max_CSVV2 = jets[i].btagCSVV2
+        #     if jets[i].btagDeepB > max_DeepB: max_DeepB = jets[i].btagDeepB
+        # self.out.fillBranch("max_CMVA",max_CMVA)
+        # self.out.fillBranch("max_CSVV2",max_CSVV2)
+        # self.out.fillBranch("max_DeepB",max_DeepB)
 
         if len(electron_select)==0 and len(muon_select)==0:      #reject event if there is no lepton selected in the event
             return False

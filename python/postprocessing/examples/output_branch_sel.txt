@@ -7,3 +7,4 @@ keep MET
 keep event
 keep dilepton*
 keep *weight*
+keep max*
