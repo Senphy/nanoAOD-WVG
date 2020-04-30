@@ -19,8 +19,11 @@ MET_pass = 0
 photon_pass = 0
 electron_pass = 0
 muon_pass = 0
+lepton_pass = 0
+threelepton_pass = 0
 dilepton_pass = 0
-btagjet_cut = 0
+emumu_pass = 0
+btagjet_pass = 0
 class WZAAnalysis(Module):
     def __init__(self):
         pass
@@ -65,8 +68,11 @@ class WZAAnalysis(Module):
         global photon_pass
         global electron_pass
         global muon_pass
+        global lepton_pass
+        global threelepton_pass
         global dilepton_pass
-        global btagjet_cut
+        global emumu_pass 
+        global btagjet_pass
         global test
 
         # selection on MET. Pass to next event directly if fail.
@@ -96,7 +102,17 @@ class WZAAnalysis(Module):
             if  muons[i].pt>20  and  abs(muons[i].eta)<2.5:  #or  muons[i].cutBased<=3:            
                 muon_pass += 1
                 muon_select.append(i)
+
+        if len(electron_select)==0 and len(muon_select)==0:      #reject event if there is no lepton selected in the event
+            return False
+        else:
+            lepton_pass += 1
         
+        if len(electron_select)+len(muon_select) != 3:      #reject event if there are not exactly three leptons
+            return False
+        else:
+            threelepton_pass += 1
+
         #dilepton mass
         if  len(muon_select)==2  and len(electron_select)==1:  #begin with emumu channel 
             if muons[muon_select[0]].pdgId == -muons[muon_select[1]].pdgId:
@@ -109,28 +125,32 @@ class WZAAnalysis(Module):
         if emumu_dilepton == False: 
             return False                        #reject event if there are no di-leptons pass the selection in the event 
         else:
-            dilepton_pass += 1
+            emumu_pass += 1
 
         # selection on b-tag jet
         for i in range(0,len(jets)): 
-             if jets[i].btagCMVA > -0.5884:  # cMVAv2L
+            btag_cut = False
+            if jets[i].btagCMVA > -0.5884:  # cMVAv2L
             # if jets[i].btagCMVA > 0.4432:  # cMVAv2M
+            # if jets[i].btagCSVV2 > 0.5426:  # CSVv2L
             # if jets[i].btagCSVV2 > 0.8484:  # CSVv2M
+            # if jets[i].btagDeepB > 0.2219:  # DeepCSVL
             # if jets[i].btagDeepB > 0.6324:  # DeepCSVM
+                btag_cut = True      #initialize
                 if jets[i].pt<30:
                     continue
-                for j in range(0,len(photon_select)):
-                    if deltaR(jets[i].eta,jets[i].phi,photons[photon_select[j]].eta,photons[photon_select[j]].phi) > 0.3:
-                        btagjet_cut +=1
-                        return False
+                for j in range(0,len(photon_select)):          # delta R cut, if all deltaR(lep,jet) and deltaR(gamma,jet)>0.3, consider jet as a b jet
+                    if deltaR(jets[i].eta,jets[i].phi,photons[photon_select[j]].eta,photons[photon_select[j]].phi) < 0.3:
+                        btag_cut = False
                 for j in range(0,len(electron_select)):
-                    if deltaR(jets[i].eta,jets[i].phi,electrons[electron_select[j]].eta,electrons[electron_select[j]].phi) > 0.3:
-                        btagjet_cut +=1
-                        return False
+                    if deltaR(jets[i].eta,jets[i].phi,electrons[electron_select[j]].eta,electrons[electron_select[j]].phi) < 0.3:
+                        btag_cut = False
                 for j in range(0,len(muon_select)):
-                    if deltaR(jets[i].eta,jets[i].phi,muons[muon_select[j]].eta,muons[muon_select[j]].phi) > 0.3:
-                        btagjet_cut +=1
-                        return False
+                    if deltaR(jets[i].eta,jets[i].phi,muons[muon_select[j]].eta,muons[muon_select[j]].phi) < 0.3:
+                        btag_cut = False
+            if btag_cut == True:
+                return False
+        btagjet_pass += 1
 
         # max_CMVA=-999
         # max_CSVV2=-999
@@ -143,8 +163,6 @@ class WZAAnalysis(Module):
         # self.out.fillBranch("max_CSVV2",max_CSVV2)
         # self.out.fillBranch("max_DeepB",max_DeepB)
 
-        if len(electron_select)==0 and len(muon_select)==0:      #reject event if there is no lepton selected in the event
-            return False
 
 
         for i in range(0,len(photon_select)):
@@ -169,17 +187,19 @@ class WZAAnalysis(Module):
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv4/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/260000/FA76270A-417C-174F-B403-8FE5E5A3EFE4.root"]
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv4/ttZJets_13TeV_madgraphMLM/NANOAODSIM/Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/280000/AF15D61D-C169-1F49-B287-DCF0B7F44B8B.root"]
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/tZq_ll_4f_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/280000/A85C5B62-D4C8-6845-B005-C0CE9B0AB4EA.root"]
-files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_15_test_submit/SMP-RunIISummer16NanoAODv6-00310.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_30_test_submit/SMP-RunIISummer16NanoAODv6-00310.root"]
+# files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_15_test_submit/10k/SMP-RunIISummer16NanoAODv6-00310.root"]
+# files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_30_test_submit/10k/SMP-RunIISummer16NanoAODv6-00310.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTWJetsToLNu.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTZJets.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
+files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
 p=PostProcessor(".",files,branchsel="input_branch_sel.txt",modules=[countHistogramsProducer(),WZAAnalysis()],provenance=True,outputbranchsel="output_branch_sel.txt")
 p.run()
 
 print "MET_pass","\t","=","\t",MET_pass
 print "photon_pass","\t","=","\t",photon_pass
-print "electron_pass","\t","=","\t",electron_pass
-print "muon_pass","\t","=","\t",muon_pass 
-print "dilepton_pass","\t","=","\t",dilepton_pass
-print "btagjet_cut","\t","=","\t",btagjet_cut
+# print "electron_pass","\t","=","\t",electron_pass
+# print "muon_pass","\t","=","\t",muon_pass 
+print "lepton_pass","\t","=","\t",lepton_pass
+print "threelepton_pass","\t","=","\t",threelepton_pass
+print "emumu_pass","\t","=","\t",emumu_pass
+print "btagjet_pass","\t","=","\t",btagjet_pass
