@@ -84,7 +84,7 @@ class WZAAnalysis(Module):
 
         # selection on photons
         for i in range(0,len(photons)):
-            if  photons[i].pt>20  and  abs(photons[i].eta)<2.5  and  photons[i].cutBased>=3: 
+            if  photons[i].pt>20  and  abs(photons[i].eta)<2.5  and  photons[i].cutBased>=3 and photons[i].genPartFlav==1: 
                 photon_select.append(i)
         if len(photon_select)==0:
             return False                        #reject event if there is no photon selected in the event
@@ -119,7 +119,7 @@ class WZAAnalysis(Module):
                 dileptonmass = -1.0
                 dileptonmass = (muons[muon_select[0]].p4()+muons[muon_select[1]].p4()).M()
                 # if dileptonmass >= 60 and dileptonmass <= 120:
-                print "a=",photon_select, "e=",electron_select, "mu=",muon_select
+                # print "a=",photon_select, "e=",electron_select, "mu=",muon_select
                 emumu_dilepton = True
 
         if emumu_dilepton == False: 
@@ -188,10 +188,13 @@ class WZAAnalysis(Module):
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv4/ttZJets_13TeV_madgraphMLM/NANOAODSIM/Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/280000/AF15D61D-C169-1F49-B287-DCF0B7F44B8B.root"]
 # files=["root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAODv6/tZq_ll_4f_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7_ext1-v1/280000/A85C5B62-D4C8-6845-B005-C0CE9B0AB4EA.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_15_test_submit/10k/SMP-RunIISummer16NanoAODv6-00310.root"]
+# files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_15_test_submit/WZG_bw15_420k.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_30_test_submit/10k/SMP-RunIISummer16NanoAODv6-00310.root"]
+# files=["/afs/cern.ch/work/s/sdeng/config_file/bwcutoff_30_test_submit/WZG_bw30_232k.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTWJetsToLNu.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTZJets.root"]
-files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
+files=["/afs/cern.ch/work/s/sdeng/config_file/background/WZ.root"]
+# files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
 p=PostProcessor(".",files,branchsel="input_branch_sel.txt",modules=[countHistogramsProducer(),WZAAnalysis()],provenance=True,outputbranchsel="output_branch_sel.txt")
 p.run()
 
