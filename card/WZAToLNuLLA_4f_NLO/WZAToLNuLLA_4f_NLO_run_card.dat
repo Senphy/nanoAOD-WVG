@@ -144,3 +144,7 @@ average = event_norm ! Normalize events to sum or average to the X sect.
 #***********************************************************************
  4 = maxjetflavor
 #***********************************************************************
+# Store reweight information in the LHE file for off-line model-       *
+# parameter reweighting at NLO+PS accuracy                             *
+#***********************************************************************
+ True     = store_rwgt_info ! Store info for reweighting in LHE file
