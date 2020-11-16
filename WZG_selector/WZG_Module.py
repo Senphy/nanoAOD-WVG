@@ -12,7 +12,7 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import deltaR
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsProducer
+
 
 test=0
 MET_pass = 0
@@ -30,7 +30,8 @@ btagjet_reject = 0
 none_photon_reject = 0
 same_charge_reject_eee = 0
 same_charge_reject_mumumu = 0
-class WZAAnalysis(Module):
+
+class WZG_Producer(Module):
     def __init__(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -69,7 +70,8 @@ class WZAAnalysis(Module):
         dileptonp4 = ROOT.TLorentzVector()
         photons_select = []
         electrons_select = []
-        muons_select = [] 
+        tight_muons = [] 
+        loose_but_not_tight_muons = []
         # Record the pass numbers for each cut. Noticed that for efficiency, those who can't pass the MET cut may not be counted because it will pass to next event directly.
 
         global MET_pass
@@ -88,6 +90,7 @@ class WZAAnalysis(Module):
         global none_photon_reject
         global same_charge_reject_eee
         global same_charge_reject_mumumu
+        test += 1
 
         # selection on MET. Pass to next event directly if fail.
         if  event.MET_pt>20:
@@ -103,8 +106,11 @@ class WZAAnalysis(Module):
                 continue
             if abs(muons[i].eta) > 2.5:
                 continue
-            muons_select.append(i)
-            muon_pass += 1
+            if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
+                tight_muons.append(i)
+                muon_pass += 1
+            elif muons[i].pfRelIso04_all < 0.4
+                loose_but_not_tight_muons.append(i)
 
 
         # selection on electrons
@@ -128,8 +134,8 @@ class WZAAnalysis(Module):
                 continue
 
             pass_lepton_dr_cut = True
-            for j in range(0,len(muons_select)):
-                if deltaR(muons[muons_select[j]].eta,muons[muons_select[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
+            for j in range(0,len(tight_muons)):
+                if deltaR(muons[tight_muons[j]].eta,muons[tight_muons[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
                     pass_lepton_dr_cut = False
             for j in range(0,len(electrons_select)):
                 if deltaR(electrons[electrons_select[j]].eta,electrons[electrons_select[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
@@ -145,11 +151,11 @@ class WZAAnalysis(Module):
            return False                        #reject event if there is not exact one photon in the event 
 
 
-        if len(electrons_select)==0 and len(muons_select)==0:      #reject event if there is no lepton selected in the event
+        if len(electrons_select)==0 and len(tight_muons)==0:      #reject event if there is no lepton selected in the event
             none_lepton_reject += 1
             return False
         
-        if len(electrons_select)+len(muons_select) != 3:      #reject event if there are not exactly three leptons
+        if len(electrons_select)+len(tight_muons) != 3:      #reject event if there are not exactly three leptons
             none_3lepton_reject += 1
             return False
 
@@ -162,17 +168,17 @@ class WZAAnalysis(Module):
 
         # emumu
         dileptonmass = -1.0
-        if len(muons_select)==2 and len(electrons_select)==1:  # emumu channel 
-            if muons[muons_select[0]].pdgId == -muons[muons_select[1]].pdgId:
-                dileptonmass = (muons[muons_select[0]].p4() + muons[muons_select[1]].p4()).M()
+        if len(tight_muons)==2 and len(electrons_select)==1:  # emumu channel 
+            if muons[tight_muons[0]].pdgId == -muons[tight_muons[1]].pdgId:
+                dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
                 # if dileptonmass >= 60 and dileptonmass <= 120:
-                # print "a=",photons_select, "e=",electrons_select, "mu=",muons_select
+                # print "a=",photons_select, "e=",electrons_select, "mu=",tight_muons
             if dileptonmass >= 0: 
                 channel = 1
                 emumu_pass += 1
 
         # muee
-        if len(muons_select)==1 and len(electrons_select)==2:
+        if len(tight_muons)==1 and len(electrons_select)==2:
             if electrons[electrons_select[0]].pdgId == -electrons[electrons_select[1]].pdgId:
                 dileptonmass = (electrons[electrons_select[0]].p4() + electrons[electrons_select[1]].p4()).M()
             if dileptonmass >= 0:
@@ -180,7 +186,7 @@ class WZAAnalysis(Module):
                 muee_pass += 1
 
         # eee 
-        if len(electrons_select)==3 and len(muons_select)==0:
+        if len(electrons_select)==3 and len(tight_muons)==0:
             # move the different charge lepton to the end for further analysis
             if electrons[electrons_select[0]].charge == -electrons[electrons_select[1]].charge:
                 if electrons[electrons_select[0]].charge == electrons[electrons_select[2]].charge:
@@ -208,27 +214,27 @@ class WZAAnalysis(Module):
                 eee_pass += 1
 
         # mumumu
-        if len(muons_select)==3 and len(electrons_select)==0:
+        if len(tight_muons)==3 and len(electrons_select)==0:
             # move the different charge lepton to the end for further analysis
-            if muons[muons_select[0]].charge == -muons[muons_select[1]].charge:
-                if muons[muons_select[0]].charge == muons[muons_select[2]].charge:
-                    muons_select[1],muons_select[2] = muons_select[2],muons_select[1] # e.g. +-+ -> ++-
+            if muons[tight_muons[0]].charge == -muons[tight_muons[1]].charge:
+                if muons[tight_muons[0]].charge == muons[tight_muons[2]].charge:
+                    tight_muons[1],tight_muons[2] = tight_muons[2],tight_muons[1] # e.g. +-+ -> ++-
                 else:
-                    muons_select[0],muons_select[2] = muons_select[2],muons_select[0] # e.g. -++ -> ++-
+                    tight_muons[0],tight_muons[2] = tight_muons[2],tight_muons[0] # e.g. -++ -> ++-
             else:
-                if muons[muons_select[0]].charge == muons[muons_select[2]].charge:
+                if muons[tight_muons[0]].charge == muons[tight_muons[2]].charge:
                     same_charge_reject_mumumu += 1
                     return False                                                      # reject events for +++/---
             
             # compute mll and compare to mz, leptons with cloest mll to mz are considered to be z_leptons. Remaining lepton is w_lepton.
             mll13 = -1.0
             mll23 = -1.0
-            mll13 = (muons[muons_select[0]].p4() + muons[muons_select[2]].p4()).M()
-            mll23 = (muons[muons_select[1]].p4() + muons[muons_select[2]].p4()).M()
+            mll13 = (muons[tight_muons[0]].p4() + muons[tight_muons[2]].p4()).M()
+            mll23 = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4()).M()
             if abs(mll13 - 91.188) > abs(mll23 - 91.188):
                 dileptonmass = mll23
             else:
-                muons_select[0],muons_select[1] = muons_select[1],muons_select[0] # move the w_lepton to the first one
+                tight_muons[0],tight_muons[1] = tight_muons[1],tight_muons[0] # move the w_lepton to the first one
                 dileptonmass = mll13
             
             if dileptonmass >= 0:
@@ -256,8 +262,8 @@ class WZAAnalysis(Module):
                 for j in range(0,len(electrons_select)):
                     if deltaR(jets[i].eta,jets[i].phi,electrons[electrons_select[j]].eta,electrons[electrons_select[j]].phi) < 0.3:
                         btag_cut = False
-                for j in range(0,len(muons_select)):
-                    if deltaR(jets[i].eta,jets[i].phi,muons[muons_select[j]].eta,muons[muons_select[j]].phi) < 0.3:
+                for j in range(0,len(tight_muons)):
+                    if deltaR(jets[i].eta,jets[i].phi,muons[tight_muons[j]].eta,muons[tight_muons[j]].phi) < 0.3:
                         btag_cut = False
             if btag_cut == True:
                 btagjet_reject += 1
@@ -283,16 +289,16 @@ class WZAAnalysis(Module):
             self.out.fillBranch("w_lepton_pt",  electrons[electrons_select[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[electrons_select[0]].eta)
             self.out.fillBranch("w_lepton_phi", electrons[electrons_select[0]].phi)
-            self.out.fillBranch("z_lepton1_pt", muons[muons_select[0]].pt)
-            self.out.fillBranch("z_lepton1_eta",muons[muons_select[0]].eta)
-            self.out.fillBranch("z_lepton1_phi",muons[muons_select[0]].phi)
-            self.out.fillBranch("z_lepton2_pt", muons[muons_select[1]].pt)
-            self.out.fillBranch("z_lepton2_eta",muons[muons_select[1]].eta)
-            self.out.fillBranch("z_lepton2_phi",muons[muons_select[1]].phi)
+            self.out.fillBranch("z_lepton1_pt", muons[tight_muons[0]].pt)
+            self.out.fillBranch("z_lepton1_eta",muons[tight_muons[0]].eta)
+            self.out.fillBranch("z_lepton1_phi",muons[tight_muons[0]].phi)
+            self.out.fillBranch("z_lepton2_pt", muons[tight_muons[1]].pt)
+            self.out.fillBranch("z_lepton2_eta",muons[tight_muons[1]].eta)
+            self.out.fillBranch("z_lepton2_phi",muons[tight_muons[1]].phi)
         elif channel == 2:
-            self.out.fillBranch("w_lepton_pt",  muons[muons_select[0]].pt)
-            self.out.fillBranch("w_lepton_eta", muons[muons_select[0]].eta)
-            self.out.fillBranch("w_lepton_phi", muons[muons_select[0]].phi)
+            self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
+            self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
+            self.out.fillBranch("w_lepton_phi", muons[tight_muons[0]].phi)
             self.out.fillBranch("z_lepton1_pt", electrons[electrons_select[0]].pt)
             self.out.fillBranch("z_lepton1_eta",electrons[electrons_select[0]].eta)
             self.out.fillBranch("z_lepton1_phi",electrons[electrons_select[0]].phi)
@@ -310,15 +316,15 @@ class WZAAnalysis(Module):
             self.out.fillBranch("z_lepton2_eta",electrons[electrons_select[2]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[electrons_select[2]].phi)
         elif channel == 4:
-            self.out.fillBranch("w_lepton_pt",  muons[muons_select[0]].pt)
-            self.out.fillBranch("w_lepton_eta", muons[muons_select[0]].eta)
-            self.out.fillBranch("w_lepton_phi", muons[muons_select[0]].phi)
-            self.out.fillBranch("z_lepton1_pt", muons[muons_select[1]].pt)
-            self.out.fillBranch("z_lepton1_eta",muons[muons_select[1]].eta)
-            self.out.fillBranch("z_lepton1_phi",muons[muons_select[1]].phi)
-            self.out.fillBranch("z_lepton2_pt", muons[muons_select[2]].pt)
-            self.out.fillBranch("z_lepton2_eta",muons[muons_select[2]].eta)
-            self.out.fillBranch("z_lepton2_phi",muons[muons_select[2]].phi)
+            self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
+            self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
+            self.out.fillBranch("w_lepton_phi", muons[tight_muons[0]].phi)
+            self.out.fillBranch("z_lepton1_pt", muons[tight_muons[1]].pt)
+            self.out.fillBranch("z_lepton1_eta",muons[tight_muons[1]].eta)
+            self.out.fillBranch("z_lepton1_phi",muons[tight_muons[1]].phi)
+            self.out.fillBranch("z_lepton2_pt", muons[tight_muons[2]].pt)
+            self.out.fillBranch("z_lepton2_eta",muons[tight_muons[2]].eta)
+            self.out.fillBranch("z_lepton2_phi",muons[tight_muons[2]].phi)
         self.out.fillBranch("event",event.event)
         self.out.fillBranch("dilepton_mass",dileptonmass)
         self.out.fillBranch("Generator_weight",event.Generator_weight)
@@ -326,27 +332,6 @@ class WZAAnalysis(Module):
 
         return True
 
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTWJetsToLNu.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTZJets.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/WZ.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
-files=["/eos/user/s/sdeng/WZG_analysis/final/2016/wza_full_60k.root"]
-p=PostProcessor(".",files,branchsel="input_branch_sel.txt",modules=[countHistogramsProducer(),WZAAnalysis()],provenance=True,outputbranchsel="output_branch_sel.txt")
-p.run()
+# define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-print "MET_pass","\t","=","\t",MET_pass
-print "muon_pass","\t","=","\t",muon_pass 
-print "electron_pass","\t","=","\t",electron_pass
-print "photon_pass","\t","=","\t",photon_pass
-print
-print "none_photon_reject","\t","=","\t",none_photon_reject
-print "none_lepton_reject","\t","=","\t",none_lepton_reject
-print "none_3lepton_reject","\t","=","\t",none_3lepton_reject
-print "same_charge_reject_eee","\t","=","\t",same_charge_reject_eee
-print "same_charge_reject_mumumu","\t","=","\t",same_charge_reject_mumumu
-print
-print "emumu_pass","\t","=","\t",emumu_pass
-print "muee_pass","\t","=","\t",muee_pass
-print "eee_pass","\t","=","\t",eee_pass
-print "mumumu_pass","\t","=","\t",mumumu_pass
-print "btagjet_reject","\t","=","\t",btagjet_reject
+# WZG_Module = lambda : WZG_Producer()

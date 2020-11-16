@@ -1,0 +1,10 @@
+# this is a comment
+drop * # start with all
+keep Electron*
+keep Muon*
+keep Photon*
+keep *event*
+keep MET*
+keep *gen*
+keep *Gen*
+keep Jet*
