@@ -9,15 +9,40 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModu
 # from WZG_Module import * 
 import WZG_Module as WZG
 
+import argparse
+import re
+import optparse
+import DAS_filesearch as search
+
+
+parser = argparse.ArgumentParser(description='dataset -> file path')
+parser.add_argument('-y', dest='year', default='2016', help='year of dataset')
+parser.add_argument('-n', dest='name', default='tZq_ll', help='dataset name in short')
+args = parser.parse_args()
+
+print args.year
+print args.name
+print args
+
+if args.name == 'tZq_ll':
+    if args.year == '2016': dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
+if args.name == 'WZ':
+    pass
+
+search.getFilePath(dataset)
+files = []
+with open("filepath.txt") as f:
+    lines = f.readlines()
+    for line in lines:
+        line = line.rstrip('\n')
+        files.append(line)
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTWJetsToLNu.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTZJets.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/WZ.root"]
 # files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
+print files
 
-dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM" 
-os.system("/cvmfs/cms.cern.ch/common/dasgoclient --query=\"file dataset="+dataset+"\" -limit=0")
 
-files=["/eos/user/s/sdeng/WZG_analysis/final/2016/wza_full_60k.root"]
 p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
 p.run()
 

@@ -109,13 +109,13 @@ class WZG_Producer(Module):
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
                 muon_pass += 1
-            elif muons[i].pfRelIso04_all < 0.4
+            elif muons[i].pfRelIso04_all < 0.4:
                 loose_but_not_tight_muons.append(i)
 
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            if electrons[i].pt < 20:
+            if electrons[i].pt/electrons[i].eCorr < 20:
                 continue
             if abs(electrons[i].eta) >  2.5:
                 continue
@@ -128,7 +128,7 @@ class WZG_Producer(Module):
         for i in range(0,len(photons)):
             if not photons[i].electronVeto:
                 continue
-            if photons[i].pt < 20:
+            if photons[i].pt/photons[i].eCorr < 20:
                 continue
             if abs(photons[i].eta) > 2.5:
                 continue
