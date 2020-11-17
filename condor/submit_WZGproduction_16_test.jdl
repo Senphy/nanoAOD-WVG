@@ -1,0 +1,18 @@
+universe = vanilla
+executable = slc6_active_WZGproduction_16_test.sh
+requirements = (OpSysAndVer =?= "CentOS7")
+
+Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
+use_x509userproxy  = true
++JobFlavour = "testmatch"
+
+should_transfer_files = YES
+transfer_input_files = $(Proxy_path),randomizeSeeds.py,WZG_scheme3_slc6_amd64_gcc630_CMSSW_9_3_16_tarball.tar.xz,pileup_filelist_16.txt,wrapper_WZG_16_test.sh,cmssw-cc6
+RequestCpus = 4
+error = log/job_WZG.err_$(Cluster)-$(Process)
+output = log/job_WZG.out_$(Cluster)-$(Process)
+log = log/job_WZG.log_$(Cluster)-$(Process)
+transfer_output_remaps  = "SMP-RunIISummer16NanoAODv6-00310.root = /eos/user/s/sdeng/WZG_analysis/wza_lnuza_16/WZG_lnuza_16_Nano_$(Cluster)_$(Process).root"
+when_to_transfer_output = ON_EXIT
+queue 100 
+

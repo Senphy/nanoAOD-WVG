@@ -1,0 +1,2 @@
+/store/mc/RunIISpring15PrePremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/50000/B227E846-2981-E611-8308-549F3525B220.root
+/store/mc/RunIISpring15PrePremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/50000/5CB96541-2A81-E611-B55E-D4AE526DF45D.root
