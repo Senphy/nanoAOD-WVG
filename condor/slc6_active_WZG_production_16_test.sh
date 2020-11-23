@@ -15,4 +15,4 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
 
-cat wrapper_WZGproduction_16_test.sh | bash cmssw-cc6
+cat wrapper_WZG_production_16_test.sh | bash cmssw-cc6

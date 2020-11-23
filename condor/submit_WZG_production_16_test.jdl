@@ -1,5 +1,5 @@
 universe = vanilla
-executable = slc6_active_WZGproduction_16_test.sh
+executable = slc6_active_WZG_production_16_test.sh
 requirements = (OpSysAndVer =?= "CentOS7")
 
 Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
