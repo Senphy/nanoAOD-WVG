@@ -69,7 +69,7 @@ with open ("Submit_WZG_Postproc/wrapper_"+args.name+"_"+args.year+".sh","w+") as
     f.write("scram b -j4\n\n")
     f.write("cd PhysicsTools/NanoAODTools/WZG_selector\n")
     f.write("cp ${initial_path}/filepath_"+args.name+"_"+args.year+".txt .\n" )
-    f.write("python WZG_postproc.py -m condor\n\n")
+    f.write("python WZG_postproc.py -m condor -n "+args.name+" -y "+args.year"\n\n")
     f.write("python ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/scripts/haddnano.py test.py *.root\n")
     f.write("cp test.root ${initial_path}\n")
 

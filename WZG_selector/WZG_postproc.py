@@ -47,9 +47,8 @@ if args.file == '':
     elif args.name == 'ttZJets':
         if args.year == '2016': dataset = "/ttZJets_13TeV_madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
     else:
-        if args.mode == 'local':
-            print "unknown dataset name"
-            sys.exit(0)
+        print "unknown dataset name"
+        sys.exit(0)
 
 else:
 
