@@ -94,10 +94,10 @@ class WZG_Producer(Module):
 
         # selection on MET. Pass to next event directly if fail.
         if  event.MET_pt>20:
-            self.out.fillBranch("MET",event.MET_pt)
             MET_pass += 1
         else:
             return False  
+
 
 
         #selection on muons
@@ -113,6 +113,7 @@ class WZG_Producer(Module):
                 loose_but_not_tight_muons.append(i)
 
 
+
         # selection on electrons
         for i in range(0,len(electrons)):
             if electrons[i].pt/electrons[i].eCorr < 20:
@@ -122,6 +123,7 @@ class WZG_Producer(Module):
             if electrons[i].cutBased >= 3:
                 electrons_select.append(i)
                 electron_pass += 1
+
 
 
         # selection on photons
@@ -151,6 +153,8 @@ class WZG_Producer(Module):
            return False                        #reject event if there is not exact one photon in the event 
 
 
+
+
         if len(electrons_select)==0 and len(tight_muons)==0:      #reject event if there is no lepton selected in the event
             none_lepton_reject += 1
             return False
@@ -158,6 +162,8 @@ class WZG_Producer(Module):
         if len(electrons_select)+len(tight_muons) != 3:      #reject event if there are not exactly three leptons
             none_3lepton_reject += 1
             return False
+
+
 
         #dilepton mass selection and channel selection
         channel = 0 
@@ -177,6 +183,8 @@ class WZG_Producer(Module):
                 channel = 1
                 emumu_pass += 1
 
+
+
         # muee
         if len(tight_muons)==1 and len(electrons_select)==2:
             if electrons[electrons_select[0]].pdgId == -electrons[electrons_select[1]].pdgId:
@@ -184,6 +192,8 @@ class WZG_Producer(Module):
             if dileptonmass >= 0:
                 channel = 2
                 muee_pass += 1
+
+
 
         # eee 
         if len(electrons_select)==3 and len(tight_muons)==0:
@@ -212,6 +222,8 @@ class WZG_Producer(Module):
             if dileptonmass >= 0:
                 channel = 3
                 eee_pass += 1
+
+
 
         # mumumu
         if len(tight_muons)==3 and len(electrons_select)==0:
@@ -329,6 +341,7 @@ class WZG_Producer(Module):
         self.out.fillBranch("dilepton_mass",dileptonmass)
         self.out.fillBranch("Generator_weight",event.Generator_weight)
         self.out.fillBranch("channel_mark",channel)
+        self.out.fillBranch("MET",event.MET_pt)
 
         return True
 

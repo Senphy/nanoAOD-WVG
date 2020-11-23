@@ -4,15 +4,15 @@ import re
 import optparse
 
 
-def getFilePath(dataset):
+def getFilePath(dataset, name):
 
-    os.system("/cvmfs/cms.cern.ch/common/dasgoclient --query=\"file dataset="+dataset+"\" -limit=0 > filepath.txt")
+    os.system("/cvmfs/cms.cern.ch/common/dasgoclient --query=\"file dataset="+dataset+"\" -limit=0 > filepath_"+name+".txt")
 
-    with open ("filepath.txt") as f:
+    with open ("filepath_"+name+".txt") as f:
         lines = f.readlines()
         f.close()
-    with open ("filepath.txt","w+") as f:
+    with open ("filepath_"+name+".txt","w+") as f:
         for line in lines:
-            f.write("root://xrootd-cms.infn.it//eos/cms"+line)
+            f.write("root://cms-xrd-global.cern.ch//eos/cms"+line)
         f.close()
 

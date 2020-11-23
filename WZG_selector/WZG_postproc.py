@@ -15,36 +15,79 @@ import optparse
 import DAS_filesearch as search
 
 
-parser = argparse.ArgumentParser(description='dataset -> file path')
+parser = argparse.ArgumentParser(description='baseline selection')
+parser.add_argument('-f', dest='file', default='', help='local file input')
 parser.add_argument('-y', dest='year', default='2016', help='year of dataset')
-parser.add_argument('-n', dest='name', default='tZq_ll', help='dataset name in short')
+parser.add_argument('-m', dest='mode', default='local', help='runmode local/condor')
+parser.add_argument('-n', dest='name', default='test', help='dataset name in short, currently support' 
+    '\n tZq_ll'
+    '\n WZ'
+    '\n TTWJetsToLNu'
+    '\n ttZJets')
 args = parser.parse_args()
 
-print args.year
-print args.name
-print args
-
-if args.name == 'tZq_ll':
-    if args.year == '2016': dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
-if args.name == 'WZ':
-    pass
-
-search.getFilePath(dataset)
-files = []
-with open("filepath.txt") as f:
-    lines = f.readlines()
-    for line in lines:
-        line = line.rstrip('\n')
-        files.append(line)
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTWJetsToLNu.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/TTZJets.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/WZ.root"]
-# files=["/afs/cern.ch/work/s/sdeng/config_file/background/tZq_ll.root"]
-print files
+print "mode: ", args.mode
+print "year: ", args.year
+print "dataset_name: ", args.name
 
 
-p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
-p.run()
+
+
+# classify input files
+if args.file == '':
+
+    print "no local file input, use DAS file"
+    dataset = ''
+    if args.name == 'tZq_ll':
+        if args.year == '2016': dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
+    elif args.name == 'WZ':
+        if args.year == '2016': dataset = "/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
+    elif args.name == 'TTWJetsToLNu':
+        if args.year == '2016': dataset = "/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
+    elif args.name == 'ttZJets':
+        if args.year == '2016': dataset = "/ttZJets_13TeV_madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
+    else:
+        print "unknown dataset name"
+        sys.exit(0)
+
+else:
+
+    print "input file: "+args.file
+
+
+
+
+if args.file == '':
+    files = []
+
+    # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
+    if args.mode == 'condor':
+        pass
+
+    else:
+        search.getFilePath(dataset, args.name+"_"+args.year)
+
+    with open("filepath_"+args.name+"_"+args.year+".txt") as f:
+        lines = f.readlines()
+        for line in lines:
+            line = line.rstrip('\n')
+            files.append(line)
+
+    print files
+
+    p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
+    p.run()
+
+
+else:    
+    files = args.file.rsplit(',')
+    print files
+
+    p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
+    p.run()
+
+
+
 
 print "MET_pass","\t","=","\t",WZG.MET_pass
 print "muon_pass","\t","=","\t",WZG.muon_pass 
