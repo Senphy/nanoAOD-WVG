@@ -41,23 +41,26 @@ else:
 # prepare submit code
 Proxy_path = "/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738"
 with open ("Submit_WZG_Postproc/submit_"+args.name+"_"+args.year+".jdl","w+") as f:
-    f.write("universe = vanilla\n")
-    f.write("arguments = $(Proxy_path)\n")
-    f.write("executable = wrapper_"+args.name+"_"+args.year+".sh\n")
-    f.write("requirements = (OpSysAndVer =?= \"CentOS7\")\n")
-    f.write("transfer_input_files = filepath_"+args.name+"_"+args.year+".txt\n")
-    f.write("+JobFlavour = testmatch\n")
-    f.write("should_transfer_files = YES\n")
-    f.write("RequestCpus = 4\n")
-    f.write("error = log/"+args.name+"_"+args.year+".err\n")
-    f.write("output = log/"+args.name+"_"+args.year+".output\n")
-    f.write("log = log/"+args.name+"_"+args.year+".log\n")
+    f.write("universe \t = vanilla\n")
+    f.write("executable \t = wrapper_"+args.name+"_"+args.year+".sh\n")
+    f.write("requirements \t = (OpSysAndVer =?= \"CentOS7\")\n")
+    f.write("+JobFlavour \t = testmatch\n\n")
+    f.write("request_cpus \t = 4\n")
+    f.write("request_memory \t = 4096\n")
+    f.write("request_disk \t = 4096000\n\n")
+    f.write("error \t = log/"+args.name+"_"+args.year+".err\n")
+    f.write("output \t = log/"+args.name+"_"+args.year+".output\n")
+    f.write("log \t = log/"+args.name+"_"+args.year+".log\n\n")
+    f.write("should_transfer_files \t = YES\n")
+    f.write("transfer_input_files \t = filepath_"+args.name+"_"+args.year+".txt\n")
+    f.write("transfer_output_remaps \t = \"test.root = "+args.name+"_"+args.year+".root\"\n")
+    f.write("when_to_transfer_output \t = ON_EXIT\n")
     f.write("queue 1")
 f.close()
 
 # prepare shell
 with open ("Submit_WZG_Postproc/wrapper_"+args.name+"_"+args.year+".sh","w+") as f:
-    f.write("#!usr/bin/env bash\n\n")
+    f.write("#!/bin/bash\n\n")
     f.write("voms-proxy-info -all\n")
     f.write("voms-proxy-info -all -file "+Proxy_path+"\n")
     f.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n\n")
