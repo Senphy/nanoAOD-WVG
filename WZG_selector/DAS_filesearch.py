@@ -13,6 +13,7 @@ def getFilePath(dataset, name):
         f.close()
     with open ("filepath_"+name+".txt","w+") as f:
         for line in lines:
-            f.write("root://cms-xrd-global.cern.ch//eos/cms"+line)
+            # f.write("root://cms-xrd-global.cern.ch//eos/cms"+line)
+            f.write("root://cms-xrd-global.cern.ch/"+line)
         f.close()
 
