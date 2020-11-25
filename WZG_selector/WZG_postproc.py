@@ -50,18 +50,11 @@ if args.file == '':
         print "unknown dataset name"
         sys.exit(0)
 
-else:
 
-    print "input file: "+args.file
-
-
-
-
-if args.file == '':
     files = []
 
     # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
-    if args.mode == 'condor':
+    if 'condor' in args.mode:
         pass
 
     else:
@@ -73,21 +66,33 @@ if args.file == '':
             line = line.rstrip('\n')
             files.append(line)
 
-    print files
+    print 'from DAS input files: ',files
 
     p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
     p.run()
 
 
 else:    
+    print args.mode
     # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
-    if args.mode == 'condor':
-        files = args.file
-        print files
-    
+    # designed for single file here in order to run in parallel
+    if 'condor' in args.mode:
+        files = []
+        files.append(args.file)
+        print 'input files: ',files
+        print 'test'
+
+    # local specific file input, also support root://xxx    
     else:
-        files = args.file.rsplit(',')
-        print files
+        if not ',' in args.file:
+            files = args.file
+
+        else:
+            files = []
+            for i in args.file.split(','):
+                files.append(i)
+
+        print 'input files: ',files
 
     p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
     p.run()
