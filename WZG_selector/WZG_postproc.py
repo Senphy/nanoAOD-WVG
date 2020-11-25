@@ -111,4 +111,4 @@ print "muee_pass","\t","=","\t",WZG.muee_pass
 print "eee_pass","\t","=","\t",WZG.eee_pass
 print "mumumu_pass","\t","=","\t",WZG.mumumu_pass
 print "btagjet_reject","\t","=","\t",WZG.btagjet_reject
-print WZG.test
+print "total processed events","\t","=","\t",WZG.test

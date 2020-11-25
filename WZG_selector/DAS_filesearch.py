@@ -38,6 +38,8 @@ def getFilePath(dataset, name):
                     print "no accessable site for "+line
                     os.remove("test_ValidSite.log")
                     sys.exit(0)
+
+
                 test.close()
 
 
@@ -46,4 +48,7 @@ def getFilePath(dataset, name):
 
         # f.write("root://cms-xrd-global.cern.ch//eos/cms"+line)
         f.close()
+
+if __name__ =="__main__":
+    getFilePath(dataset,name)
 
