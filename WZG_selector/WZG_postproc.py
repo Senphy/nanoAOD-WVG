@@ -80,8 +80,14 @@ if args.file == '':
 
 
 else:    
-    files = args.file.rsplit(',')
-    print files
+    # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
+    if args.mode == 'condor':
+        files = args.file
+        print files
+    
+    else:
+        files = args.file.rsplit(',')
+        print files
 
     p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
     p.run()
