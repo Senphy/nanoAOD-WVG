@@ -73,11 +73,10 @@ if args.file == '':
 
 
 else:    
-    print args.mode
+    files = []
     # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
     # designed for single file here in order to run in parallel
     if 'condor' in args.mode:
-        files = []
         files.append(args.file)
         print 'input files: ',files
         print 'test'
@@ -85,10 +84,9 @@ else:
     # local specific file input, also support root://xxx    
     else:
         if not ',' in args.file:
-            files = args.file
+            files.append(args.file)
 
         else:
-            files = []
             for i in args.file.split(','):
                 files.append(i)
 

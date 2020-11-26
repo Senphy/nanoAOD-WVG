@@ -78,7 +78,7 @@ with open ("filepath_"+args.name+"_"+args.year+".txt","r") as f0:
         # prepare shell
         with open ("wrapper_"+args.name+"_"+args.year+"_file"+str(i)+"_"+filename+".sh","w+") as f:
             f.write("#!/bin/bash\n\n")
-            f.write("voms-proxy-info -all\n")
+            # f.write("voms-proxy-info -all\n")
             f.write("voms-proxy-info -all -file "+Proxy_path+"\n")
             f.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n\n")
             f.write("initial_path=${PWD}\n")
