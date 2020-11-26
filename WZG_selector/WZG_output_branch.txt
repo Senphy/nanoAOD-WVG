@@ -6,6 +6,7 @@ keep *photon*
 keep MET
 keep event
 keep *lepton*
+keep *channel*
 keep dilepton*
 keep *weight*
 # keep max*
