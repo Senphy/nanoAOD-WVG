@@ -38,7 +38,7 @@ else:
 
 os.system("mkdir -p Submit_WZG_Postproc_"+args.name+"_"+args.year+"/log")
 os.chdir("Submit_WZG_Postproc_"+args.name+"_"+args.year)
-search.getFilePath(dataset, args.name+"_"+args.year)
+search.getLFN(dataset, args.name+"_"+args.year)
 
 
 with open ("filepath_"+args.name+"_"+args.year+".txt","r") as f0:

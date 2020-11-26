@@ -58,13 +58,13 @@ if args.file == '':
         pass
 
     else:
-        search.getFilePath(dataset, args.name+"_"+args.year)
+        search.getLFN(dataset, args.name+"_"+args.year)
+        with open ("filepath_"+args.name+"_"+args.year+".txt","r") as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.rstrip('\n')
+                files.append(search.getValidSite(line)+line)
 
-    with open("filepath_"+args.name+"_"+args.year+".txt") as f:
-        lines = f.readlines()
-        for line in lines:
-            line = line.rstrip('\n')
-            files.append(line)
 
     print 'from DAS input files: ',files
 
@@ -77,7 +77,7 @@ else:
     # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
     # designed for single file here in order to run in parallel
     if 'condor' in args.mode:
-        files.append(args.file)
+        files.append(search.getValidSite(args.file) + args.file)
         print 'input files: ',files
         print 'test'
 
