@@ -17,4 +17,4 @@ define w = w+ w-
 
 generate p p > w l+ l- a [QCD] @0
 
-output WZGToLNuLLA_4f_NLO -nojpeg
+output WZAToLNuLLA_4f_NLO -nojpeg
