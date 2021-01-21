@@ -130,6 +130,8 @@ class WZG_Producer(Module):
         for i in range(0,len(photons)):
             if not photons[i].electronVeto:
                 continue
+            if photons[i].genPartFlav != 1:
+                continue
             if photons[i].pt/photons[i].eCorr < 20:
                 continue
             if abs(photons[i].eta) > 2.5:
