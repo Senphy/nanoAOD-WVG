@@ -46,6 +46,7 @@ def merge_log(path):
             valid = f.read()
             if not 'pass' in valid:
                 print filename," corrupted, skipping"
+                merge.append(filename+' corrupted to be ')
                 continue
 
             f.seek(0,0)
