@@ -22,7 +22,10 @@ def getValidSite(filepath):
                 test_lines = test.read()
                 # print test_lines
                 if 'Successfully' in test_lines:
-                    valid_site = test_lines.split('Successfully opened file ')[1].split('/store/mc')[0]
+                    if '/store/mc' in test_lines:
+                        valid_site = test_lines.split('Successfully opened file ')[1].split('/store/mc')[0]
+                    if '/store/data' in test_lines:
+                        valid_site = test_lines.split('Successfully opened file ')[1].split('/store/data')[0]
                     print "valid site for ", filepath, ": ", valid_site, "\n"
                     return(valid_site)
 
