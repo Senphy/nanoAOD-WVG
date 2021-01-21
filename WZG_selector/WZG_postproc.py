@@ -36,21 +36,6 @@ print "dataset_name: ", args.name
 # classify input files
 if args.file == '':
 
-    print "no local file input, use DAS file"
-    dataset = ''
-    if args.name == 'tZq_ll':
-        if args.year == '2016': dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
-    elif args.name == 'WZ':
-        if args.year == '2016': dataset = "/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
-    elif args.name == 'TTWJetsToLNu':
-        if args.year == '2016': dataset = "/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
-    elif args.name == 'ttZJets':
-        if args.year == '2016': dataset = "/ttZJets_13TeV_madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
-    else:
-        print "unknown dataset name"
-        sys.exit(0)
-
-
     files = []
 
     # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
@@ -58,6 +43,19 @@ if args.file == '':
         pass
 
     else:
+        print "no local file input, use DAS file"
+        dataset = ''
+        if args.name == 'tZq_ll':
+            if args.year == '2016': dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
+        elif args.name == 'WZ':
+            if args.year == '2016': dataset = "/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
+        elif args.name == 'TTWJetsToLNu':
+            if args.year == '2016': dataset = "/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
+        elif args.name == 'ttZJets':
+            if args.year == '2016': dataset = "/ttZJets_13TeV_madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
+        else:
+            print "unknown dataset name"
+            sys.exit(0)
         search.getLFN(dataset, args.name+"_"+args.year)
         with open ("filepath_"+args.name+"_"+args.year+".txt","r") as f:
             lines = f.readlines()
