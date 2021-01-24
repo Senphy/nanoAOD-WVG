@@ -22,13 +22,15 @@ parser.add_argument('-f', dest='file', default='', help='root file input')
 parser.add_argument('-j', dest='json', default=None, help='golden json input')
 args = parser.parse_args()
 
-print "Input root file: ", args.file
+files = []
+files.append(args.file)
+print "Input root file: ", files 
 
 # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
 # designed for single file here in order to run in parallel
 # local specific file input, also support root://xxx    
 
-p=PostProcessor(".",args.file,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt",jsonInput=args.json)
+p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt",jsonInput=args.json)
 p.run()
 
 
