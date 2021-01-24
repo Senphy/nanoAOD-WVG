@@ -77,7 +77,7 @@ for dataset in jsons:
             f.write("scram b -j4\n\n")
             f.write("cd PhysicsTools/NanoAODTools/WZG_selector/data\n")
             # f.write("cp ${initial_path}/filepath_"+datasetname+".txt .\n" )
-            f.write("python WZG_postproc_data.py -f "+filepath+" -j"+dataset['json']+"\n\n")
+            f.write("python WZG_postproc_data.py -f "+filepath+" -j "+dataset['json']+"\n\n")
             f.write("cp *.root ${initial_path}")
             # f.write("python ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/scripts/haddnano.py test.root *.root\n")
             # f.write("cp test.root ${initial_path}\n")
