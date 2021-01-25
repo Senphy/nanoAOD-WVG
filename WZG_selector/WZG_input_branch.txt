@@ -8,3 +8,4 @@ keep MET*
 keep *gen*
 keep *Gen*
 keep Jet*
+keep HLT*
