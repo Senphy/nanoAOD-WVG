@@ -1,5 +1,0 @@
-# this is a comment
-drop * # start with all
-keep Electron*
-keep Muon*
-keep Jet*

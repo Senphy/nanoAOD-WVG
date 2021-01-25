@@ -70,6 +70,7 @@ with open ("filepath_"+args.name+"_"+args.year+".txt","r") as f0:
             # f.write("transfer_input_files \t = filepath_"+args.name+"_"+args.year+".txt\n")
             # f.write("transfer_output_remaps \t = \"test.root = "+args.name+"_"+args.year+"_file"+filename+".root\"\n")
             f.write("when_to_transfer_output \t = ON_EXIT\n")
+            f.write("+MaxRuntime = 49600")
             f.write("queue 1")
         f.close()
         print "file",str(i),filename," submit code prepared"
