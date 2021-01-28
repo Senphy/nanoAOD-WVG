@@ -7,7 +7,6 @@ keep event
 keep dilepton*
 keep *channel*
 keep dilepton*
-keep *weight*
 # keep max*
 
 

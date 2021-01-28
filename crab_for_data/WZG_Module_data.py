@@ -51,7 +51,6 @@ class WZG_Producer(Module):
         self.out.branch("w_lepton_eta",  "F")
         self.out.branch("w_lepton_phi",  "F")
         self.out.branch("dilepton_mass",  "F")
-        self.out.branch("Generator_weight","F")
         # self.out.branch("max_CMVA","F")
         # self.out.branch("max_CSVV2","F")
         # self.out.branch("max_DeepB","F")
@@ -339,7 +338,6 @@ class WZG_Producer(Module):
             self.out.fillBranch("z_lepton2_phi",muons[tight_muons[2]].phi)
         self.out.fillBranch("event",event.event)
         self.out.fillBranch("dilepton_mass",dileptonmass)
-        self.out.fillBranch("Generator_weight",event.Generator_weight)
         self.out.fillBranch("channel_mark",channel)
         self.out.fillBranch("MET",event.MET_pt)
 
