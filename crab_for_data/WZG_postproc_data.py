@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
 import os, sys
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsProducer
+from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles, runsAndLumis
 
 # from WZG_Module import * 
 import WZG_Module_data as WZG
@@ -12,25 +14,32 @@ import WZG_Module_data as WZG
 import argparse
 import re
 import optparse
-sys.path.append('..')
+sys.path.append('../WZG_selector')
 import DAS_filesearch as search
 import json
 
 
 parser = argparse.ArgumentParser(description='baseline selection')
-parser.add_argument('-f', dest='file', default='', help='root file input')
-parser.add_argument('-j', dest='json', default=None, help='golden json input')
+parser.add_argument('-f',dest='file',help='input file, if it is not provided, assume as a crab job',default=None)
+parser.add_argument('-y',dest='year',help='the year or data',choices=('2016','2017','2018'),default='2018')
 args = parser.parse_args()
 
-files = []
-files.append(args.file)
+if args.file:
+    files = [args.file]
+else:
+    files = inputFiles()
 print "Input root file: ", files 
 
 # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
 # designed for single file here in order to run in parallel
 # local specific file input, also support root://xxx    
 
-p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt",jsonInput=args.json)
+p=PostProcessor(".",files,
+                branchsel="WZG_input_branch.txt",
+                modules=[countHistogramsProducer(),WZG.WZG_Producer()],
+                provenance=True,
+                outputbranchsel="WZG_output_branch.txt",
+                )
 p.run()
 
 
