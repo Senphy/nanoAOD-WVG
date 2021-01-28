@@ -15,7 +15,7 @@ def getValidSite(filepath):
 
 
             print "Searching for valid site"
-            os.system("cmsRun ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/WZG_selector/test_ValidSite_cfg.py inputFiles=\""+filepath+"\" > test_ValidSite.log 2>&1")
+            os.system("cmsRun ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/WZG_selector/test_ValidSite_cfg.py inputFiles=\""+filepath+"\" > test_ValidSite.log 2>&1")
 
 
             with open ("test_ValidSite.log","r") as test:
@@ -33,8 +33,7 @@ def getValidSite(filepath):
                 else:
                     print "no accessable site for "+filepath
                     os.remove("test_ValidSite.log")
-                    sys.exit(0)
-
+                    return
 
                 test.close()
 

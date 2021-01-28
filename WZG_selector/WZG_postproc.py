@@ -16,82 +16,26 @@ import DAS_filesearch as search
 
 
 parser = argparse.ArgumentParser(description='baseline selection')
-parser.add_argument('-f', dest='file', default='', help='local file input')
-parser.add_argument('-y', dest='year', default='2016', help='year of dataset')
+parser.add_argument('-f', dest='file', default='', help='File input. In local mode it will be the filepath. In condor mode it will be the dataset name')
 parser.add_argument('-m', dest='mode', default='local', help='runmode local/condor')
-parser.add_argument('-n', dest='name', default='test', help='dataset name in short, currently support' 
-    '\n tZq_ll'
-    '\n WZ'
-    '\n TTWJetsToLNu'
-    '\n ttZJets')
 args = parser.parse_args()
 
 print "mode: ", args.mode
-print "year: ", args.year
-print "dataset_name: ", args.name
+print "input file: ", args.file
 
+files = []
+if args.mode == 'condor':
+    files.append(search.getValidSite(args.file)+args.file) 
+else:
+    files.append(args.file)
 
-
-
-# classify input files
-if args.file == '':
-
-    files = []
-
-    # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
-    if 'condor' in args.mode:
-        pass
-
-    else:
-        print "no local file input, use DAS file"
-        dataset = ''
-        if args.name == 'tZq_ll':
-            if args.year == '2016': dataset = "/tZq_ll_4f_13TeV-amcatnlo-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
-        elif args.name == 'WZ':
-            if args.year == '2016': dataset = "/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
-        elif args.name == 'TTWJetsToLNu':
-            if args.year == '2016': dataset = "/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8_ext1-v1/NANOAODSIM"
-        elif args.name == 'ttZJets':
-            if args.year == '2016': dataset = "/ttZJets_13TeV_madgraphMLM-pythia8/RunIISummer16NanoAODv7-PUMoriond17_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1/NANOAODSIM"
-        else:
-            print "unknown dataset name"
-            sys.exit(0)
-        search.getLFN(dataset, args.name+"_"+args.year)
-        with open ("filepath_"+args.name+"_"+args.year+".txt","r") as f:
-            lines = f.readlines()
-            for line in lines:
-                line = line.rstrip('\n')
-                files.append(search.getValidSite(line)+line)
-
-
-    print 'from DAS input files: ',files
-
-    p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
-    p.run()
-
-
-else:    
-    files = []
-    # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
-    # designed for single file here in order to run in parallel
-    if 'condor' in args.mode:
-        files.append(search.getValidSite(args.file) + args.file)
-        print 'input files: ',files
-        print 'test'
-
-    # local specific file input, also support root://xxx    
-    else:
-        if not ',' in args.file:
-            files.append(args.file)
-
-        else:
-            for i in args.file.split(','):
-                files.append(i)
-
-        print 'input files: ',files
-
-    p=PostProcessor(".",files,branchsel="WZG_input_branch.txt",modules=[countHistogramsProducer(),WZG.WZG_Producer()],provenance=True,outputbranchsel="WZG_output_branch.txt")
-    p.run()
+p=PostProcessor(".",files,
+                branchsel="WZG_input_branch.txt",
+                modules=[countHistogramsProducer(),WZG.WZG_Producer()],
+                provenance=True,
+                outputbranchsel="WZG_output_branch.txt",
+                )
+p.run()
 
 
 

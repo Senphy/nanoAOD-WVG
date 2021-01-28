@@ -42,7 +42,7 @@ def getversion(sandbox):
         logger.info("Could not get cmssw release version. Is this a cmssw sandbox?")
         return
 
-    print "Using CMSSW {0}".format(rtname)
+    print("Using CMSSW {0}".format(rtname))
     return
 
 def package(indir, outdir, blacklist=None, update=False, include_all=False, include_dir=None):
