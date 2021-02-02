@@ -105,7 +105,7 @@ if __name__ == '__main__':
         rootfiles = []
         for filename in os.listdir(datasetname):
             if filename.endswith("_Skim.root"):
-                rootfile.append(filename)
+                rootfiles.append(filename)
         print  "Total ", len(rootfiles), " root file to be merged"
 
         os.system("python ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/scripts/haddnano.py "+datasetname+".root "+datasetname+"/*_Skim.root")
