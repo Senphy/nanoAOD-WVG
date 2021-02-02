@@ -110,4 +110,4 @@ if __name__ == '__main__':
 
         os.system("python ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/scripts/haddnano.py "+datasetname+".root "+datasetname+"/*_Skim.root")
         os.system("mv "+datasetname+".root "+dataset['year'])
-        os.system("cp "+datasetname+"/*.merge.log "+dataset['year'])
+        os.system("cp "+datasetname+"/*_merge.log "+dataset['year'])
