@@ -70,7 +70,7 @@ def merge_log(path):
         print filename, " merged"
     
 
-    with open(path + path.rstrip('/') + '_merge.log','w+') as f:
+    with open(path + "/"+path.rstrip('/') + '_merge.log','w+') as f:
         for j in range(0,len(list)):
             f.write(list[j] + '\t=\t' + str(list_value[j]) + '\n')
 
