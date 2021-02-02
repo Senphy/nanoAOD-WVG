@@ -42,7 +42,7 @@ def merge_log(path):
         if not filename.endswith(".output"):
             continue
 
-        with open(path+"log/"+filename,"r") as f:
+        with open(path+"/log/"+filename,"r") as f:
             
             valid = f.read()
             if not 'pass' in valid:
