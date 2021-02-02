@@ -93,11 +93,13 @@ if __name__ == '__main__':
         jsons = json.load(f)
 
     for dataset in jsons:
-        os.mkdir(dataset['year'])
+        if not os.path.exists(dataset['year']):
+            os.mkdir(dataset['year'])
+
         datasetname = dataset['name'].split('/')[1].split('_')[0]+'_'+dataset['year']
         merge_log(datasetname)
 
-        if os.listdir(datasetname+"/"+datasetname+".root"):
+        if os.path.exists(datasetname+"/"+datasetname+".root"):
             os.remove(datasetname+"/"+datasetname+".root")
         
         print  "Total ", len(os.listdir(datasetname+"/"+"*_Skim.root")), " root file to be merged"
