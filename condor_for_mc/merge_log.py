@@ -102,7 +102,11 @@ if __name__ == '__main__':
         if os.path.exists(datasetname+"/"+datasetname+".root"):
             os.remove(datasetname+"/"+datasetname+".root")
         
-        print  "Total ", len(os.listdir(datasetname+"/"+"*_Skim.root")), " root file to be merged"
+        rootfiles = []
+        for filename in os.listdir(datasetname):
+            if filename.endswith("_Skim.root"):
+                rootfile.append(filename)
+        print  "Total ", len(rootfiles), " root file to be merged"
 
         os.system("python ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/scripts/haddnano.py "+datasetname+".root "+datasetname+"/*_Skim.root")
         os.system("mv "+datasetname+".root "+dataset['year'])
