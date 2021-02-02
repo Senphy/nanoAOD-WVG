@@ -39,6 +39,7 @@ p=PostProcessor(".",files,
                 modules=[countHistogramsProducer(),WZG.WZG_Producer()],
                 provenance=True,
                 outputbranchsel="WZG_output_branch.txt",
+                fwkJobReport=True
                 )
 p.run()
 

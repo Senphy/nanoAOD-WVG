@@ -17,3 +17,5 @@ keep *event*
 keep MET*
 keep Jet*
 keep HLT*
+keep run
+keep lumi*

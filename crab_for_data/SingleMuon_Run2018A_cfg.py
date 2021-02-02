@@ -4,7 +4,7 @@ config = Configuration()
 
 config.section_("General")
 config.General.requestName = 'SingleMuon_Run2018A'
-config.General.transferLogs= True
+config.General.transferLogs = False 
 config.General.workArea = 'crab2018'
 
 config.section_("JobType")
@@ -17,8 +17,7 @@ config.JobType.sendPythonFolder  = True
 config.JobType.allowUndistributedCMSSW = True
 
 config.section_("Data")
-# config.Data.inputDataset = '/SingleMuon/Run2018A-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD'
-config.Data.inputDataset = '/SingleMuon/Run2018A-02Apr2020-v1/NANOAOD'
+config.Data.inputDataset = '/SingleMuon/Run2018A-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD'
 #config.Data.inputDBS = 'phys03'
 config.Data.inputDBS = 'global'
 # config.Data.splitting = 'LumiBased'

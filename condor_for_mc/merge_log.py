@@ -1,8 +1,9 @@
 import os,sys
 import argparse
+import json
 
 parser = argparse.ArgumentParser(description="merge log")
-parser.add_argument('-f', dest='file', default='', help='file path')
+parser.add_argument('-f', dest='file', default='', help='json file path')
 
 def merge_log(path):
 
@@ -88,4 +89,19 @@ def merge_log(path):
 
 if __name__ == '__main__':
     # print parser.parse_args().file
-    merge_log(parser.parse_args().file)
+    with open(parser.parse_args().file,"r") as f:
+        jsons = json.load(f)
+
+    for dataset in jsons:
+        os.mkdir(dataset['year'])
+        datasetname = dataset['name'].split('/')[1].split('_')[0]+'_'+dataset['year']
+        merge_log(datasetname)
+
+        if os.listdir(datasetname+"/"+datasetname+".root"):
+            os.remove(datasetname+"/"+datasetname+".root")
+        
+        print  "Total ", len(os.listdir(datasetname+"/"+"*_Skim.root")), " root file to be merged"
+
+        os.system("python ${CMSSW_BASE}/src/PhysicsTools/NanoAODTools/scripts/haddnano.py "+datasetname+".root "+datasetname+"/*_Skim.root")
+        os.system("mv "+datasetname+".root "+dataset['year'])
+        os.system("cp "+datasetname+"/*.merge.log "+dataset['year'])

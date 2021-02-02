@@ -39,3 +39,11 @@ def getValidSite(filepath):
 
 
             os.remove("test_ValidSite.log")
+
+if __name__ == '__main__':
+    getLFN(sys.argv[1], sys.argv[1].split('/')[1])
+    with open('filepath_'+sys.argv[1].split('/')[1]+".txt") as f:
+        lines = f.readlines()
+        for line in lines:
+            line = line.rstrip('\n')
+            getValidSite(line)
