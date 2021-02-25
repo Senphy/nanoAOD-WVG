@@ -10,7 +10,7 @@ config.General.workArea = 'crab2018'
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
-config.JobType.scriptExe = './WZG_crab_script.sh'
+config.JobType.scriptExe = './FR_crab_script.sh'
 config.JobType.inputFiles = ['../../scripts/haddnano.py','./FR_Template_Module.py','./FR_Template_postproc.py','./FR_keep_and_drop.txt','./FR_output_branch_selection.txt','../WZG_selector/DAS_filesearch.py'] #hadd nano will not be needed once nano tools are in cmssw
 # config.JobType.scriptArgs = ['isdata=1','issignal=0','year=2018']
 config.JobType.sendPythonFolder  = True
