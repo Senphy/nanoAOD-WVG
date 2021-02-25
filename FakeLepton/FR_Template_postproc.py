@@ -19,24 +19,23 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 
 if args.isdata:
-    modules = [countHistogramsModule(),FakeLeptonModule()]
+    Modules = [countHistogramsModule(),FakeLeptonModule()]
 else:
-    modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2018(),PrefCorr()]
+    Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2018(),PrefCorr()]
 
 if args.infile:
     infilelist = [args.infile]
     jsoninput = None
     fwkjobreport = False
 else:
-    # from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
+    from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
     infilelist = inputFiles()
     # jsoninput = runsAndLumis()
     fwkjobreport = True
 
 p=PostProcessor(".",infilelist,
-                None,
                 branchsel="FR_keep_and_drop.txt",
-                modules,
+                modules = Modules,
                 provenance=True,
                 justcount=False,
                 noOut=False,

@@ -45,7 +45,7 @@ class FakeLeptonProducer(Module):
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
         jets = Collection(event, "Jet")
-        photons = Collection(event, "Photon")
+        # photons = Collection(event, "Photon")
 
         tight_muons = []
 
