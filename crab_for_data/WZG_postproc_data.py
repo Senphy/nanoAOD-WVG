@@ -26,8 +26,13 @@ args = parser.parse_args()
 
 if args.file:
     files = [args.file]
+    jsoninput = None
+    fwkjobreport = False
 else:
     files = inputFiles()
+    jsoninput = runsAndLumis()
+    fwkjobreport = True
+
 print "Input root file: ", files 
 
 # condor can't use dasgoclient, so we should upload the filepath for condor run. sth. different with local run here
@@ -39,7 +44,8 @@ p=PostProcessor(".",files,
                 modules=[countHistogramsProducer(),WZG.WZG_Producer()],
                 provenance=True,
                 outputbranchsel="WZG_output_branch.txt",
-                fwkJobReport=True
+                jsonInput=jsoninput, 
+                fwkJobReport=fwkjobreport
                 )
 p.run()
 

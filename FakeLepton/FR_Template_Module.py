@@ -63,8 +63,8 @@ class FakeLeptonProducer(Module):
 
         tight_jets = []
 
-        if event.MET_pt > 30:
-            return False
+        # if event.MET_pt > 30:
+            # return False
 
         # here the tight muons actually means fake_rate_denominator_muons
         # the numerator is extracted by a different pfRelIso04_all in further analysis

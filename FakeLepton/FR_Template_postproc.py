@@ -30,7 +30,7 @@ if args.infile:
 else:
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
     infilelist = inputFiles()
-    # jsoninput = runsAndLumis()
+    jsoninput = runsAndLumis()
     fwkjobreport = True
 
 p=PostProcessor(".",infilelist,
@@ -40,7 +40,7 @@ p=PostProcessor(".",infilelist,
                 justcount=False,
                 noOut=False,
                 fwkJobReport=fwkjobreport, 
-                # jsonInput=jsoninput, 
+                jsonInput=jsoninput, 
                 outputbranchsel = "FR_output_branch_selection.txt")
 
 p.run()
