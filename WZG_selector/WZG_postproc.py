@@ -18,20 +18,46 @@ import DAS_filesearch as search
 parser = argparse.ArgumentParser(description='baseline selection')
 parser.add_argument('-f', dest='file', default='', help='File input. In local mode it will be the filepath. In condor mode it will be the dataset name')
 parser.add_argument('-m', dest='mode', default='local', help='runmode local/condor')
+parser.add_argument('-y', dest='year', default='2018', help='year')
+parser.add_argument('-d', dest='isdata',action='store_true',default=False)
 args = parser.parse_args()
 
 print "mode: ", args.mode
 print "input file: ", args.file
 
-files = []
-if args.mode == 'condor':
-    files.append(search.getValidSite(args.file)+args.file) 
-else:
-    files.append(args.file)
 
-p=PostProcessor(".",files,
+if args.isdata:
+    Modules = [countHistogramsProducer(),WZG.WZG_Producer()]
+    print "processing data"
+else:
+    Modules = [countHistogramsProducer(),WZG.WZG_Producer()]
+    print "processing MC samples"
+
+if args.file:
+
+    infilelist = []
+    jsoninput = None
+    fwkjobreport = False
+
+    if args.mode == 'condor':
+        infilelist.append(search.getValidSite(args.file)+args.file) 
+    else:
+        infilelist = [args.file]
+
+else:
+
+    from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
+    infilelist = inputFiles()
+    jsoninput = runsAndLumis()
+    fwkjobreport = True
+
+p=PostProcessor(".",infilelist,
                 branchsel="WZG_input_branch.txt",
-                modules=[countHistogramsProducer(),WZG.WZG_Producer()],
+                modules=Modules,
+                justcount=False,
+                noOut=False,
+                fwkJobReport=fwkjobreport, 
+                jsonInput=jsoninput, 
                 provenance=True,
                 outputbranchsel="WZG_output_branch.txt",
                 )

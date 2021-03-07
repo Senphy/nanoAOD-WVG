@@ -41,6 +41,7 @@ class WZG_Producer(Module):
         self.out.branch("photon_pt",  "F")
         self.out.branch("photon_eta",  "F")
         self.out.branch("photon_phi",  "F")
+        self.out.branch("photon_genPartFlav",  "I")
         self.out.branch("z_lepton1_pt",  "F")
         self.out.branch("z_lepton1_eta",  "F")
         self.out.branch("z_lepton1_phi",  "F")
@@ -92,72 +93,36 @@ class WZG_Producer(Module):
         global same_charge_reject_mumumu
         test += 1
 
-        # selection on MET. Pass to next event directly if fail.
-        # if  event.MET_pt>20:
-            # MET_pass += 1
-        # else:
-            # return False  
 
+        # selection on MET. Pass to next event directly if fail.
+        if  event.MET_pt > 20:
+            MET_pass += 1
+        else:
+            return False  
 
 
         #selection on muons
         for i in range(0,len(muons)):
-            if muons[i].pt < 10:
+            if muons[i].pt < 20:
                 continue
             if abs(muons[i].eta) > 2.5:
                 continue
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
                 muon_pass += 1
-            elif muons[i].pfRelIso04_all < 0.4:
-                loose_but_not_tight_muons.append(i)
-
+            # elif muons[i].pfRelIso04_all < 0.4:
+                # loose_but_not_tight_muons.append(i)
 
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            if electrons[i].pt/electrons[i].eCorr < 10:
+            if electrons[i].pt < 10:
                 continue
-            if abs(electrons[i].eta) >  2.5:
+            if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
             if electrons[i].cutBased >= 3:
                 tight_electrons.append(i)
                 electron_pass += 1
-
-
-
-        # selection on photons
-        for i in range(0,len(photons)):
-            if not photons[i].electronVeto:
-                continue
-
-            # This condition should be changed for different process
-            if photons[i].genPartFlav == 1:
-                continue
-
-            if photons[i].pt/photons[i].eCorr < 20:
-                continue
-            if abs(photons[i].eta) > 2.5:
-                continue
-
-            pass_lepton_dr_cut = True
-            for j in range(0,len(tight_muons)):
-                if deltaR(muons[tight_muons[j]].eta,muons[tight_muons[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
-                    pass_lepton_dr_cut = False
-            for j in range(0,len(tight_electrons)):
-                if deltaR(electrons[tight_electrons[j]].eta,electrons[tight_electrons[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
-                    pass_lepton_dr_cut = False
-            if not pass_lepton_dr_cut:
-                continue
-
-            tight_photons.append(i)
-            photon_pass += 1
-
-        if not len(tight_photons)==1:
-           none_photon_reject +=1 
-           return False                        #reject event if there is not exact one photon in the event 
-
-
 
 
         if len(tight_electrons)==0 and len(tight_muons)==0:      #reject event if there is no lepton selected in the event
@@ -168,6 +133,41 @@ class WZG_Producer(Module):
             none_3lepton_reject += 1
             return False
 
+
+        # selection on photons
+        for i in range(0,len(photons)):
+
+            # This condition should be changed for different process
+            #  photons[i].genPartFlav == 1:
+                # continue
+
+            if photons[i].pt < 20:
+                continue
+
+            if not (photons[i].isScEtaEE or photons[i].isScEtaEB):
+                continue
+            # if abs(photons[i].eta) > 2.5:
+                # continue
+
+            pass_lepton_dr_cut = True
+
+            for j in range(0,len(tight_muons)):
+                if deltaR(muons[tight_muons[j]].eta,muons[tight_muons[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
+                    pass_lepton_dr_cut = False
+
+            for j in range(0,len(tight_electrons)):
+                if deltaR(electrons[tight_electrons[j]].eta,electrons[tight_electrons[j]].phi,photons[i].eta,photons[i].phi) < 0.5:
+                    pass_lepton_dr_cut = False
+
+            if not pass_lepton_dr_cut:
+                continue
+
+            tight_photons.append(i)
+            photon_pass += 1
+
+        if not len(tight_photons)==1:
+           none_photon_reject +=1 
+           return False                        #reject event if there is not exact one photon in the event 
 
 
         #dilepton mass selection and channel selection
@@ -189,7 +189,6 @@ class WZG_Producer(Module):
                 emumu_pass += 1
 
 
-
         # muee
         if len(tight_muons)==1 and len(tight_electrons)==2:
             if electrons[tight_electrons[0]].pdgId == -electrons[tight_electrons[1]].pdgId:
@@ -197,7 +196,6 @@ class WZG_Producer(Module):
             if dileptonmass >= 4:
                 channel = 2
                 muee_pass += 1
-
 
 
         # eee 
@@ -227,7 +225,6 @@ class WZG_Producer(Module):
             if dileptonmass >= 4:
                 channel = 3
                 eee_pass += 1
-
 
 
         # mumumu
@@ -261,47 +258,40 @@ class WZG_Producer(Module):
         if channel == 0:
             return False
 
-        # selection on b-tag jet
+
         for i in range(0,len(jets)): 
-            btag_cut = False
-            if jets[i].btagCMVA > -0.5884:  # cMVAv2L
-            # if jets[i].btagCMVA > 0.4432:  # cMVAv2M
-            # if jets[i].btagCSVV2 > 0.5426:  # CSVv2L
-            # if jets[i].btagCSVV2 > 0.8484:  # CSVv2M
-            # if jets[i].btagDeepB > 0.2219:  # DeepCSVL
-            # if jets[i].btagDeepB > 0.6324:  # DeepCSVM
-                btag_cut = True      #initialize
-                if jets[i].pt<30:
-                    continue
-                for j in range(0,len(tight_photons)):          # delta R cut, if all deltaR(lep,jet) and deltaR(gamma,jet)>0.3, consider jet as a b jet
-                    if deltaR(jets[i].eta,jets[i].phi,photons[tight_photons[j]].eta,photons[tight_photons[j]].phi) < 0.3:
-                        btag_cut = False
-                for j in range(0,len(tight_electrons)):
-                    if deltaR(jets[i].eta,jets[i].phi,electrons[tight_electrons[j]].eta,electrons[tight_electrons[j]].phi) < 0.3:
-                        btag_cut = False
-                for j in range(0,len(tight_muons)):
-                    if deltaR(jets[i].eta,jets[i].phi,muons[tight_muons[j]].eta,muons[tight_muons[j]].phi) < 0.3:
-                        btag_cut = False
-            if btag_cut == True:
-                btagjet_reject += 1
-                return False
 
-        # max_CMVA=-999
-        # max_CSVV2=-999
-        # max_DeepB=-999
-        # for i in range(0,len(jets)): 
-        #     if jets[i].btagCMVA > max_CMVA: max_CMVA = jets[i].btagCMVA
-        #     if jets[i].btagCSVV2 > max_CSVV2: max_CSVV2 = jets[i].btagCSVV2
-        #     if jets[i].btagDeepB > max_DeepB: max_DeepB = jets[i].btagDeepB
-        # self.out.fillBranch("max_CMVA",max_CMVA)
-        # self.out.fillBranch("max_CSVV2",max_CSVV2)
-        # self.out.fillBranch("max_DeepB",max_DeepB)
+            if jets[i].pt < 10:
+                continue
 
+            if abs(jets[i].eta) > 4.7:
+                continue
+
+            pass_lepton_dr_cut = True
+
+            for j in range(0,len(tight_photons)):
+                if deltaR(jets[i].eta,jets[i].phi,photons[tight_photons[j]].eta,photons[tight_photons[j]].phi) < 0.5:
+                    pass_lepton_dr_cut = False
+
+            for j in range(0,len(tight_electrons)):
+                if deltaR(jets[i].eta,jets[i].phi,electrons[tight_electrons[j]].eta,electrons[tight_electrons[j]].phi) < 0.5:
+                    pass_lepton_dr_cut = False
+
+            for j in range(0,len(tight_muons)):
+                if deltaR(jets[i].eta,jets[i].phi,muons[tight_muons[j]].eta,muons[tight_muons[j]].phi) < 0.5:
+                    pass_lepton_dr_cut = False
+
+            if not pass_lepton_dr_cut: 
+                continue
 
 
         self.out.fillBranch("photon_pt",photons[tight_photons[0]].pt)
         self.out.fillBranch("photon_eta",photons[tight_photons[0]].eta)
         self.out.fillBranch("photon_phi",photons[tight_photons[0]].phi)
+        if hasattr(photons[tight_photons[0]], "genPartFlav"):
+            self.out.fillBranch("photon_genPartFlav",photons[tight_photons[0]].genPartFlav)
+        else:
+            self.out.fillBranch("photon_genPartFlav",-1)
         if channel == 1:
             self.out.fillBranch("w_lepton_pt",  electrons[tight_electrons[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[tight_electrons[0]].eta)
@@ -344,7 +334,10 @@ class WZG_Producer(Module):
             self.out.fillBranch("z_lepton2_phi",muons[tight_muons[2]].phi)
         self.out.fillBranch("event",event.event)
         self.out.fillBranch("dilepton_mass",dileptonmass)
-        self.out.fillBranch("Generator_weight",event.Generator_weight)
+        if hasattr(event, "Generator_weight"):
+            self.out.fillBranch("Generator_weight",event.Generator_weight)
+        else:
+            self.out.fillBranch("Generator_weight",0)
         self.out.fillBranch("channel_mark",channel)
         self.out.fillBranch("MET",event.MET_pt)
 

@@ -6,11 +6,11 @@ keep *photon*
 keep event
 keep dilepton*
 keep *channel*
-keep dilepton*
 keep *weight*
 # keep max*
 
 
+# keep NanoAOD initiated variables below for further test
 keep Electron*
 keep Muon*
 keep Photon*
