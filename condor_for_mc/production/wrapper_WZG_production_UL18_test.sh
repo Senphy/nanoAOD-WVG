@@ -3,10 +3,10 @@
 # set up cmssw
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
-export Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
+export X509_USER_PROXY=$1
 voms-proxy-info -all
-voms-proxy-info -all -file $Proxy_path
-EVENTS=100
+voms-proxy-info -all -file $1
+EVENTS=1000
 
 # lhe-gen level production
 export SCRAM_ARCH=slc7_amd64_gcc700
@@ -26,6 +26,7 @@ cmsDriver.py Configuration/GenProduction/python/SUS-RunIISummer20UL18wmLHEGEN-00
     --datatier GEN,LHE \
     --fileout file:SUS-RunIISummer20UL18wmLHEGEN-00040.root \
     --conditions 106X_upgrade2018_realistic_v4 \
+    --customise_commands process.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" \
     --beamspot Realistic25ns13TeVEarly2018Collision \
     --step LHE,GEN \
     --geometry DB:Extended \
@@ -85,9 +86,13 @@ cmsRun SUS-RunIISummer20UL18DIGIPremix-00009_1_cfg.py
 
 
 # HLT level
-scramv1 project CMSSW CMSSW_10_2_16_UL
-cd CMSSW_10_2_16_UL
-eval `scramv1 runtime -sh`
+if [ -r CMSSW_10_2_16_UL/src ] ; then
+  echo release CMSSW_10_2_16_UL already exists
+else
+  scram p CMSSW CMSSW_10_2_16_UL
+fi
+cd CMSSW_10_2_16_UL/src
+eval `scram runtime -sh`
 scram b
 cd ../../
 cmsDriver.py --python_filename SUS-RunIISummer20UL18HLT-00009_1_cfg.py \
