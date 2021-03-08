@@ -117,11 +117,11 @@ def hadd_help(name,sample_type,year):
         return True
 
     if not (os.path.exists(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')):
-        print (f'results for {abbre_name} not existed in {store_path}/{sample_type}/{year}/{first_name}/{abbre_name}, skipping')
+        print (f'results for {abbre_name} not existed in {store_path}/{sample_type}/{year}/{first_name}/{abbre_name}, skipping\n')
         return True
     
     if not (len(os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')) == 1 ):
-        print (f'more than 1 result for {abbre_name}, Please check {store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')
+        print (f'more than 1 result for {abbre_name}, Please check {store_path}/{sample_type}/{year}/{first_name}/{abbre_name}\n')
         return True
 
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
@@ -130,10 +130,24 @@ def hadd_help(name,sample_type,year):
     r=subprocess.run(args=f"python $CMSSW_BASE/src/PhysicsTools/NanoAODTools/scripts/haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
     if os.path.exists(f'{abbre_name}.root'):
-        print (f'hadd complete, please check {abbre_name}.root')
+        print (f'hadd complete, please check {abbre_name}.root\n')
     else:
         print (f'hadd fail!!')
 
+def report_lumi(name,sample_type,year):
+
+    abbre_name = get_abbre(name,sample_type,year)
+    if not os.path.exists(f'crab{year}/crab_{abbre_name}'):
+        print ("crab log for ",abbre_name," not existed, skipping \n")
+        return True
+
+    r=subprocess.run(args=f"crab report -d crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    print (r.stdout,'\n')
+
+    if not os.path.exists(f'lumi_{year}'):
+        os.mkdir(f'lumi_{year}')
+    
+    shutil.copy(f'crab{year}/crab_{abbre_name}/results/notFinishedLumis.json', f'lumi_{year}/{abbre_name}.json')
 
 if __name__=='__main__':
     
@@ -160,6 +174,11 @@ if __name__=='__main__':
     if args.mode == 'hadd':
         for dataset in jsons:
             hadd_help(dataset['name'], dataset['type'], str(dataset['year']))
+
+    if args.mode == 'report':
+        for dataset in jsons:
+            if dataset['type'] == 'data':
+                report_lumi(dataset['name'], dataset['type'], str(dataset['year']))
     
 
 
