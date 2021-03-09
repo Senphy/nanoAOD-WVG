@@ -6,6 +6,7 @@ keep *photon*
 keep dilepton*
 keep *channel*
 keep *weight*
+keep MET*
 # keep max*
 
 
@@ -53,6 +54,7 @@ keep Photon_electronVeto
 keep Photon_pixelSeed
 keep Photon_eCorr
 keep Photon_vidNestedWPBitmap
+keep Photon_genPartFlav
 keep Photon_isScEtaEE
 keep Photon_isScEtaEB
 keep Jet_pt
@@ -64,13 +66,14 @@ keep Jet_jetId
 keep Jet_rawFactor
 keep Jet_btagDeepB
 keep Jet_btagCSVV2
-keep HLT_Ele27_WPTight_Gsf
-keep HLT_Ele32_WPTight_Gsf
-keep HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL
-keep HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30 
-keep HLT_IsoMu24
-keep HLT_IsoTkMu24
-keep HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8
-keep HLT_Mu17_TrkIsoVVL
+# keep HLT_Ele27_WPTight_Gsf
+# keep HLT_Ele32_WPTight_Gsf
+# keep HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL
+# keep HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30 
+# keep HLT_IsoMu24
+# keep HLT_IsoTkMu24
+# keep HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8
+# keep HLT_Mu17_TrkIsoVVL
+keep HLT*
 keep Pileup_nPU
 keep Pileup_nTrueInt
