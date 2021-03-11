@@ -20,6 +20,25 @@ keep Electron_dz
 keep Electron_dxy
 keep Electron_deltaEtaSC
 keep Electron_genPartFlav
+keep Electron_jetIdx
+keep Electron_photonIdx
+keep Photon_pt
+keep Photon_eta
+keep Photon_sieie
+keep Photon_pfRelIso03_chg
+keep Photon_hoe
+keep Photon_phi
+keep Photon_mass
+keep Photon_cutBased
+keep Photon_electronVeto
+keep Photon_pixelSeed
+keep Photon_eCorr
+keep Photon_vidNestedWPBitmap
+keep Photon_genPartFlav
+keep Photon_isScEtaEE
+keep Photon_isScEtaEB
+keep Photon_jetIdx
+keep Photon_electronIdx
 keep Muon_pt
 keep Muon_eta
 keep Muon_phi
@@ -36,10 +55,11 @@ keep Jet_mass
 keep Jet_puId
 keep Jet_jetId
 keep Jet_rawFactor
-keep HLT_Ele27_WPTight_Gsf
-keep HLT_IsoMu24
-keep HLT_IsoTkMu24
-keep HLT_Mu17_TrkIsoVVL
-keep HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30 
+# keep HLT_Ele27_WPTight_Gsf
+# keep HLT_IsoMu24
+# keep HLT_IsoTkMu24
+# keep HLT_Mu17_TrkIsoVVL
+# keep HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30 
+keep HLT*
 keep Pileup_nPU
 keep Pileup_nTrueInt

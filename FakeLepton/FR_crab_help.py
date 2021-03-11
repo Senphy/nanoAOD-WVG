@@ -11,9 +11,9 @@ args = parser.parse_args()
 
 def get_abbre(name,sample_type,year):
     if sample_type == 'MC':
-        return name.split('/')[1].split('_')[0] + '_' + year
+        return name.split('/')[1] + '_' + year
     elif sample_type == 'data':
-        return name.split('/')[1].split('_')[0] + '_' + name.split('/')[2].split('-')[0]
+        return name.split('/')[1] + '_' + name.split('/')[2].split('-')[0]
 
 def prepare_crab(name,sample_type,year):
 
@@ -34,9 +34,9 @@ def prepare_crab(name,sample_type,year):
         f.write('config.section_("JobType")\n')
         f.write('config.JobType.pluginName = "Analysis"\n')
         f.write('config.JobType.psetName = "PSet.py"\n')
-        f.write('config.JobType.scriptExe = "./WZG_crab_script.sh" \n')
-        f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","./FR_Template_postproc.py","./FR_Template_Module.py","./FR_keep_and_drop.txt","./FR_output_branch_selection.txt","../WZG_selector/DAS_filesearch.py"] #hadd nano will not be needed once nano tools are in cmssw \n')
-        f.write('config.JobType.scriptArgs = ["type=' + sample_type + '","year=' + year + '"] \n')
+        f.write('config.JobType.scriptExe = "./FR_crab_script.sh" \n')
+        f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","./FR_Template_postproc.py","./FR_Template_Module.py","./FR_keep_and_drop.txt","./FR_output_branch_selection.txt"] #hadd nano will not be needed once nano tools are in cmssw \n')
+        f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n\n')
 
@@ -54,7 +54,7 @@ def prepare_crab(name,sample_type,year):
         elif year == '2018':
             f.write('config.Data.lumiMask = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" \n\n')
 
-        f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/fake_lepton_template' + sample_type + '/' + year + '"\n')
+        f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/fake_lepton_template/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
         f.write('config.Data.ignoreLocality = True\n')
         f.write('config.Data.allowNonValidInputDataset = True\n')
@@ -109,7 +109,7 @@ def status(name,sample_type,year):
 def hadd_help(name,sample_type,year):
 
     abbre_name = get_abbre(name,sample_type,year)
-    store_path = '/eos/user/s/sdeng/WZG_analysis'
+    store_path = '/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/'
     first_name = name.split('/')[1]
 
     if os.path.exists(f'{abbre_name}.root'):
@@ -149,6 +149,19 @@ def report_lumi(name,sample_type,year):
     
     shutil.copy(f'FR_crab{year}/crab_{abbre_name}/results/notFinishedLumis.json', f'lumi_{year}/{abbre_name}.json')
 
+def resubmit(name,sample_type,year):
+
+    abbre_name = get_abbre(name,sample_type,year)
+
+    if not os.path.exists(f'FR_crab{year}/crab_{abbre_name}'):
+        print ("crab log for ",abbre_name," not existed, skipping \n")
+        return True
+
+    print (f"resubmitting {abbre_name}\n")
+    r = subprocess.run(args=f"crab resubmit -d FR_crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    print (r.stdout,"\n")
+
+
 if __name__=='__main__':
     
     with open(args.file, "r") as f:
@@ -159,26 +172,32 @@ if __name__=='__main__':
         for dataset in jsons:
             prepare_crab(dataset['name'], dataset['type'], str(dataset['year']))
     
-    if args.mode == 'submit':
+    elif args.mode == 'submit':
         for dataset in jsons:
             submit(dataset['name'], dataset['type'], str(dataset['year']))
 
-    if args.mode == 'kill':
+    elif args.mode == 'kill':
         for dataset in jsons:
             kill(dataset['name'], dataset['type'], str(dataset['year']))
     
-    if args.mode == 'status':
+    elif args.mode == 'status':
         for dataset in jsons:
             status(dataset['name'], dataset['type'], str(dataset['year']))
 
-    if args.mode == 'hadd':
+    elif args.mode == 'hadd':
         for dataset in jsons:
             hadd_help(dataset['name'], dataset['type'], str(dataset['year']))
 
-    if args.mode == 'report':
+    elif args.mode == 'report':
         for dataset in jsons:
             if dataset['type'] == 'data':
                 report_lumi(dataset['name'], dataset['type'], str(dataset['year']))
     
+    elif args.mode == 'resubmit':
+        for dataset in jsons:
+            resubmit(dataset['name'], dataset['type'], str(dataset['year']))
+
+    else:
+        print ("unknown syntax for -m args")
 
 

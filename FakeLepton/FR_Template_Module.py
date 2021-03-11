@@ -63,8 +63,8 @@ class FakeLeptonProducer(Module):
 
         tight_jets = []
 
-        # if event.MET_pt > 30:
-            # return False
+        if event.MET_pt > 20:
+            return False
 
         # here the tight muons actually means fake_rate_denominator_muons
         # the numerator is extracted by a different pfRelIso04_all in further analysis
@@ -111,7 +111,8 @@ class FakeLeptonProducer(Module):
                 if abs(jets[i].eta) > 4.7:
                     continue
 
-                if not jets[i].jetId & (1 << 0):
+                # for UL samples, jetId=2 means: pass tight ID, fail tightLepVeto
+                if not jets[i].jetId & ((1 << 1)|(1 << 0)):
                     continue
 
                 if deltaR(muons[muon_index].eta,muons[muon_index].phi,jets[i].eta,jets[i].phi) < 0.3:
@@ -135,7 +136,7 @@ class FakeLeptonProducer(Module):
 
             hlt = 0
 
-            if event.HLT_IsoMu24 or event.HLT_IsoTkMu24:
+            if event.HLT_IsoMu24: # or event.HLT_IsoTkMu24:
                 hlt += 1 
 
             if event.HLT_Mu17_TrkIsoVVL:
@@ -180,7 +181,7 @@ class FakeLeptonProducer(Module):
                 if abs(jets[i].eta) > 4.7:
                     continue
 
-                if not jets[i].jetId & (1 << 0):
+                if not jets[i].jetId & ((1 << 1)|(1 << 0)):
                     continue
 
                 if deltaR(electrons[electron_index].eta,electrons[electron_index].phi,jets[i].eta,jets[i].phi) < 0.3:
@@ -210,7 +211,11 @@ class FakeLeptonProducer(Module):
             if event.HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30:
                 hlt += 2
 
-            self.out.fillBranch("mt",sqrt(2*electrons[electron_index].pt*event.MET_pt*(1 - cos(event.MET_phi - electrons[electron_index].phi))))
+            mt = sqrt(2*electrons[electron_index].pt*event.MET_pt*(1 - cos(event.MET_phi - electrons[electron_index].phi)))
+            if mt > 20:
+                return False
+
+            self.out.fillBranch("mt",mt)
             self.out.fillBranch("puppimt",sqrt(2*electrons[electron_index].pt*event.PuppiMET_pt*(1 - cos(event.PuppiMET_phi - electrons[electron_index].phi))))
             self.out.fillBranch("lepton_pt",electrons[electron_index].pt)
             if hasattr(electrons[electron_index],'genPartFlav'):

@@ -5,8 +5,9 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('-i',dest='infile',help="if an input file is not provide, assume this is a crab job")
+parser.add_argument('-f',dest='infile',help="if an input file is not provide, assume this is a crab job")
 parser.add_argument('-d',dest='isdata',action='store_true',default=False)
+parser.add_argument('-y', dest='year', default='2018', help='year')
 
 args = parser.parse_args()
 
