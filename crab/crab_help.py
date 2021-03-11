@@ -11,9 +11,9 @@ args = parser.parse_args()
 
 def get_abbre(name,sample_type,year):
     if sample_type == 'MC':
-        return name.split('/')[1].split('_')[0] + '_' + year
+        return name.split('/')[1] + '_' + year
     elif sample_type == 'data':
-        return name.split('/')[1].split('_')[0] + '_' + name.split('/')[2].split('-')[0]
+        return name.split('/')[1] + '_' + name.split('/')[2].split('-')[0]
 
 def prepare_crab(name,sample_type,year):
 
@@ -36,7 +36,7 @@ def prepare_crab(name,sample_type,year):
         f.write('config.JobType.psetName = "PSet.py"\n')
         f.write('config.JobType.scriptExe = "./WZG_crab_script.sh" \n')
         f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","../WZG_selector/WZG_postproc.py","../WZG_selector/WZG_Module.py","../WZG_selector/WZG_input_branch.txt","../WZG_selector/WZG_output_branch.txt","../WZG_selector/DAS_filesearch.py"] #hadd nano will not be needed once nano tools are in cmssw \n')
-        f.write('config.JobType.scriptArgs = ["type=' + sample_type + '","year=' + year + '"] \n')
+        f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n\n')
 
@@ -47,6 +47,7 @@ def prepare_crab(name,sample_type,year):
         f.write('# config.Data.splitting = "LumiBased"\n')
         f.write('config.Data.splitting = "FileBased"\n')
         f.write('#config.Data.splitting = "EventAwareLumiBased" \n')
+        f.write('#config.Data.splitting = "Automatic" \n')
         f.write('config.Data.unitsPerJob = 1\n')
 
         if sample_type == 'MC':
@@ -77,7 +78,7 @@ def submit(name,sample_type,year):
     if 'Success' in r.stdout:
         print ("--------> submit info:","submit crab jobs for",abbre_name)
     else:
-        print ("--------> submit info:","fail to submit for",abbre_name)
+        print ("--------> submit info:","\033[31mfail\033[0m to submit for",abbre_name)
 
 def kill(name,sample_type,year):
 
@@ -132,7 +133,7 @@ def hadd_help(name,sample_type,year):
     if os.path.exists(f'{abbre_name}.root'):
         print (f'hadd complete, please check {abbre_name}.root\n')
     else:
-        print (f'hadd fail!!')
+        print (f'hadd \033[31mfail\033[0m!!')
 
 def report_lumi(name,sample_type,year):
 
@@ -148,6 +149,19 @@ def report_lumi(name,sample_type,year):
         os.mkdir(f'lumi_{year}')
     
     shutil.copy(f'crab{year}/crab_{abbre_name}/results/notFinishedLumis.json', f'lumi_{year}/{abbre_name}.json')
+
+def resubmit(name,sample_type,year):
+
+    abbre_name = get_abbre(name,sample_type,year)
+
+    if not os.path.exists(f'crab{year}/crab_{abbre_name}'):
+        print ("crab log for ",abbre_name," not existed, skipping \n")
+        return True
+
+    print (f"resubmitting {abbre_name}\n")
+    r = subprocess.run(args=f"crab resubmit -d crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    print (r.stdout,"\n")
+
 
 if __name__=='__main__':
     
@@ -180,5 +194,8 @@ if __name__=='__main__':
             if dataset['type'] == 'data':
                 report_lumi(dataset['name'], dataset['type'], str(dataset['year']))
     
+    if args.mode == 'resubmit':
+        for dataset in jsons:
+            resubmit(dataset['name'], dataset['type'], str(dataset['year']))
 
 

@@ -104,7 +104,7 @@ class WZG_Producer(Module):
 
         #selection on muons
         for i in range(0,len(muons)):
-            if muons[i].pt < 20:
+            if muons[i].pt < 10:
                 continue
             if abs(muons[i].eta) > 2.5:
                 continue
@@ -117,7 +117,7 @@ class WZG_Producer(Module):
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            if electrons[i].pt < 20:
+            if electrons[i].pt < 10:
                 continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
@@ -190,6 +190,12 @@ class WZG_Producer(Module):
         dileptonmass = -1.0
         if len(tight_muons)==2 and len(tight_electrons)==1:  # emumu channel 
             if muons[tight_muons[0]].pdgId == -muons[tight_muons[1]].pdgId:
+
+                if muons[tight_muons[0]].pt < 25:
+                    return False
+                if electrons[tight_electrons[0]].pt < 25:
+                    return False
+
                 dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
                 # if dileptonmass >= 60 and dileptonmass <= 120:
                 # print "a=",tight_photons, "e=",tight_electrons, "mu=",tight_muons
@@ -203,6 +209,12 @@ class WZG_Producer(Module):
         # muee
         if len(tight_muons)==1 and len(tight_electrons)==2:
             if electrons[tight_electrons[0]].pdgId == -electrons[tight_electrons[1]].pdgId:
+
+                if muons[tight_muons[0]].pt < 25:
+                    return False
+                if electrons[tight_electrons[0]].pt < 25:
+                    return False
+
                 dileptonmass = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4()).M()
             if dileptonmass < 4: 
                 return False
@@ -235,6 +247,11 @@ class WZG_Producer(Module):
                 tight_electrons[0],tight_electrons[1] = tight_electrons[1],tight_electrons[0] # move the w_lepton to the first one
                 dileptonmass = mll13
             
+            if electrons[tight_electrons[0]].pt < 25:
+                return False
+            if (electrons[tight_electrons[1]].pt < 25) and (electrons[tight_electrons[2]].pt < 25):
+                return False
+
             if dileptonmass < 4: 
                 return False
 
@@ -266,6 +283,11 @@ class WZG_Producer(Module):
                 tight_muons[0],tight_muons[1] = tight_muons[1],tight_muons[0] # move the w_lepton to the first one
                 dileptonmass = mll13
             
+            if muons[tight_muons[0]].pt < 25:
+                return False
+            if (muons[tight_muons[1]].pt < 25) and (muons[tight_muons[1]].pt < 25):
+                return False
+
             if dileptonmass < 4: 
                 return False
 
