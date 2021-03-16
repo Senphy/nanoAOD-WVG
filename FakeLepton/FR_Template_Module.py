@@ -142,6 +142,10 @@ class FakeLeptonProducer(Module):
             if event.HLT_Mu17_TrkIsoVVL:
                 hlt += 2
 
+            mt = sqrt(2*muons[muon_index].pt*event.MET_pt*(1 - cos(event.MET_phi - muons[muon_index].phi))) 
+            if mt > 20:
+                return False
+
             self.out.fillBranch("mt",sqrt(2*muons[muon_index].pt*event.MET_pt*(1 - cos(event.MET_phi - muons[muon_index].phi))))
             self.out.fillBranch("puppimt",sqrt(2*muons[muon_index].pt*event.PuppiMET_pt*(1 - cos(event.PuppiMET_phi - muons[muon_index].phi))))
 
@@ -181,7 +185,7 @@ class FakeLeptonProducer(Module):
                 if abs(jets[i].eta) > 4.7:
                     continue
 
-                if not jets[i].jetId & ((1 << 1)|(1 << 0)):
+                if not jets[i].jetId & (1 << 1):
                     continue
 
                 if deltaR(electrons[electron_index].eta,electrons[electron_index].phi,jets[i].eta,jets[i].phi) < 0.3:
