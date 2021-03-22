@@ -12,7 +12,6 @@ import WZG_Module as WZG
 import argparse
 import re
 import optparse
-import DAS_filesearch as search
 
 
 parser = argparse.ArgumentParser(description='baseline selection')
@@ -40,6 +39,7 @@ if args.file:
     fwkjobreport = False
 
     if args.mode == 'condor':
+        import DAS_filesearch as search
         infilelist.append(search.getValidSite(args.file)+args.file) 
     else:
         infilelist = [args.file]
