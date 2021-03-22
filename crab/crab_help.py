@@ -71,7 +71,7 @@ def submit(name,sample_type,year):
     abbre_name = get_abbre(name,sample_type,year)
 
     if not os.path.exists(f'crabcode_{year}/{abbre_name}_cfg.py'):
-        print ("crabcode for ",abbre_name," not existed, skipping")
+        print ("crabcode for ",abbre_name," not existed, \033[31mskipping\033[0m")
         return True
 
     r=subprocess.run(args=f"crab submit -c crabcode_{year}/{abbre_name}_cfg.py",shell=True,stdout=subprocess.PIPE,encoding='utf-8')
@@ -85,7 +85,7 @@ def kill(name,sample_type,year):
     abbre_name = get_abbre(name,sample_type,year)
 
     if not os.path.exists(f'crab{year}/crab_{abbre_name}'):
-        print ("crab log for ",abbre_name," not existed, skipping \n")
+        print ("crab log for ",abbre_name," not existed, \033[31mskipping\033[0m \n")
         return True
 
     r=subprocess.run(args=f"crab kill -d crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
@@ -100,7 +100,7 @@ def status(name,sample_type,year):
     abbre_name = get_abbre(name,sample_type,year)
 
     if not os.path.exists(f'crab{year}/crab_{abbre_name}'):
-        print ("crab log for ",abbre_name," not existed, skipping \n")
+        print ("crab log for ",abbre_name," not existed, \033[31mskipping\033[0m \n")
         return True
 
     r=subprocess.run(args=f"crab status -d crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
@@ -114,11 +114,11 @@ def hadd_help(name,sample_type,year):
     first_name = name.split('/')[1]
 
     if os.path.exists(f'{abbre_name}.root'):
-        print (f'{abbre_name} already existed, skipping')
+        print (f'{abbre_name} already existed, \033[31mskipping\033[0m')
         return True
 
     if not (os.path.exists(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')):
-        print (f'results for {abbre_name} not existed in {store_path}/{sample_type}/{year}/{first_name}/{abbre_name}, skipping\n')
+        print (f'results for {abbre_name} not existed in {store_path}/{sample_type}/{year}/{first_name}/{abbre_name}, \033[31mskipping\033[0m\n')
         return True
     
     if not (len(os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')) == 1 ):
@@ -131,15 +131,15 @@ def hadd_help(name,sample_type,year):
     r=subprocess.run(args=f"python $CMSSW_BASE/src/PhysicsTools/NanoAODTools/scripts/haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
     if os.path.exists(f'{abbre_name}.root'):
-        print (f'hadd complete, please check {abbre_name}.root\n')
+        print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}.root\n')
     else:
-        print (f'hadd \033[31mfail\033[0m!!')
+        print (f'hadd \033[31m fail \033[0m!!')
 
 def report_lumi(name,sample_type,year):
 
     abbre_name = get_abbre(name,sample_type,year)
     if not os.path.exists(f'crab{year}/crab_{abbre_name}'):
-        print ("crab log for ",abbre_name," not existed, skipping \n")
+        print ("crab log for ",abbre_name," not existed, \033[31mskipping\033[0m \n")
         return True
 
     r=subprocess.run(args=f"crab report -d crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
@@ -155,7 +155,7 @@ def resubmit(name,sample_type,year):
     abbre_name = get_abbre(name,sample_type,year)
 
     if not os.path.exists(f'crab{year}/crab_{abbre_name}'):
-        print ("crab log for ",abbre_name," not existed, skipping \n")
+        print ("crab log for ",abbre_name," not existed, \033[31mskipping\031[0m \n")
         return True
 
     print (f"resubmitting {abbre_name}\n")
