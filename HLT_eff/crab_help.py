@@ -54,7 +54,8 @@ def prepare_crab(name,sample_type,year):
             pass
         elif year == '2018':
             # f.write('config.Data.lumiMask = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" \n\n')
-            f.write('config.Data.lumiMask = "test.json" \n\n')
+            # f.write('config.Data.lumiMask = "test.json" \n\n')
+            f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt" \n\n')
 
         f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/HLT_template/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
@@ -64,7 +65,7 @@ def prepare_crab(name,sample_type,year):
 
         f.write('config.section_("Site")\n')
         f.write('config.Site.storageSite = "T3_CH_CERNBOX"\n')
-        f.write('config.Site.whitelist = ["T2_US_MIT","T2_US_Wisconsin","T2_US_Purdue","T2_US_UCSD","T2_US_Caltech","T2_US_Nebraska"] \n')
+        f.write('config.Site.whitelist = ["T2_US_MIT","T2_US_Wisconsin","T2_US_Purdue","T2_US_UCSD","T2_US_Caltech"] \n')
         f.close()
 
 def submit(name,sample_type,year):
