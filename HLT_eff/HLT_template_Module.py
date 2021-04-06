@@ -36,7 +36,7 @@ class HLT_template_Producer(Module):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("event",  "i")
+        self.out.branch("event",  "l")
         self.out.branch("MET",  "F")
         self.out.branch("photon_pt",  "F")
         self.out.branch("photon_eta",  "F")
@@ -74,6 +74,7 @@ class HLT_template_Producer(Module):
         tight_electrons = [] 
         tight_muons = [] 
         loose_but_not_tight_muons = []
+        loose_but_not_tight_electrons = []
         # Record the pass numbers for each cut. Noticed that for efficiency, those who can't pass the MET cut may not be counted because it will pass to next event directly.
 
         global MET_pass
@@ -104,36 +105,38 @@ class HLT_template_Producer(Module):
 
         #selection on muons
         for i in range(0,len(muons)):
-            # if muons[i].pt < 10:
-            #     continue
+            if muons[i].pt < 10:
+                continue
             if abs(muons[i].eta) > 2.5:
                 continue
-            # if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
-            if muons[i].mvaId >= 3:
+            if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
+            # if muons[i].mvaId >= 3:
                 tight_muons.append(i)
                 muon_pass += 1
-            # elif muons[i].pfRelIso04_all < 0.4:
-                # loose_but_not_tight_muons.append(i)
+            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
+                loose_but_not_tight_muons.append(i)
 
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            # if electrons[i].pt < 10:
-            #     continue
+            if electrons[i].pt < 10:
+                continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
             if (abs(electrons[i].eta + electrons[i].deltaEtaSC) < 1.479 and abs(electrons[i].dz) < 0.1 and abs(electrons[i].dxy) < 0.05) or (abs(electrons[i].eta + electrons[i].deltaEtaSC) > 1.479 and abs(electrons[i].dz) < 0.2 and abs(electrons[i].dxy) < 0.1):
-                if electrons[i].mvaFall17V2Iso_WPL:
-                # if electrons[i].cutBased >= 3:
+                # if electrons[i].mvaFall17V2Iso_WPL:
+                if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
                     electron_pass += 1
+                elif electrons.cutBased >= 1:
+                    loose_but_not_tight_electrons.append(i)
 
 
         if len(tight_electrons)==0 and len(tight_muons)==0:      #reject event if there is no lepton selected in the event
             none_lepton_reject += 1
             return False
         
-        if len(tight_electrons)+len(tight_muons) != 3:      #reject event if there are not exactly three leptons
+        if len(tight_electrons)+len(tight_muons)+len(loose_but_not_tight_electrons)+len(loose_but_not_tight_muons) != 3:      #reject event if there are not exactly three leptons
             none_3lepton_reject += 1
             return False
 

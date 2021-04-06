@@ -31,6 +31,7 @@ keep Muon_pdgId
 keep Muon_charge
 keep Muon_pfRelIso04_all
 keep Muon_tightId
+keep Muon_looseId
 keep Muon_genPartFlav
 keep Muon_genPartIdx
 keep Photon_pt
