@@ -128,7 +128,7 @@ class HLT_template_Producer(Module):
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
                     electron_pass += 1
-                elif electrons.cutBased >= 1:
+                elif electrons[i].cutBased >= 1:
                     loose_but_not_tight_electrons.append(i)
 
 
