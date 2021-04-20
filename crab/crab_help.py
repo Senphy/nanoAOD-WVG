@@ -129,7 +129,7 @@ def hadd_help(name,sample_type,year):
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
     path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/0000/'
     print (f'hadding root files in {path}')
-    r=subprocess.run(args=f"python $CMSSW_BASE/src/PhysicsTools/NanoAODTools/scripts/haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    r=subprocess.run(args=f"haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
     if os.path.exists(f'{abbre_name}.root'):
         print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}.root\n')

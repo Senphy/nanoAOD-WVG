@@ -55,6 +55,8 @@ def prepare_crab(name,sample_type,year):
             # f.write('config.Data.lumiMask = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" \n\n')
             # f.write('config.Data.lumiMask = "test.json" \n\n')
             f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt" \n\n')
+        elif year == '2017':
+            f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt" \n\n')
 
         f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/fake_lepton_template/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
@@ -64,6 +66,7 @@ def prepare_crab(name,sample_type,year):
 
         f.write('config.section_("Site")\n')
         f.write('config.Site.storageSite = "T3_CH_CERNBOX"\n')
+        # f.write('config.Site.storageSite = "T2_CN_Beijing"\n')
         f.write('config.Site.whitelist = ["T2_US_MIT","T2_US_Wisconsin","T2_US_Purdue","T2_US_UCSD","T2_US_Caltech"] \n')
         f.close()
 
@@ -129,7 +132,7 @@ def hadd_help(name,sample_type,year):
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
     path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/0000/'
     print (f'hadding root files in {path}')
-    r=subprocess.run(args=f"python $CMSSW_BASE/src/PhysicsTools/NanoAODTools/scripts/haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    r=subprocess.run(args=f"haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
     if os.path.exists(f'{abbre_name}.root'):
         print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}.root\n')
