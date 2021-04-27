@@ -36,7 +36,7 @@ class WZG_Producer(Module):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("event",  "i")
+        self.out.branch("event",  "l")
         self.out.branch("MET",  "F")
         self.out.branch("photon_pt",  "F")
         self.out.branch("photon_eta",  "F")
@@ -243,9 +243,13 @@ class WZG_Producer(Module):
             mll23 = (electrons[tight_electrons[1]].p4() + electrons[tight_electrons[2]].p4()).M()
             if abs(mll13 - 91.188) > abs(mll23 - 91.188):
                 dileptonmass = mll23
+                if electrons[tight_electrons[1]].pt < electrons[tight_electrons[2]].pt:
+                    tight_electrons[1],tight_electrons[2] = tight_electrons[2],tight_electrons[1]
             else:
                 tight_electrons[0],tight_electrons[1] = tight_electrons[1],tight_electrons[0] # move the w_lepton to the first one
                 dileptonmass = mll13
+                if electrons[tight_electrons[1]].pt < electrons[tight_electrons[2]].pt:
+                    tight_electrons[1],tight_electrons[2] = tight_electrons[2],tight_electrons[1]
             
             if electrons[tight_electrons[0]].pt < 25:
                 return False
@@ -279,9 +283,13 @@ class WZG_Producer(Module):
             mll23 = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4()).M()
             if abs(mll13 - 91.188) > abs(mll23 - 91.188):
                 dileptonmass = mll23
+                if muons[tight_muons[1]].pt < muons[tight_muons[2]].pt:
+                    tight_muons[1],tight_muons[2] = tight_muons[2], tight_muons[1]
             else:
                 tight_muons[0],tight_muons[1] = tight_muons[1],tight_muons[0] # move the w_lepton to the first one
                 dileptonmass = mll13
+                if muons[tight_muons[1]].pt < muons[tight_muons[2]].pt:
+                    tight_muons[1],tight_muons[2] = tight_muons[2], tight_muons[1]
             
             if muons[tight_muons[0]].pt < 25:
                 return False
@@ -303,7 +311,7 @@ class WZG_Producer(Module):
             if jets[i].pt < 10:
                 continue
 
-            if abs(jets[i].eta) > 4.7:
+            if abs(jets[i].eta) > 2.4:
                 continue
 
             pass_lepton_dr_cut = True
@@ -323,8 +331,8 @@ class WZG_Producer(Module):
             if not pass_lepton_dr_cut: 
                 continue
 
-            # if jets[i].btagDeepB > 0.7665:
-                # nJets += 1
+            if jets[i].btagDeepB > 0.7665:
+                nJets += 1
 
 
         self.out.fillBranch("photon_pt",photons[tight_photons[0]].pt)
