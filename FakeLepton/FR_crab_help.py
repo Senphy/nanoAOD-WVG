@@ -149,10 +149,10 @@ def report_lumi(name,sample_type,year):
     r=subprocess.run(args=f"crab report -d FR_crab{year}/crab_{abbre_name}" ,shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     print (r.stdout,'\n')
 
-    if not os.path.exists(f'lumi_{year}'):
-        os.mkdir(f'lumi_{year}')
+    if not os.path.exists(f'FR_lumi_{year}'):
+        os.mkdir(f'FR_lumi_{year}')
     
-    shutil.copy(f'FR_crab{year}/crab_{abbre_name}/results/notFinishedLumis.json', f'lumi_{year}/{abbre_name}.json')
+    shutil.copy(f'FR_crab{year}/crab_{abbre_name}/results/notFinishedLumis.json', f'FR_lumi_{year}/{abbre_name}.json')
 
 def resubmit(name,sample_type,year):
 
