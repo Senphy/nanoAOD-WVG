@@ -22,7 +22,10 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer im
 if args.isdata:
     Modules = [countHistogramsModule(),FakeLeptonModule()]
 else:
-    Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2018(),PrefCorr()]
+    if args.year == '2018':
+        Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2018(),PrefCorr()]
+    if args.year == '2017':
+        Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2017(),PrefCorr()]
 
 if args.infile:
     infilelist = [args.infile]

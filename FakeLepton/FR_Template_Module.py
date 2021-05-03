@@ -63,7 +63,8 @@ class FakeLeptonProducer(Module):
 
         tight_jets = []
 
-        if event.MET_pt > 20:
+        # if event.MET_pt > 20:
+        if event.MET_pt > 30:
             return False
 
         # here the tight muons actually means fake_rate_denominator_muons
@@ -71,9 +72,11 @@ class FakeLeptonProducer(Module):
         for i in range(0,len(muons)):
 
             if muons[i].pt < 10:
+            # if muons[i].pt < 20:
                 continue
 
             if abs(muons[i].eta) > 2.4:
+            # if abs(muons[i].eta) > 2.5:
                 continue
 
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.4:
@@ -105,17 +108,19 @@ class FakeLeptonProducer(Module):
 
             for i in range(0,len(jets)):
                 
-                if jets[i].pt < 20:
+                if jets[i].pt < 10:
+                # if jets[i].pt < 30:
                     continue
 
-                if abs(jets[i].eta) > 4.7:
+                if abs(jets[i].eta) > 2.4:
                     continue
 
                 # for UL samples, jetId=2 means: pass tight ID, fail tightLepVeto
-                if not jets[i].jetId & ((1 << 1)|(1 << 0)):
+                if not jets[i].jetId & (1 << 1):
                     continue
 
-                if deltaR(muons[muon_index].eta,muons[muon_index].phi,jets[i].eta,jets[i].phi) < 0.3:
+                if deltaR(muons[muon_index].eta,muons[muon_index].phi,jets[i].eta,jets[i].phi) < 0.5:
+                # if deltaR(muons[muon_index].eta,muons[muon_index].phi,jets[i].eta,jets[i].phi) < 0.4:
                     continue
 
                 if not found_other_jet:
@@ -131,16 +136,16 @@ class FakeLeptonProducer(Module):
             if not found_other_jet:
                 return False
 
-            if muons[muon_index].pt < 26:
-                return False
+            # if muons[muon_index].pt < 26:
+            #     return False
 
             hlt = 0
 
-            if event.HLT_IsoMu24: # or event.HLT_IsoTkMu24:
-                hlt += 1 
+            # if event.HLT_IsoMu24: # or event.HLT_IsoTkMu24:
+            #     hlt += 1 
 
-            if event.HLT_Mu17_TrkIsoVVL:
-                hlt += 2
+            # if event.HLT_Mu17_TrkIsoVVL:
+            #     hlt += 2
 
             mt = sqrt(2*muons[muon_index].pt*event.MET_pt*(1 - cos(event.MET_phi - muons[muon_index].phi))) 
             if mt > 20:
@@ -179,16 +184,17 @@ class FakeLeptonProducer(Module):
 
             for i in range(0,len(jets)):
                 
-                if jets[i].pt < 20:
+                if jets[i].pt < 10:
                     continue
 
-                if abs(jets[i].eta) > 4.7:
+                if abs(jets[i].eta) > 2.4:
                     continue
 
                 if not jets[i].jetId & (1 << 1):
                     continue
 
-                if deltaR(electrons[electron_index].eta,electrons[electron_index].phi,jets[i].eta,jets[i].phi) < 0.3:
+                if deltaR(electrons[electron_index].eta,electrons[electron_index].phi,jets[i].eta,jets[i].phi) < 0.5:
+                # if deltaR(electrons[electron_index].eta,electrons[electron_index].phi,jets[i].eta,jets[i].phi) < 0.4:
                     continue
 
                 if not found_other_jet:
@@ -204,16 +210,16 @@ class FakeLeptonProducer(Module):
             if not found_other_jet:
                 return False
 
-            if electrons[electron_index].pt < 30:
-                return False
+            # if electrons[electron_index].pt < 30:
+            #     return False
 
             hlt = 0
 
-            if event.HLT_Ele27_WPTight_Gsf:
-                hlt += 1
+            # if event.HLT_Ele27_WPTight_Gsf:
+            #     hlt += 1
 
-            if event.HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30:
-                hlt += 2
+            # if event.HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30:
+            #     hlt += 2
 
             mt = sqrt(2*electrons[electron_index].pt*event.MET_pt*(1 - cos(event.MET_phi - electrons[electron_index].phi)))
             if mt > 20:
