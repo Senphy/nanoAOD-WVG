@@ -101,6 +101,11 @@ class DYTestProducer(Module):
             self.out.fillBranch("lepton1_phi",muons[tight_muons[0]].phi)
             self.out.fillBranch("lepton1_pdgId",muons[tight_muons[0]].pdgId)
 
+            self.out.fillBranch("lepton2_pt",muons[tight_muons[1]].pt)
+            self.out.fillBranch("lepton2_eta",muons[tight_muons[1]].eta)
+            self.out.fillBranch("lepton2_phi",muons[tight_muons[1]].phi)
+            self.out.fillBranch("lepton2_pdgId",muons[tight_muons[1]].pdgId)
+
             if hasattr(muons[tight_muons[0]],'genPartFlav'):
                 self.out.fillBranch("lepton1_gen_matching",muons[tight_muons[0]].genPartFlav)
                 self.out.fillBranch("lepton2_gen_matching",muons[tight_muons[1]].genPartFlav)
@@ -121,6 +126,11 @@ class DYTestProducer(Module):
             self.out.fillBranch("lepton1_eta",electrons[tight_electrons[0]].eta)
             self.out.fillBranch("lepton1_phi",electrons[tight_electrons[0]].phi)
             self.out.fillBranch("lepton1_pdgId",electrons[tight_electrons[0]].pdgId)
+
+            self.out.fillBranch("lepton2_pt",electrons[tight_electrons[1]].pt)
+            self.out.fillBranch("lepton2_eta",electrons[tight_electrons[1]].eta)
+            self.out.fillBranch("lepton2_phi",electrons[tight_electrons[1]].phi)
+            self.out.fillBranch("lepton2_pdgId",electrons[tight_electrons[1]].pdgId)
 
             if hasattr(electrons[tight_electrons[0]],'genPartFlav'):
                 self.out.fillBranch("lepton1_gen_matching",electrons[tight_electrons[0]].genPartFlav)
