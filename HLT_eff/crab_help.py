@@ -109,10 +109,9 @@ def status(name,sample_type,year):
     print (r.stdout,'\n')
 
 
-def hadd_help(name,sample_type,year):
+def hadd_help(name,sample_type,year,store_path):
 
     abbre_name = get_abbre(name,sample_type,year)
-    store_path = '/eos/user/s/sdeng/WZG_analysis/HLT_template/'
     first_name = name.split('/')[1]
 
     if os.path.exists(f'{abbre_name}.root'):
@@ -167,6 +166,8 @@ def resubmit(name,sample_type,year):
 
 if __name__=='__main__':
     
+    store_path = '/eos/user/s/sdeng/WZG_analysis/HLT_template/'
+
     with open(args.file, "r") as f:
         jsons = json.load(f)
         f.close()
@@ -189,7 +190,7 @@ if __name__=='__main__':
 
     if args.mode == 'hadd':
         for dataset in jsons:
-            hadd_help(dataset['name'], dataset['type'], str(dataset['year']))
+            hadd_help(dataset['name'], dataset['type'], str(dataset['year']), store_path)
 
     if args.mode == 'report':
         for dataset in jsons:

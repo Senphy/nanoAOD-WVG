@@ -56,7 +56,7 @@ def prepare_crab(name,sample_type,year):
             # f.write('config.Data.lumiMask = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" \n\n')
             f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt" \n\n')
 
-        f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/' + sample_type + '/' + year + '"\n')
+        f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/final_skim/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
         f.write('config.Data.ignoreLocality = True\n')
         f.write('config.Data.allowNonValidInputDataset = True\n')
@@ -111,7 +111,7 @@ def status(name,sample_type,year):
 def hadd_help(name,sample_type,year):
 
     abbre_name = get_abbre(name,sample_type,year)
-    store_path = '/eos/user/s/sdeng/WZG_analysis'
+    store_path = '/eos/user/s/sdeng/WZG_analysis/final_skim/'
     first_name = name.split('/')[1]
 
     if os.path.exists(f'{abbre_name}.root'):
