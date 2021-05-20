@@ -23,9 +23,11 @@ if args.isdata:
     Modules = [countHistogramsModule(),FakeLeptonModule()]
 else:
     if args.year == '2018':
-        Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2018(),PrefCorr()]
+        Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2018()]
     if args.year == '2017':
         Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2017(),PrefCorr()]
+    if args.year == '2016':
+        Modules = [countHistogramsModule(),FakeLeptonModule(),puWeight_2016(),PrefCorr()]
 
 if args.infile:
     infilelist = [args.infile]

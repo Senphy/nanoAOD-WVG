@@ -23,9 +23,11 @@ if args.isdata:
     Modules = [countHistogramsModule(),DYTestModule()]
 else:
     if args.year == '2018':
-        Modules = [countHistogramsModule(),DYTestModule(),puWeight_2018(),PrefCorr()]
+        Modules = [countHistogramsModule(),DYTestModule(),puWeight_2018()]
     if args.year == '2017':
         Modules = [countHistogramsModule(),DYTestModule(),puWeight_2017(),PrefCorr()]
+    if args.year == '2016':
+        Modules = [countHistogramsModule(),DYTestModule(),puWeight_2016(),PrefCorr()]
 
 if args.infile:
     infilelist = [args.infile]

@@ -29,8 +29,12 @@ if args.isdata:
     Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule()]
     print "processing data"
 else:
-    Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule()]
-    # Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule(),puWeight_2018(),PrefCorr()]
+    if args.year == '2018':
+        Modules = [countHistogramsModule(),ApplyRegionFakeLeptonModule(),puWeight_2018()]
+    if args.year == '2017':
+        Modules = [countHistogramsModule(),ApplyRegionFakeLeptonModule(),puWeight_2017(),PrefCorr()]
+    if args.year == '2016':
+        Modules = [countHistogramsModule(),ApplyRegionFakeLeptonModule(),puWeight_2016(),PrefCorr()]
     print "processing MC samples"
 
 if args.file:

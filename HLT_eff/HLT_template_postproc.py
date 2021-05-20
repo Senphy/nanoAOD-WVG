@@ -29,7 +29,12 @@ if args.isdata:
     Modules = [countHistogramsProducer(),WZG.HLT_template_Producer()]
     print "processing data"
 else:
-    Modules = [countHistogramsProducer(),WZG.HLT_template_Producer()]
+    if args.year == '2018':
+        Modules = [countHistogramsModule(),WZG.HLT_template_Producer(),puWeight_2018()]
+    if args.year == '2017':
+        Modules = [countHistogramsModule(),WZG.HLT_template_Producer(),puWeight_2017(),PrefCorr()]
+    if args.year == '2016':
+        Modules = [countHistogramsModule(),WZG.HLT_template_Producer(),puWeight_2016(),PrefCorr()]
     print "processing MC samples"
 
 if args.file:
