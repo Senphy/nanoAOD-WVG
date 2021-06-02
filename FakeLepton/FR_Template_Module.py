@@ -89,15 +89,13 @@ class FakeLeptonProducer(Module):
             if abs(electrons[i].eta+ electrons[i].deltaEtaSC) > 2.5:
                 continue
 
+        # here the tight muons actually means fake_rate_denominator_muons
+        # the numerator is extracted by a different cutBased in further analysis
             if (abs(electrons[i].eta + electrons[i].deltaEtaSC) < 1.479 and abs(electrons[i].dz) < 0.1 and abs(electrons[i].dxy) < 0.05) or (abs(electrons[i].eta + electrons[i].deltaEtaSC) > 1.479 and abs(electrons[i].dz) < 0.2 and abs(electrons[i].dxy) < 0.1):
-                if electrons[i].cutBased >= 3:
+                if electrons[i].cutBased >= 1:
                     tight_electrons.append(i)
-                elif electrons[i].cutBased == 1:
-                    fake_rate_denominator_electrons.append(i)
-                elif electrons[i].cutBased >= 1:
-                    other_loose_electrons.append(i)
 
-        if len(tight_muons) == 1 and len(tight_electrons) + len(fake_rate_denominator_electrons) + len(other_loose_electrons) == 0:
+        if len(tight_muons) == 1 and len(tight_electrons)  == 0:
 
 
             muon_index = tight_muons[0]
@@ -169,14 +167,12 @@ class FakeLeptonProducer(Module):
 
             self.out.fillBranch("lepton_pfRelIso04_all",muons[muon_index].pfRelIso04_all)
 
-        elif len(tight_electrons) + len(fake_rate_denominator_electrons) == 1 and len(tight_muons) + len(other_loose_electrons) == 0:   
+        elif len(tight_electrons)  == 1 and len(tight_muons)  == 0:   
 
-            if len(tight_electrons) == 1:
-                electron_index = tight_electrons[0]
+            electron_index = tight_electrons[0]
+            if electrons[electron_index].cutBased >= 3:
                 self.out.fillBranch("is_lepton_tight",1)
-
-            if len(fake_rate_denominator_electrons) == 1:
-                electron_index = fake_rate_denominator_electrons[0]
+            elif electrons[electron_index].cutBased >= 1:
                 self.out.fillBranch("is_lepton_tight",0)
 
             found_other_jet = False
