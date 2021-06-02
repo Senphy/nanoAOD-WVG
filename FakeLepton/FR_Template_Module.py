@@ -64,8 +64,8 @@ class FakeLeptonProducer(Module):
         tight_jets = []
 
         # if event.MET_pt > 20:
-        if event.MET_pt > 30:
-            return False
+        # if event.MET_pt > 30:
+        #     return False
 
         # here the tight muons actually means fake_rate_denominator_muons
         # the numerator is extracted by a different pfRelIso04_all in further analysis
@@ -75,8 +75,7 @@ class FakeLeptonProducer(Module):
             # if muons[i].pt < 20:
                 continue
 
-            if abs(muons[i].eta) > 2.4:
-            # if abs(muons[i].eta) > 2.5:
+            if abs(muons[i].eta) > 2.5:
                 continue
 
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.4:
@@ -148,8 +147,8 @@ class FakeLeptonProducer(Module):
             #     hlt += 2
 
             mt = sqrt(2*muons[muon_index].pt*event.MET_pt*(1 - cos(event.MET_phi - muons[muon_index].phi))) 
-            if mt > 20:
-                return False
+            # if mt > 20:
+            #     return False
 
             self.out.fillBranch("mt",sqrt(2*muons[muon_index].pt*event.MET_pt*(1 - cos(event.MET_phi - muons[muon_index].phi))))
             self.out.fillBranch("puppimt",sqrt(2*muons[muon_index].pt*event.PuppiMET_pt*(1 - cos(event.PuppiMET_phi - muons[muon_index].phi))))
@@ -222,8 +221,8 @@ class FakeLeptonProducer(Module):
             #     hlt += 2
 
             mt = sqrt(2*electrons[electron_index].pt*event.MET_pt*(1 - cos(event.MET_phi - electrons[electron_index].phi)))
-            if mt > 20:
-                return False
+            # if mt > 20:
+            #     return False
 
             self.out.fillBranch("mt",mt)
             self.out.fillBranch("puppimt",sqrt(2*electrons[electron_index].pt*event.PuppiMET_pt*(1 - cos(event.PuppiMET_phi - electrons[electron_index].phi))))
