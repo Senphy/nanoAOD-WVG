@@ -42,6 +42,9 @@ class WZG_Producer(Module):
         self.out.branch("photon_eta",  "F")
         self.out.branch("photon_phi",  "F")
         self.out.branch("photon_genPartFlav",  "I")
+        self.out.branch("z_lepton1_genPartFlav",  "I")
+        self.out.branch("z_lepton2_genPartFlav",  "I")
+        self.out.branch("w_lepton_genPartFlav",  "I")
         self.out.branch("z_lepton1_pt",  "F")
         self.out.branch("z_lepton1_eta",  "F")
         self.out.branch("z_lepton1_phi",  "F")
@@ -352,6 +355,10 @@ class WZG_Producer(Module):
             self.out.fillBranch("z_lepton2_pt", muons[tight_muons[1]].pt)
             self.out.fillBranch("z_lepton2_eta",muons[tight_muons[1]].eta)
             self.out.fillBranch("z_lepton2_phi",muons[tight_muons[1]].phi)
+            if hasattr(muons[tight_muons[0]], "genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav",electrons[tight_electrons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav",muons[tight_muons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav",muons[tight_muons[1]].genPartFlav)
         elif channel == 2:
             self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
             self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
@@ -362,6 +369,10 @@ class WZG_Producer(Module):
             self.out.fillBranch("z_lepton2_pt", electrons[tight_electrons[1]].pt)
             self.out.fillBranch("z_lepton2_eta",electrons[tight_electrons[1]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[tight_electrons[1]].phi)
+            if hasattr(muons[tight_muons[0]], "genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav",muons[tight_muons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav",electrons[tight_electrons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav",electrons[tight_electrons[1]].genPartFlav)
         elif channel == 3:
             self.out.fillBranch("w_lepton_pt",  electrons[tight_electrons[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[tight_electrons[0]].eta)
@@ -372,6 +383,10 @@ class WZG_Producer(Module):
             self.out.fillBranch("z_lepton2_pt", electrons[tight_electrons[2]].pt)
             self.out.fillBranch("z_lepton2_eta",electrons[tight_electrons[2]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[tight_electrons[2]].phi)
+            if hasattr(electrons[tight_electrons[0]], "genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav",electrons[tight_electrons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav",electrons[tight_electrons[1]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav",electrons[tight_electrons[2]].genPartFlav)
         elif channel == 4:
             self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
             self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
@@ -382,6 +397,11 @@ class WZG_Producer(Module):
             self.out.fillBranch("z_lepton2_pt", muons[tight_muons[2]].pt)
             self.out.fillBranch("z_lepton2_eta",muons[tight_muons[2]].eta)
             self.out.fillBranch("z_lepton2_phi",muons[tight_muons[2]].phi)
+            if hasattr(muons[tight_muons[0]], "genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav",muons[tight_muons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav",muons[tight_muons[1]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav",muons[tight_muons[2]].genPartFlav)
+
         self.out.fillBranch("event",event.event)
         self.out.fillBranch("dilepton_mass",dileptonmass)
         if hasattr(event, "Generator_weight"):
