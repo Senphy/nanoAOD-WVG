@@ -109,11 +109,12 @@ class HLT_template_Producer(Module):
                 continue
             if abs(muons[i].eta) > 2.5:
                 continue
+            if abs(muons[i].dz) > 0.1 or abs(muons[i].dxy) > 0.05:
+                continue
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
-            # if muons[i].mvaId >= 3:
                 tight_muons.append(i)
                 muon_pass += 1
-            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
+            elif muons[i].tightId and muons[i].pfRelIso04_all < 0.4:
                 loose_but_not_tight_muons.append(i)
 
 
@@ -124,7 +125,6 @@ class HLT_template_Producer(Module):
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
             if (abs(electrons[i].eta + electrons[i].deltaEtaSC) < 1.479 and abs(electrons[i].dz) < 0.1 and abs(electrons[i].dxy) < 0.05) or (abs(electrons[i].eta + electrons[i].deltaEtaSC) > 1.479 and abs(electrons[i].dz) < 0.2 and abs(electrons[i].dxy) < 0.1):
-                # if electrons[i].mvaFall17V2Iso_WPL:
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
                     electron_pass += 1
@@ -136,10 +136,12 @@ class HLT_template_Producer(Module):
             none_lepton_reject += 1
             return False
         
-        if len(tight_electrons)+len(tight_muons)+len(loose_but_not_tight_electrons)+len(loose_but_not_tight_muons) != 3:      #reject event if there are not exactly three leptons
+        if len(tight_electrons)+len(tight_muons) != 3:      #reject event if there are not exactly three leptons
             none_3lepton_reject += 1
             return False
 
+        if len(loose_but_not_tight_electrons)+len(loose_but_not_tight_muons) !=0: # 4th lep veto
+            return False
 
         # selection on photons
         # for i in range(0,len(photons)):
