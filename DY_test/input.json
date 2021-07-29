@@ -1,7 +1,13 @@
 [
     {"name":"/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM", "type":"MC", "year":"2018"},
+    {"name":"/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer19UL16NanoAODAPVv2-106X_mcRun2_asymptotic_preVFP_v9-v1/NANOAODSIM", "type":"MC", "year":"2016"},
     {"name":"/SingleMuon/Run2018A-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
     {"name":"/SingleMuon/Run2018B-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
     {"name":"/SingleMuon/Run2018C-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
-    {"name":"/SingleMuon/Run2018D-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"}
+    {"name":"/SingleMuon/Run2018D-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
+    {"name":"/DoubleMuon/Run2018A-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
+    {"name":"/DoubleMuon/Run2018B-UL2018_MiniAODv1_NanoAODv2-v2/NANOAOD", "type":"data", "year":"2018"},
+    {"name":"/DoubleMuon/Run2018C-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
+    {"name":"/DoubleMuon/Run2018D-UL2018_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2018"},
+    {"name":"/SingleMuon/Run2016C-UL2016_MiniAODv1_NanoAODv2-v1/NANOAOD", "type":"data", "year":"2016"}
 ]
