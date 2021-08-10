@@ -21,21 +21,16 @@ parser.add_argument('-y', dest='year', default='2018', help='year')
 parser.add_argument('-d', dest='isdata',action='store_true',default=False)
 args = parser.parse_args()
 
-print "mode: ", args.mode
-print "input file: ", args.file
-
 
 if args.isdata:
-    Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule()]
-    print "processing data"
+    Modules = [ApplyRegionFakeLeptonModule()]
 else:
     if args.year == '2018':
-        Modules = [countHistogramsModule(),ApplyRegionFakeLeptonModule(),puWeight_2018()]
+        Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule(),puWeight_2018()]
     if args.year == '2017':
-        Modules = [countHistogramsModule(),ApplyRegionFakeLeptonModule(),puWeight_2017(),PrefCorr()]
+        Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule(),puWeight_2017(),PrefCorr()]
     if args.year == '2016':
-        Modules = [countHistogramsModule(),ApplyRegionFakeLeptonModule(),puWeight_2016(),PrefCorr()]
-    print "processing MC samples"
+        Modules = [countHistogramsProducer(),ApplyRegionFakeLeptonModule(),puWeight_2016(),PrefCorr()]
 
 if args.file:
 

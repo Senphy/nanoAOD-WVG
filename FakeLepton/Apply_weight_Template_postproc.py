@@ -18,8 +18,6 @@ parser = argparse.ArgumentParser(description='create attachment NanoAOD-like fak
 parser.add_argument('-f', dest='file', default='', help='File input')
 args = parser.parse_args()
 
-print "input file: ", args.file
-
 
 Modules = [ApplyWeightFakeLeptonModule()]
 infilelist = [args.file]
