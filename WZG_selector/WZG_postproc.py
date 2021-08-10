@@ -5,9 +5,11 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsProducer
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2       import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 
-# from WZG_Module import * 
-import WZG_Module as WZG
+from WZG_Module import * 
 
 import argparse
 import re
@@ -19,23 +21,36 @@ parser.add_argument('-f', dest='file', default='', help='File input. In local mo
 parser.add_argument('-m', dest='mode', default='local', help='runmode local/condor')
 parser.add_argument('-y', dest='year', default='2018', help='year')
 parser.add_argument('-d', dest='isdata',action='store_true',default=False)
+parser.add_argument('-p', dest='period',default="B", help="Run period, only work for data")
 args = parser.parse_args()
 
-print "mode: ", args.mode
-print "input file: ", args.file
+# print ("mode: ", args.mode)
+# print ("input file: ", args.file)
 
 
 if args.isdata:
-    Modules = [countHistogramsProducer(),WZG.WZG_Producer()]
-    print "processing data"
+    if args.year == '2018':
+        jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2018", runPeriod=args.period, metBranchName="MET")
+    if args.year == '2017':
+        jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
+    if args.year == '2016':
+        jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016", runPeriod=args.period, metBranchName="MET")
+    if args.year == '2016_PreVFP':
+        jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016_PreVFP", runPeriod=args.period, metBranchName="MET")
+    Modules = [countHistogramsProducer(),jetmetCorrector(),WZG_select_Module()]
 else:
     if args.year == '2018':
-        Modules = [countHistogramsModule(),WZG.WZG_Producer(),puWeight_2018()]
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="All", metBranchName="MET", splitJER=True, applyHEMfix=True)
+        Modules = [countHistogramsProducer(),jetmetCorrector(),WZG_select_Module(),puWeight_2018()]
     if args.year == '2017':
-        Modules = [countHistogramsModule(),WZG.WZG_Producer(),puWeight_2017(),PrefCorr()]
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="All", metBranchName="MET", splitJER=True)
+        Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),WZG_select_Module(),puWeight_2017()]
     if args.year == '2016':
-        Modules = [countHistogramsModule(),WZG.WZG_Producer(),puWeight_2016(),PrefCorr()]
-    print "processing MC samples"
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="All", metBranchName="MET", splitJER=True)
+        Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),WZG_select_Module(),puWeight_2016()]
+    if args.year == '2016_PreVFP':
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016_PreVFP", jesUncert="All", metBranchName="MET", splitJER=True)
+        Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),WZG_select_Module(),puWeight_2016()]
 
 if args.file:
 
@@ -67,24 +82,3 @@ p=PostProcessor(".",infilelist,
                 outputbranchsel="WZG_output_branch.txt",
                 )
 p.run()
-
-
-
-
-print "MET_pass","\t","=","\t",WZG.MET_pass
-print "muon_pass","\t","=","\t",WZG.muon_pass 
-print "electron_pass","\t","=","\t",WZG.electron_pass
-print "photon_pass","\t","=","\t",WZG.photon_pass
-print
-print "none_photon_reject","\t","=","\t",WZG.none_photon_reject
-print "none_lepton_reject","\t","=","\t",WZG.none_lepton_reject
-print "none_3lepton_reject","\t","=","\t",WZG.none_3lepton_reject
-print "same_charge_reject_eee","\t","=","\t",WZG.same_charge_reject_eee
-print "same_charge_reject_mumumu","\t","=","\t",WZG.same_charge_reject_mumumu
-print
-print "emumu_pass","\t","=","\t",WZG.emumu_pass
-print "muee_pass","\t","=","\t",WZG.muee_pass
-print "eee_pass","\t","=","\t",WZG.eee_pass
-print "mumumu_pass","\t","=","\t",WZG.mumumu_pass
-print "btagjet_reject","\t","=","\t",WZG.btagjet_reject
-print "total processed events","\t","=","\t",WZG.test
