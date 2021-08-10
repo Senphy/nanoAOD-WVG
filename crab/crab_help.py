@@ -15,7 +15,7 @@ def get_abbre(name,sample_type,year):
     elif sample_type == 'data':
         return name.split('/')[1] + '_' + name.split('/')[2].split('-')[0]
 
-def prepare_crab(name,sample_type,year):
+def prepare_crab(name,sample_type,year,period):
 
     abbre_name = get_abbre(name,sample_type,year) 
     if not os.path.exists('crabcode_' + year):
@@ -36,7 +36,7 @@ def prepare_crab(name,sample_type,year):
         f.write('config.JobType.psetName = "PSet.py"\n')
         f.write('config.JobType.scriptExe = "./WZG_crab_script.sh" \n')
         f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","../WZG_selector/WZG_postproc.py","../WZG_selector/WZG_Module.py","../WZG_selector/WZG_input_branch.txt","../WZG_selector/WZG_output_branch.txt","../WZG_selector/DAS_filesearch.py"] #hadd nano will not be needed once nano tools are in cmssw \n')
-        f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '"] \n')
+        f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '","period=' + period + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n\n')
 
@@ -172,7 +172,7 @@ if __name__=='__main__':
 
     if args.mode == 'prepare':
         for dataset in jsons:
-            prepare_crab(dataset['name'], dataset['type'], str(dataset['year']))
+            prepare_crab(dataset['name'], dataset['type'], str(dataset['year']), dataset['period'])
     
     if args.mode == 'submit':
         for dataset in jsons:
