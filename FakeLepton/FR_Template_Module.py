@@ -75,7 +75,7 @@ class FakeLeptonProducer(Module):
             # if muons[i].pt < 20:
                 continue
 
-            if abs(muons[i].eta) > 2.5:
+            if abs(muons[i].eta) > 2.4:
                 continue
 
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.4:

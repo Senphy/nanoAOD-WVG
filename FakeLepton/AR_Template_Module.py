@@ -25,19 +25,26 @@ class ApplyRegionFakeLeptonProducer(Module):
         self.out.branch("photon_pt",  "F")
         self.out.branch("photon_eta",  "F")
         self.out.branch("photon_phi",  "F")
+        self.out.branch("photon_mass",  "F")
         self.out.branch("photon_genPartFlav",  "I")
         self.out.branch("z_lepton1_pt",  "F")
         self.out.branch("z_lepton1_eta",  "F")
         self.out.branch("z_lepton1_phi",  "F")
+        self.out.branch("z_lepton1_mass",  "F")
         self.out.branch("z_lepton1_type",  "I")
+        self.out.branch("z_lepton1_genPartFlav",  "I")
         self.out.branch("z_lepton2_pt",  "F")
         self.out.branch("z_lepton2_eta",  "F")
         self.out.branch("z_lepton2_phi",  "F")
+        self.out.branch("z_lepton2_mass",  "F")
         self.out.branch("z_lepton2_type",  "I")
+        self.out.branch("z_lepton2_genPartFlav",  "I")
         self.out.branch("w_lepton_pt",  "F")
         self.out.branch("w_lepton_eta",  "F")
         self.out.branch("w_lepton_phi",  "F")
+        self.out.branch("w_lepton_mass",  "F")
         self.out.branch("w_lepton_type",  "I")
+        self.out.branch("w_lepton_genPartFlav",  "I")
         self.out.branch("dilepton_mass",  "F")
         self.out.branch("Generator_weight","F")
         # self.out.branch("max_CMVA","F")
@@ -74,7 +81,7 @@ class ApplyRegionFakeLeptonProducer(Module):
         for i in range(0,len(muons)):
             if muons[i].pt < 10:
                 continue
-            if abs(muons[i].eta) > 2.5:
+            if abs(muons[i].eta) > 2.4:
                 continue
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
@@ -141,9 +148,6 @@ class ApplyRegionFakeLeptonProducer(Module):
                 continue
 
             tight_photons.append(i)
-
-        if len(tight_photons)==0:
-           return False                        #reject event if there is not exact one photon in the event 
 
 
         #dilepton mass selection and channel selection
@@ -325,65 +329,103 @@ class ApplyRegionFakeLeptonProducer(Module):
                 nJets += 1
 
 
-        self.out.fillBranch("photon_pt",photons[tight_photons[0]].pt)
-        self.out.fillBranch("photon_eta",photons[tight_photons[0]].eta)
-        self.out.fillBranch("photon_phi",photons[tight_photons[0]].phi)
-        if hasattr(photons[tight_photons[0]], "genPartFlav"):
-            self.out.fillBranch("photon_genPartFlav",photons[tight_photons[0]].genPartFlav)
-        else:
+        if len(tight_photons) == 0:
+            self.out.fillBranch("photon_mark", 0)
+            self.out.fillBranch("photon_pt", 0)
+            self.out.fillBranch("photon_eta", 0)
+            self.out.fillBranch("photon_phi", 0)
+            self.out.fillBranch("photon_mass", 0)
             self.out.fillBranch("photon_genPartFlav",-1)
+        else:
+            self.out.fillBranch("photon_mark", 1)
+            self.out.fillBranch("photon_pt",photons[tight_photons[0]].pt)
+            self.out.fillBranch("photon_eta",photons[tight_photons[0]].eta)
+            self.out.fillBranch("photon_phi",photons[tight_photons[0]].phi)
+            self.out.fillBranch("photon_mass",photons[tight_photons[0]].mass)
+            if hasattr(photons[tight_photons[0]], "genPartFlav"):
+                self.out.fillBranch("photon_genPartFlav",photons[tight_photons[0]].genPartFlav)
+            else:
+                self.out.fillBranch("photon_genPartFlav",-1)
         if channel == 1:
             self.out.fillBranch("w_lepton_pt",  electrons[selected_electrons[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[selected_electrons[0]].eta)
             self.out.fillBranch("w_lepton_phi", electrons[selected_electrons[0]].phi)
+            self.out.fillBranch("w_lepton_mass", electrons[selected_electrons[0]].mass)
             self.out.fillBranch("w_lepton_type", selected_electrons_type[0])
             self.out.fillBranch("z_lepton1_pt", muons[selected_muons[0]].pt)
             self.out.fillBranch("z_lepton1_eta",muons[selected_muons[0]].eta)
             self.out.fillBranch("z_lepton1_phi",muons[selected_muons[0]].phi)
+            self.out.fillBranch("z_lepton1_mass",muons[selected_muons[0]].mass)
             self.out.fillBranch("z_lepton1_type", selected_muons_type[0])
             self.out.fillBranch("z_lepton2_pt", muons[selected_muons[1]].pt)
             self.out.fillBranch("z_lepton2_eta",muons[selected_muons[1]].eta)
             self.out.fillBranch("z_lepton2_phi",muons[selected_muons[1]].phi)
+            self.out.fillBranch("z_lepton2_mass",muons[selected_muons[1]].mass)
             self.out.fillBranch("z_lepton2_type", selected_muons_type[1])
+            if hasattr(electrons[selected_electrons[0]],"genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav", electrons[selected_electrons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav", muons[selected_muons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav", muons[selected_muons[1]].genPartFlav)
         elif channel == 2:
             self.out.fillBranch("w_lepton_pt",  muons[selected_muons[0]].pt)
             self.out.fillBranch("w_lepton_eta", muons[selected_muons[0]].eta)
             self.out.fillBranch("w_lepton_phi", muons[selected_muons[0]].phi)
+            self.out.fillBranch("w_lepton_mass", muons[selected_muons[0]].mass)
             self.out.fillBranch("w_lepton_type", selected_muons_type[0])
             self.out.fillBranch("z_lepton1_pt", electrons[selected_electrons[0]].pt)
             self.out.fillBranch("z_lepton1_eta",electrons[selected_electrons[0]].eta)
             self.out.fillBranch("z_lepton1_phi",electrons[selected_electrons[0]].phi)
+            self.out.fillBranch("z_lepton1_mass",electrons[selected_electrons[0]].mass)
             self.out.fillBranch("z_lepton1_type", selected_electrons_type[0])
             self.out.fillBranch("z_lepton2_pt", electrons[selected_electrons[1]].pt)
             self.out.fillBranch("z_lepton2_eta",electrons[selected_electrons[1]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[selected_electrons[1]].phi)
+            self.out.fillBranch("z_lepton2_mass",electrons[selected_electrons[1]].mass)
             self.out.fillBranch("z_lepton2_type", selected_electrons_type[1])
+            if hasattr(electrons[selected_electrons[0]],"genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav", muons[selected_muons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav", electrons[selected_electrons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav", electrons[selected_electrons[1]].genPartFlav)
         elif channel == 3:
             self.out.fillBranch("w_lepton_pt",  electrons[selected_electrons[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[selected_electrons[0]].eta)
             self.out.fillBranch("w_lepton_phi", electrons[selected_electrons[0]].phi)
+            self.out.fillBranch("w_lepton_mass", electrons[selected_electrons[0]].mass)
             self.out.fillBranch("w_lepton_type", selected_electrons_type[0])
             self.out.fillBranch("z_lepton1_pt", electrons[selected_electrons[1]].pt)
             self.out.fillBranch("z_lepton1_eta",electrons[selected_electrons[1]].eta)
             self.out.fillBranch("z_lepton1_phi",electrons[selected_electrons[1]].phi)
+            self.out.fillBranch("z_lepton1_mass",electrons[selected_electrons[1]].mass)
             self.out.fillBranch("z_lepton1_type", selected_electrons_type[1])
             self.out.fillBranch("z_lepton2_pt", electrons[selected_electrons[2]].pt)
             self.out.fillBranch("z_lepton2_eta",electrons[selected_electrons[2]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[selected_electrons[2]].phi)
+            self.out.fillBranch("z_lepton2_mass",electrons[selected_electrons[2]].mass)
             self.out.fillBranch("z_lepton2_type", selected_electrons_type[2])
+            if hasattr(electrons[selected_electrons[0]],"genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav", electrons[selected_electrons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav", electrons[selected_electrons[1]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav", electrons[selected_electrons[2]].genPartFlav)
         elif channel == 4:
             self.out.fillBranch("w_lepton_pt",  muons[selected_muons[0]].pt)
             self.out.fillBranch("w_lepton_eta", muons[selected_muons[0]].eta)
             self.out.fillBranch("w_lepton_phi", muons[selected_muons[0]].phi)
+            self.out.fillBranch("w_lepton_mass", muons[selected_muons[0]].mass)
             self.out.fillBranch("w_lepton_type", selected_muons_type[0])
             self.out.fillBranch("z_lepton1_pt", muons[selected_muons[1]].pt)
             self.out.fillBranch("z_lepton1_eta",muons[selected_muons[1]].eta)
             self.out.fillBranch("z_lepton1_phi",muons[selected_muons[1]].phi)
+            self.out.fillBranch("z_lepton1_mass",muons[selected_muons[1]].mass)
             self.out.fillBranch("z_lepton1_type", selected_muons_type[1])
             self.out.fillBranch("z_lepton2_pt", muons[selected_muons[2]].pt)
             self.out.fillBranch("z_lepton2_eta",muons[selected_muons[2]].eta)
             self.out.fillBranch("z_lepton2_phi",muons[selected_muons[2]].phi)
+            self.out.fillBranch("z_lepton2_mass",muons[selected_muons[2]].mass)
             self.out.fillBranch("z_lepton2_type", selected_muons_type[2])
+            if hasattr(muons[selected_muons[0]],"genPartFlav"):
+                self.out.fillBranch("w_lepton_genPartFlav", muons[selected_muons[0]].genPartFlav)
+                self.out.fillBranch("z_lepton1_genPartFlav", muons[selected_muons[1]].genPartFlav)
+                self.out.fillBranch("z_lepton2_genPartFlav", muons[selected_muons[2]].genPartFlav)
         self.out.fillBranch("event",event.event)
         self.out.fillBranch("dilepton_mass",dileptonmass)
         if hasattr(event, "Generator_weight"):
