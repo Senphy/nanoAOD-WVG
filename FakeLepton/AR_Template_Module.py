@@ -71,10 +71,10 @@ class ApplyRegionFakeLeptonProducer(Module):
         loose_but_not_tight_electrons = []
 
         # selection on MET. Pass to next event directly if fail.
-        if event.MET_pt > 20:
-            pass
-        else:
-            return False  
+        # if event.MET_pt > 20:
+            # pass
+        # else:
+            # return False  
 
 
         #selection on muons
