@@ -40,16 +40,16 @@ if args.isdata:
     Modules = [countHistogramsProducer(),jetmetCorrector(),WZG_select_Module()]
 else:
     if args.year == '2018':
-        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="All", metBranchName="MET", splitJER=True, applyHEMfix=True)
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="Total", metBranchName="MET", splitJER=False, applyHEMfix=True)
         Modules = [countHistogramsProducer(),jetmetCorrector(),WZG_select_Module(),puWeight_2018()]
     if args.year == '2017':
-        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="All", metBranchName="MET", splitJER=True)
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),WZG_select_Module(),puWeight_2017()]
     if args.year == '2016':
-        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="All", metBranchName="MET", splitJER=True)
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),WZG_select_Module(),puWeight_2016()]
     if args.year == '2016_PreVFP':
-        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016_PreVFP", jesUncert="All", metBranchName="MET", splitJER=True)
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016_PreVFP", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),WZG_select_Module(),puWeight_2016()]
 
 if args.file:
