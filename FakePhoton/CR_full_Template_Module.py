@@ -239,16 +239,14 @@ class CR_FakePhotonFullProducer(Module):
                 if muons[tight_muons[0]].pdgId == -muons[tight_muons[1]].pdgId:
                     if (muons[tight_muons[0]].pt >= 25) and (electrons[tight_electrons[0]].pt >= 25):
                         dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
-                        if abs(dileptonmass-91.188) <= 15: 
-                            channel = 1
+                        channel = 1
                 
             # muee
             if len(tight_muons)==1 and len(tight_electrons)==2:
                 if electrons[tight_electrons[0]].pdgId == -electrons[tight_electrons[1]].pdgId:
                     if (muons[tight_muons[0]].pt >= 25) and (electrons[tight_electrons[0]].pt >= 25):
                         dileptonmass = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4()).M()
-                        if abs(dileptonmass-91.188) <= 15: 
-                            channel = 2
+                        channel = 2
 
             # eee 
             if len(tight_electrons)==3 and len(tight_muons)==0:
@@ -276,8 +274,7 @@ class CR_FakePhotonFullProducer(Module):
                         tight_electrons[1],tight_electrons[2] = tight_electrons[2],tight_electrons[1]
                     
                     if (electrons[tight_electrons[0]].pt >= 25) and (electrons[tight_electrons[1]].pt >= 25):
-                        if abs(dileptonmass-91.188) <= 15: 
-                            channel = 3
+                        channel = 3
 
 
             # mumumu
@@ -306,8 +303,7 @@ class CR_FakePhotonFullProducer(Module):
                         tight_muons[1],tight_muons[2] = tight_muons[2], tight_muons[1]
                     
                     if (muons[tight_muons[0]].pt >= 25) and (muons[tight_muons[1]].pt >= 25):
-                        if abs(dileptonmass-91.188) <= 15: 
-                            channel = 4
+                        channel = 4
 
             if dileptonmass < 4:
                 return False
