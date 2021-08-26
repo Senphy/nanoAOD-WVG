@@ -38,7 +38,8 @@ def prepare_crab(name,sample_type,year,period):
         f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","../WZG_selector/WZG_postproc.py","../WZG_selector/WZG_Module.py","../WZG_selector/WZG_input_branch.txt","../WZG_selector/WZG_output_branch.txt","../WZG_selector/DAS_filesearch.py"] #hadd nano will not be needed once nano tools are in cmssw \n')
         f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '","period=' + period + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
-        f.write('config.JobType.allowUndistributedCMSSW = True \n\n')
+        f.write('config.JobType.allowUndistributedCMSSW = True \n')
+        f.write('config.JobType.maxJobRuntimeMin = 4320 \n\n')
 
         f.write('config.section_("Data")\n')
         f.write('config.Data.inputDataset = "' + name + '" \n')
@@ -47,7 +48,7 @@ def prepare_crab(name,sample_type,year,period):
         f.write('# config.Data.splitting = "LumiBased"\n')
         f.write('config.Data.splitting = "FileBased"\n')
         f.write('#config.Data.splitting = "EventAwareLumiBased" \n')
-        f.write('#config.Data.splitting = "Automatic" \n')
+        # f.write('config.Data.splitting = "Automatic" \n')
         f.write('config.Data.unitsPerJob = 1\n')
 
         if sample_type == 'MC':
