@@ -1,0 +1,23 @@
+{
+    "utils":{
+        "nlepton":"(nMuon+nElectron)>=2"
+    },
+    "electron":{
+        "electron_pt":"Electron_pt>=10",
+        "electron_eta":"abs(Electron_eta+Electron_deltaEtaSC)<2.5",
+        "electron_id":"Electron_cutBased>=1"
+    },
+    "muon":{
+        "muon_pt":"Muon_pt>=10",
+        "muon_eta":"abs(Muon_eta)<2.4",
+        "muon_id":"Muon_tightId==1",
+        "muon_pfRelIso04_all":"Muon_pfRelIso04_all<0.4"
+    },
+    "photon":{
+        "nphoton":"nPhoton>0",
+        "photon_pt":"Photon_pt>=10",
+        "photon_eta":"abs(Photon_eta)<1.4442 || (abs(Photon_eta)>1.566 && abs(Photon_eta)<2.5)",
+        "photon_transition":"Photon_isScEtaEE==1 || Photon_isScEtaEB==1",
+        "photon_pixelseed":"Photon_pixelSeed==0"
+    }
+}
