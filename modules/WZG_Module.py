@@ -85,7 +85,7 @@ class WZG_Producer(Module):
 
         #selection on muons
         for i in range(0,len(muons)):
-            if muons[i].pt < 10:
+            if event.Muon_corrected_pt[i] < 10:
                 continue
             if abs(muons[i].eta) > 2.4:
                 continue
@@ -258,11 +258,11 @@ class WZG_Producer(Module):
                     self.out.fillBranch("ZZ_lepton2_eta", electrons[tight_electrons[1]].eta)
                     self.out.fillBranch("ZZ_lepton2_phi", electrons[tight_electrons[1]].phi)
                     self.out.fillBranch("ZZ_lepton2_mass", electrons[tight_electrons[1]].mass)
-                    self.out.fillBranch("ZZ_lepton3_pt", muons[tight_muons[0]].pt)
+                    self.out.fillBranch("ZZ_lepton3_pt", event.Muon_corrected_pt[tight_muons[0]])
                     self.out.fillBranch("ZZ_lepton3_eta", muons[tight_muons[0]].eta)
                     self.out.fillBranch("ZZ_lepton3_phi", muons[tight_muons[0]].phi)
                     self.out.fillBranch("ZZ_lepton3_mass", muons[tight_muons[0]].mass)
-                    self.out.fillBranch("ZZ_lepton4_pt", muons[tight_muons[1]].pt)
+                    self.out.fillBranch("ZZ_lepton4_pt", event.Muon_corrected_pt[tight_muons[1]])
                     self.out.fillBranch("ZZ_lepton4_eta", muons[tight_muons[1]].eta)
                     self.out.fillBranch("ZZ_lepton4_phi", muons[tight_muons[1]].phi)
                     self.out.fillBranch("ZZ_lepton4_mass", muons[tight_muons[1]].mass)
@@ -273,12 +273,12 @@ class WZG_Producer(Module):
                         self.out.fillBranch("ZZ_lepton4_genPartFlav", muons[tight_muons[1]].genPartFlav)
                 if z_pair_mark == 2:
                     self.out.fillBranch("channel_mark", 6)
-                    self.out.fillBranch("ZZ_lepton1_pt", muons[tight_muons[0]].pt)
+                    self.out.fillBranch("ZZ_lepton1_pt", event.Muon_corrected_pt[tight_muons[0]])
                     self.out.fillBranch("ZZ_lepton1_eta", muons[tight_muons[0]].eta)
                     self.out.fillBranch("ZZ_lepton1_phi", muons[tight_muons[0]].phi)
                     self.out.fillBranch("ZZ_lepton1_mass", muons[tight_muons[0]].mass)
                     self.out.fillBranch("ZZ_lepton1_charge", muons[tight_muons[0]].charge)
-                    self.out.fillBranch("ZZ_lepton2_pt", muons[tight_muons[1]].pt)
+                    self.out.fillBranch("ZZ_lepton2_pt", event.Muon_corrected_pt[tight_muons[1]])
                     self.out.fillBranch("ZZ_lepton2_eta", muons[tight_muons[1]].eta)
                     self.out.fillBranch("ZZ_lepton2_phi", muons[tight_muons[1]].phi)
                     self.out.fillBranch("ZZ_lepton2_mass", muons[tight_muons[1]].mass)
@@ -461,7 +461,9 @@ class WZG_Producer(Module):
                 
                 temp_wl1_p4 = electrons[tight_electrons[0]].p4()
                 temp_zl1_p4 = muons[tight_muons[0]].p4()
+                temp_zl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_zl1_p4.Eta(), temp_zl1_p4.Phi(), temp_zl1_p4.M())
                 temp_zl2_p4 = muons[tight_muons[1]].p4()
+                temp_zl2_p4.SetPtEtaPhiM(event.Muon_corrected_pt[1], temp_zl2_p4.Eta(), temp_zl2_p4.Phi(), temp_zl2_p4.M())
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
                     temp_zl1_genPartFlav = muons[tight_muons[0]].genPartFlav
@@ -490,6 +492,7 @@ class WZG_Producer(Module):
                     return False
 
                 temp_wl1_p4 = muons[tight_muons[0]].p4()
+                temp_wl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_wl1_p4.Eta(), temp_wl1_p4.Phi(), temp_wl1_p4.M())
                 temp_zl1_p4 = electrons[tight_electrons[0]].p4()
                 temp_zl2_p4 = electrons[tight_electrons[1]].p4()
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
@@ -594,8 +597,11 @@ class WZG_Producer(Module):
                     m_lla = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4() + photons[tight_photons[0]].p4()).M()
 
                 temp_wl1_p4 = muons[tight_muons[0]].p4()
+                temp_wl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_wl1_p4.Eta(), temp_wl1_p4.Phi(), temp_wl1_p4.M())
                 temp_zl1_p4 = muons[tight_muons[1]].p4()
+                temp_zl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[1], temp_zl1_p4.Eta(), temp_zl1_p4.Phi(), temp_zl1_p4.M())
                 temp_zl2_p4 = muons[tight_muons[2]].p4()
+                temp_zl2_p4.SetPtEtaPhiM(event.Muon_corrected_pt[2], temp_zl2_p4.Eta(), temp_zl2_p4.Phi(), temp_zl2_p4.M())
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = muons[tight_muons[0]].genPartFlav
                     temp_zl1_genPartFlav = muons[tight_muons[1]].genPartFlav
