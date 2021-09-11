@@ -148,7 +148,7 @@ class WZG_Producer(Module):
 
         for i in range(0,len(jets)): 
 
-            if event.Jet_pt_nom[i].pt < 10:
+            if event.Jet_pt_nom[i] < 10:
                 continue
 
             if abs(jets[i].eta) > 2.4:

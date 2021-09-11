@@ -32,7 +32,7 @@ We need to update some files for official NanoAOD-tools. Also we need to `scram`
 ```bash
 mv modules/* $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/modules/
 mv update_for_nanotools/for_prefire/L1PrefiringMaps.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
-mv data/ $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/data/
+mv data/* $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/data/
 cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools
 scram b
 ```
