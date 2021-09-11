@@ -12,7 +12,7 @@ class eleRECOSFProducer(Module):
     self.year = year
     self.reco_input1 = "egamma_RECO_low.root"
     self.reco_input2 = "egamma_RECO_high.root"
-    self.SF_location_path = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/data/year%s/" %(os.environ['CMSSW_BASE'], self.year)
+    self.SF_location_path = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/year%s/" %(os.environ['CMSSW_BASE'], self.year)
 #    print 'SF location:', self.SF_location_path
 
   def beginJob(self):

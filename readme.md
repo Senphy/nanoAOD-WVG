@@ -26,6 +26,15 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 cd PhysicsTools/NanoAODTools
 scram b
 git clone https://github.com/Senphy/nanoAOD-WVG.git
+cd nanoAOD-WVG
+```
+We need to update some files for official NanoAOD-tools. Also we need to `scram` the new modules.
+```bash
+mv modules/* $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/modules/
+mv update_for_nanotools/for_prefire/L1PrefiringMaps.root $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/prefire_maps/
+mv data/ $CMSSW_BASE/src/PhysicsTools/NanoAODTools/python/postprocessing/data/
+cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools
+scram b
 ```
 <br>
 
@@ -33,7 +42,7 @@ git clone https://github.com/Senphy/nanoAOD-WVG.git
 In WZG_seletor, `WZG_Module.py` is designed for basic selection (e.g. pt cut). Use `WZG_postproc.py` for local test.
 
 ```bash
-cd WZG_selector
+cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/WZG_selector
 python WZG_postproc.py -h
 ```
 

@@ -12,7 +12,7 @@ class muonIDISOSFProducer(Module):
     self.year = year
     self.id_ = "muon_ID.root"
     self.iso_ = "muon_ISO.root"
-    self.SF_location_path = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/analysis/data/year%s/" %(os.environ['CMSSW_BASE'], self.year)
+    self.SF_location_path = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/year%s/" %(os.environ['CMSSW_BASE'], self.year)
     print 'SF location:', self.SF_location_path
 
   def beginJob(self):

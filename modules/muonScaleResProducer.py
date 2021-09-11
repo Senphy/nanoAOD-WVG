@@ -24,7 +24,7 @@ class muonScaleResProducer(Module):
     def __init__(self, rc_dir, rc_corrections, dataYear):
         p_postproc = '%s/src/PhysicsTools/NanoAODTools/python/postprocessing' % os.environ[
             'CMSSW_BASE']
-        p_roccor = p_postproc + '/analysis/data/' + rc_dir
+        p_roccor = p_postproc + '/data/' + rc_dir
         if "/RoccoR_cc.so" not in ROOT.gSystem.GetLibraries():
             p_helper = '%s/RoccoR.cc' % p_roccor
             print('Loading C++ helper from ' + p_helper)

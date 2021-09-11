@@ -14,8 +14,6 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.muonScaleResProducer impor
 from PhysicsTools.NanoAODTools.postprocessing.modules.muonIDISOSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.WZG_Module import *
 
-from WZG_Module import * 
-
 import argparse
 import re
 import optparse
