@@ -547,7 +547,7 @@ class WZG_Producer(Module):
                 temp_wl1_p4 = electrons[tight_electrons[0]].p4()
                 temp_zl1_p4 = electrons[tight_electrons[1]].p4()
                 temp_zl2_p4 = electrons[tight_electrons[2]].p4()
-                if hasattr(muons[tight_muons[0]],"genPartFlav"):
+                if hasattr(muons[tight_electrons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
                     temp_zl1_genPartFlav = electrons[tight_electrons[1]].genPartFlav
                     temp_zl2_genPartFlav = electrons[tight_electrons[2]].genPartFlav
