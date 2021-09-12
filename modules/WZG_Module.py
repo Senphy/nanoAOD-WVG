@@ -669,7 +669,7 @@ class WZG_Producer(Module):
                 self.out.fillBranch("ttZ_lepton3_eta", temp_zl2_p4.Eta())
                 self.out.fillBranch("ttZ_lepton3_phi", temp_zl2_p4.Phi())
                 self.out.fillBranch("ttZ_lepton3_mass", temp_zl2_p4.M())
-                if temp_wl1_genPartFlav in locals():
+                if 'temp_wl1_genPartFlav' in locals():
                     self.out.fillBranch("ttZ_lepton1_genPartFlav", temp_wl1_genPartFlav)
                     self.out.fillBranch("ttZ_lepton2_genPartFlav", temp_zl1_genPartFlav)
                     self.out.fillBranch("ttZ_lepton3_genPartFlav", temp_zl2_genPartFlav)
@@ -707,7 +707,7 @@ class WZG_Producer(Module):
                 self.out.fillBranch("WZG_photon_mass", photons[tight_photons[0]].mass)
                 if hasattr(photons[tight_photons[0]], "genPartFlav"):
                     self.out.fillBranch("WZG_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
-                if temp_wl1_genPartFlav in locals():
+                if 'temp_wl1_genPartFlav' in locals():
                     self.out.fillBranch("WZG_lepton1_genPartFlav", temp_wl1_genPartFlav)
                     self.out.fillBranch("WZG_lepton2_genPartFlav", temp_zl1_genPartFlav)
                     self.out.fillBranch("WZG_lepton3_genPartFlav", temp_zl2_genPartFlav)
