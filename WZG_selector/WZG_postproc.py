@@ -37,7 +37,7 @@ args = parser.parse_args()
 if args.isdata:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2018", runPeriod=args.period, metBranchName="MET")
-        Modules = [muonScaleRes2018(),jetmetCorrector(),WZG_select_Module()]
+        Modules = [muonScaleRes2018(),first_Template_Producer(),jetmetCorrector(),WZG_select_Module()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2017(),jetmetCorrector(),WZG_select_Module()]
@@ -50,7 +50,7 @@ if args.isdata:
 else:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="Total", metBranchName="MET", splitJER=False, applyHEMfix=True)
-        Modules = [countHistogramsProducer(),puAutoWeight_2018(),muonIDISOSF2018(),muonScaleRes2018(),eleRECOSF2018(),eleIDSF2018(),jetmetCorrector(),WZG_select_Module()]
+        Modules = [countHistogramsProducer(),muonScaleRes2018(),first_Template_Producer(),puAutoWeight_2018(),muonIDISOSF2018(),eleRECOSF2018(),eleIDSF2018(),jetmetCorrector(),WZG_select_Module()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),puAutoWeight_2017(),PrefCorrUL17(),muonIDISOSF2017(),muonScaleRes2017(),eleRECOSF2017(),eleIDSF2017(),jetmetCorrector(),WZG_select_Module()]
@@ -79,6 +79,31 @@ else:
     infilelist = inputFiles()
     jsoninput = runsAndLumis()
     fwkjobreport = True
+
+if args.isdata and args.year=='2018' and args.period=='D' and ('MuonEG' in infilelist):
+    print 'special treatment for MuonEG_Run2018D'
+    import FWCore.PythonUtilities.LumiList as LumiList
+    import FWCore.ParameterSet.Config as cms
+
+    lumisToProcess = cms.untracked.VLuminosityBlockRange( LumiList.LumiList(filename="./Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt").getCMSSWString().split(',') )
+    # print lumisToProcess
+
+    runsAndLumis_special = {}
+    for l in lumisToProcess:
+        if "-" in l:
+            start, stop = l.split("-")
+            rstart, lstart = start.split(":")
+            rstop, lstop = stop.split(":")
+        else:
+            rstart, lstart = l.split(":")
+            rstop, lstop = l.split(":")
+        if rstart != rstop:
+            raise Exception(
+                "Cannot convert '%s' to runs and lumis json format" % l)
+        if rstart not in runsAndLumis_special:
+            runsAndLumis_special[rstart] = []
+        runsAndLumis_special[rstart].append([int(lstart), int(lstop)])
+    jsoninput = runsAndLumis_special
 
 p=PostProcessor(".",infilelist,
                 branchsel="WZG_input_branch.txt",
