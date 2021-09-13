@@ -134,9 +134,13 @@ def hadd_help(name,sample_type,year):
         return True
 
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
-    path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/0000/'
+    path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/'
+    path = [path + i  for i in os.listdir(path)] 
     print (f'hadding root files in {path}')
-    r=subprocess.run(args=f"haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    hadd_list = ''
+    for i in path:
+        hadd_list += i + '/*.root '
+    r=subprocess.run(args=f"haddnano.py {abbre_name}.root {hadd_list} ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
     if os.path.exists(f'{abbre_name}.root'):
         print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}.root\n')
