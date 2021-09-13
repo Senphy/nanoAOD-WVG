@@ -37,7 +37,7 @@ args = parser.parse_args()
 if args.isdata:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2018", runPeriod=args.period, metBranchName="MET")
-        Modules = [muonScaleRes2018(),first_Template_Producer(),jetmetCorrector(),WZG_select_Module()]
+        Modules = [muonScaleRes2018(),first_Template_Module(),jetmetCorrector(),WZG_select_Module()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2017(),jetmetCorrector(),WZG_select_Module()]
