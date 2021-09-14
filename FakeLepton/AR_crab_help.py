@@ -136,7 +136,7 @@ def hadd_help(name,sample_type,year):
         return True
 
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
-    path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/0000/'
+    path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/'
     print (f'hadding root files in {path}')
     for i in os.listdir(path):
         # print (f'{path}/{i}/*.root')
