@@ -39,6 +39,7 @@ def prepare_crab(name,sample_type,year,period):
         f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '","period=' + period + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n\n')
+        f.write('config.JobType.maxJobRuntimeMin = 4320 \n\n')
 
         f.write('config.section_("Data")\n')
         f.write('config.Data.inputDataset = "' + name + '" \n')
@@ -137,12 +138,14 @@ def hadd_help(name,sample_type,year):
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
     path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/0000/'
     print (f'hadding root files in {path}')
-    r=subprocess.run(args=f"haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    for i in os.listdir(path):
+        # print (f'{path}/{i}/*.root')
+        r=subprocess.run(args=f"haddnano.py {abbre_name}_{i}.root {path}/{i}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
-    if os.path.exists(f'{abbre_name}.root'):
-        print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}.root\n')
-    else:
-        print (f'hadd \033[31mfail\033[0m!!')
+        if os.path.exists(f'{abbre_name}_{i}.root'):
+            print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}_{i}.root\n')
+        else:
+            print (f'hadd \033[31m fail \033[0m!!')
 
 def report_lumi(name,sample_type,year):
 
