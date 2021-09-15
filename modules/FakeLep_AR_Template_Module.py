@@ -37,6 +37,10 @@ class ApplyRegionFakeLeptonProducer(Module):
         self.out.branch("nbJets","i")
         self.out.branch("nLooseMuon","i")
         self.out.branch("nLooseElectron","i")
+        self.out.branch("LooseNotTightMuon_pt", "F", lenVar="nLooseMuon")
+        self.out.branch("LooseNotTightMuon_eta", "F", lenVar="nLooseMuon")
+        self.out.branch("LooseNotTightElectron_pt", "F", lenVar="nLooseElectron")
+        self.out.branch("LooseNotTightElectron_eta", "F", lenVar="nLooseElectron")
 
         self.out.branch("ZZ_lepton1_pt",  "F")
         self.out.branch("ZZ_lepton1_eta",  "F")
@@ -133,9 +137,12 @@ class ApplyRegionFakeLeptonProducer(Module):
             MET = event.MET_pt
             self.out.fillBranch("MET",event.MET_pt)
 
+        LooseNotTightMuon_pt = []
+        LooseNotTightMuon_eta = []
+        LooseNotTightElectron_pt = []
+        LooseNotTightElectron_eta = []
 
         #selection on muons
-        muons_type = []
         for i in range(0,len(muons)):
             if event.Muon_corrected_pt[i] < 10:
                 continue
@@ -146,10 +153,10 @@ class ApplyRegionFakeLeptonProducer(Module):
             # Use muons_type to mark muon, 1: tight, 0: loose not tight
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
-                muons_type.append(1)
             elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
                 tight_muons.append(i)
-                muons_type.append(0)
+                LooseNotTightMuon_pt.append(event.Muon_corrected_pt[i])
+                LooseNotTightMuon_eta.append(muons[i].eta)
 
 
         # selection on electrons
@@ -165,17 +172,15 @@ class ApplyRegionFakeLeptonProducer(Module):
             if (abs(electrons[i].eta + electrons[i].deltaEtaSC) < 1.479 and abs(electrons[i].dz) < 0.1 and abs(electrons[i].dxy) < 0.05) or (abs(electrons[i].eta + electrons[i].deltaEtaSC) > 1.479 and abs(electrons[i].dz) < 0.2 and abs(electrons[i].dxy) < 0.1):
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
-                    electrons_type.append(1)
                 elif electrons[i].cutBased >= 1:
                     tight_electrons.append(i)
-                    electrons_type.append(0)
+                    LooseNotTightElectron_pt.append(electrons[i].pt)
+                    LooseNotTightElectron_eta.append(electrons[i].eta)
 
-        # At least one loose lepton
-        if electrons_type.count(0) + muons_type.count(0) == 0:
-            return False
-        else:
-            self.out.fillBranch("nLooseMuon", muons_type.count(0))
-            self.out.fillBranch("nLooseElectron", electrons_type.count(0))
+        self.out.fillBranch("LooseNotTightMuon_pt", LooseNotTightMuon_pt)
+        self.out.fillBranch("LooseNotTightMuon_eta", LooseNotTightMuon_eta)
+        self.out.fillBranch("LooseNotTightElectron_pt", LooseNotTightElectron_pt)
+        self.out.fillBranch("LooseNotTightElectron_eta", LooseNotTightElectron_eta)
 
 
         # selection on photons, but not requirement on photon number in this module
@@ -748,8 +753,8 @@ class FakeLep_first_Template_Producer(Module):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("nLooseNotTightLep","I")
-        self.out.branch("nTightLep","I")
+        self.out.branch("nLooseMuon","I")
+        self.out.branch("nLooseElectron","I")
         pass
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -795,9 +800,12 @@ class FakeLep_first_Template_Producer(Module):
         # For Fake Lepton application region, we need at least one loose not tight lep
         if (len(loose_but_not_tight_electrons)) + len(loose_but_not_tight_muons) == 0:
             return False
+        
+        if (len(tight_muons)+len(tight_electrons)+len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons)) > 4:
+            return False
 
-        self.out.fillBranch("nLooseNotTightLep", len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons))
-        self.out.fillBranch("nTightLep", len(tight_muons)+len(tight_electrons))
+        self.out.fillBranch("nLooseMuon", len(loose_but_not_tight_muons))
+        self.out.fillBranch("nLooseElectron", len(loose_but_not_tight_electrons))
 
         return True
 
