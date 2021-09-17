@@ -38,7 +38,7 @@ class ApplyWeightFakeLeptonProducer(Module):
         weight = 1
         number_of_loose = event.nLooseMuon + event.nLooseElectron
 
-        for i in len(event.LooseNotTightMuon_pt):
+        for i in range(0, len(event.LooseNotTightMuon_pt)):
             BinX = FR_M.GetXaxis().FindBin(abs(event.LooseNotTightMuon_eta[i]))
             BinY = FR_M.GetYaxis().FindBin(abs(event.LooseNotTightMuon_pt[i]))
             if BinX > FR_M.GetNbinsX():
@@ -47,7 +47,7 @@ class ApplyWeightFakeLeptonProducer(Module):
                 BinY = FR_M.GetNbinsY()
             weight = weight*FR_M.GetBinContent(BinX, BinY)/(1 - FR_M.GetBinContent(BinX, BinY))
             
-        for i in len(event.LooseNotTightElectron_pt):
+        for i in range(0, len(event.LooseNotTightElectron_pt)):
             BinX = FR_E.GetXaxis().FindBin(abs(event.LooseNotTightElectron_eta[i]))
             BinY = FR_E.GetYaxis().FindBin(abs(event.LooseNotTightElectron_pt[i]))
             if BinX > FR_E.GetNbinsX():
