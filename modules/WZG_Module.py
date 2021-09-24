@@ -34,6 +34,10 @@ class WZG_Producer(Module):
         self.out.branch("channel_mark","i")
         self.out.branch("nJets","i")
         self.out.branch("nbJets","i")
+        self.out.branch("TightMuon_index", "F", lenVar="nTightMuon")
+        self.out.branch("TightElectron_index", "F", lenVar="nTightElectron")
+        self.out.branch("LooseNotTightMuon_index", "F", lenVar="nLooseNotTightMuon")
+        self.out.branch("LooseNotTightElectron_index", "F", lenVar="nLooseNotTightElectron")
 
         self.out.branch("ZZ_lepton1_pt",  "F")
         self.out.branch("ZZ_lepton1_eta",  "F")
@@ -56,7 +60,6 @@ class WZG_Producer(Module):
         self.out.branch("ZZ_lepton4_mass",  "F")
         self.out.branch("ZZ_lepton4_genPartFlav",  "i")
         self.out.branch("ZZ_mllz1",  "F")
-        self.out.branch("ZZ_MET",  "F")
 
         self.out.branch("WZG_lepton1_pt",  "F")
         self.out.branch("WZG_lepton1_eta",  "F")
@@ -81,7 +84,6 @@ class WZG_Producer(Module):
         self.out.branch("WZG_dileptonmass",  "F")
         self.out.branch("WZG_trileptonmass",  "F")
         self.out.branch("WZG_mlla",  "F")
-        self.out.branch("WZG_MET",  "F")
 
         self.out.branch("ttZ_lepton1_pt",  "F")
         self.out.branch("ttZ_lepton1_eta",  "F")
@@ -100,7 +102,6 @@ class WZG_Producer(Module):
         self.out.branch("ttZ_lepton3_genPartFlav",  "i")
         self.out.branch("ttZ_dileptonmass",  "F")
         self.out.branch("ttZ_trileptonmass",  "F")
-        self.out.branch("ttZ_MET",  "F")
 
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -155,6 +156,10 @@ class WZG_Producer(Module):
                 elif electrons[i].cutBased >= 1:
                     loose_but_not_tight_electrons.append(i)
 
+        self.out.fillBranch("TightMuon_index", tight_muons)
+        self.out.fillBranch("TightElectron_index", tight_electrons)
+        self.out.fillBranch("LooseNotTightMuon_index", loose_but_not_tight_muons)
+        self.out.fillBranch("LooseNotTightElectron_index", loose_but_not_tight_electrons)
 
         # selection on photons, but not requirement on photon number in this module
         for i in range(0,len(photons)):
@@ -239,7 +244,8 @@ class WZG_Producer(Module):
             tight_jets.append(i)
 
             if jets[i].btagDeepB > 0.7738:
-                tight_bjets.append(i)
+                if event.Jet_pt_nom[i] >= 30:
+                    tight_bjets.append(i)
 
         self.out.fillBranch("nJets", len(tight_jets))
         self.out.fillBranch("nbJets", len(tight_bjets))
@@ -347,7 +353,6 @@ class WZG_Producer(Module):
                         self.out.fillBranch("ZZ_lepton4_genPartFlav", electrons[tight_electrons[1]].genPartFlav)
                     
                 self.out.fillBranch("ZZ_mllz1", dilepton_mass)
-                self.out.fillBranch("ZZ_MET", MET)
                 return True
 
             elif len(tight_electrons) == 4:
@@ -398,7 +403,6 @@ class WZG_Producer(Module):
                     self.out.fillBranch("ZZ_lepton4_genPartFlav", electrons[tight_electrons[l4_index]].genPartFlav)
                     
                 self.out.fillBranch("ZZ_mllz1", dileptonmass_temp[abs_mll_mz.index(min(abs_mll_mz))])
-                self.out.fillBranch("ZZ_MET", MET)
                 return True
 
 
@@ -450,7 +454,6 @@ class WZG_Producer(Module):
                     self.out.fillBranch("ZZ_lepton4_genPartFlav", muons[tight_muons[l4_index]].genPartFlav)
                     
                 self.out.fillBranch("ZZ_mllz1", dileptonmass_temp[abs_mll_mz.index(min(abs_mll_mz))])
-                self.out.fillBranch("ZZ_MET", MET)
                 return True
 
             pass
@@ -475,8 +478,10 @@ class WZG_Producer(Module):
 
         if len(tight_electrons) + len(tight_muons) == 3:
 
-            if MET <= 30:
-                return False
+            # REMOVE MET cut in this module in order to vary up/down 
+            # if MET <= 30:
+            #     return False
+
             if len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons) != 0:
                 return False
 
@@ -675,7 +680,6 @@ class WZG_Producer(Module):
                     self.out.fillBranch("ttZ_lepton3_genPartFlav", temp_zl2_genPartFlav)
                 self.out.fillBranch("ttZ_dileptonmass", dileptonmass)
                 self.out.fillBranch("ttZ_trileptonmass", trileptonmass)
-                self.out.fillBranch("ttZ_MET", MET)
                 return True
 
             
@@ -714,7 +718,6 @@ class WZG_Producer(Module):
                 self.out.fillBranch("WZG_dileptonmass", dileptonmass)
                 self.out.fillBranch("WZG_trileptonmass", trileptonmass)
                 self.out.fillBranch("WZG_mlla", m_lla)
-                self.out.fillBranch("WZG_MET", MET)
                 return True
 
 
@@ -728,6 +731,10 @@ class first_Template_Producer(Module):
         self.out = wrappedOutputTree
         self.out.branch("nLooseNotTightLep","I")
         self.out.branch("nTightLep","I")
+        self.out.branch("nTightMuon","I")
+        self.out.branch("nTightElectron","I")
+        self.out.branch("nLooseNotTightMuon","I")
+        self.out.branch("nLooseNotTightElectron","I")
         pass
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -773,6 +780,10 @@ class first_Template_Producer(Module):
 
         self.out.fillBranch("nLooseNotTightLep", len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons))
         self.out.fillBranch("nTightLep", len(tight_muons)+len(tight_electrons))
+        self.out.fillBranch("nTightMuon", len(tight_muons))
+        self.out.fillBranch("nTightElectron", len(tight_electrons))
+        self.out.fillBranch("nLooseNotTightMuon", len(loose_but_not_tight_muons))
+        self.out.fillBranch("nLooseNotTightElectron", len(loose_but_not_tight_electrons))
 
         return True
 
