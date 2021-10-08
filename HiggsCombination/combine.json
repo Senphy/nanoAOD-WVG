@@ -1,0 +1,23 @@
+{
+    "utils":{
+        "imax":1,
+        "bins":5,
+        "variable":"dileptonmass",
+        "tag":2018
+    },
+
+    "regions":{
+        "CR_1":{
+            "name":"t_enriched",
+            "csv":"combine_CR.csv"
+        },
+        "CR_2":{
+            "name":"ZZ",
+            "csv":"combine_CR.csv"
+        },
+        "SR_1":{
+            "name":"wza",
+            "csv":"combine_SR.csv"
+        }
+    }
+}
