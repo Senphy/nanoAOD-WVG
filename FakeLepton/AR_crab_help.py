@@ -140,7 +140,7 @@ def hadd_help(name,sample_type,year):
     print (f'hadding root files in {path}')
     for i in os.listdir(path):
         # print (f'{path}/{i}/*.root')
-        r=subprocess.run(args=f"haddnano.py {abbre_name}_{i}.root {path}/{i}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+        r=subprocess.run(args=f"andrew_haddnano.py {abbre_name}_{i}.root {path}/{i}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
         if os.path.exists(f'{abbre_name}_{i}.root'):
             print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}_{i}.root\n')
