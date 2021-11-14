@@ -47,22 +47,28 @@ class ApplyRegionFakeLeptonProducer(Module):
         self.out.branch("ZZ_lepton1_phi",  "F")
         self.out.branch("ZZ_lepton1_mass",  "F")
         self.out.branch("ZZ_lepton1_genPartFlav",  "i")
+        self.out.branch("ZZ_lepton1_index",  "i")
         self.out.branch("ZZ_lepton2_pt",  "F")
         self.out.branch("ZZ_lepton2_eta",  "F")
         self.out.branch("ZZ_lepton2_phi",  "F")
         self.out.branch("ZZ_lepton2_mass",  "F")
         self.out.branch("ZZ_lepton2_genPartFlav",  "i")
+        self.out.branch("ZZ_lepton2_index",  "i")
         self.out.branch("ZZ_lepton3_pt",  "F")
         self.out.branch("ZZ_lepton3_eta",  "F")
         self.out.branch("ZZ_lepton3_phi",  "F")
         self.out.branch("ZZ_lepton3_mass",  "F")
         self.out.branch("ZZ_lepton3_genPartFlav",  "i")
+        self.out.branch("ZZ_lepton3_index",  "i")
         self.out.branch("ZZ_lepton4_pt",  "F")
         self.out.branch("ZZ_lepton4_eta",  "F")
         self.out.branch("ZZ_lepton4_phi",  "F")
         self.out.branch("ZZ_lepton4_mass",  "F")
         self.out.branch("ZZ_lepton4_genPartFlav",  "i")
+        self.out.branch("ZZ_lepton4_index",  "i")
         self.out.branch("ZZ_mllz1",  "F")
+        self.out.branch("ZZ_mllz2",  "F")
+        self.out.branch("ZZ_trileptonmass",  "F")
         self.out.branch("ZZ_MET",  "F")
 
         self.out.branch("WZG_lepton1_pt",  "F")
@@ -70,21 +76,25 @@ class ApplyRegionFakeLeptonProducer(Module):
         self.out.branch("WZG_lepton1_phi",  "F")
         self.out.branch("WZG_lepton1_mass",  "F")
         self.out.branch("WZG_lepton1_genPartFlav",  "i")
+        self.out.branch("WZG_lepton1_index",  "i")
         self.out.branch("WZG_lepton2_pt",  "F")
         self.out.branch("WZG_lepton2_eta",  "F")
         self.out.branch("WZG_lepton2_phi",  "F")
         self.out.branch("WZG_lepton2_mass",  "F")
         self.out.branch("WZG_lepton2_genPartFlav",  "i")
+        self.out.branch("WZG_lepton2_index",  "i")
         self.out.branch("WZG_lepton3_pt",  "F")
         self.out.branch("WZG_lepton3_eta",  "F")
         self.out.branch("WZG_lepton3_phi",  "F")
         self.out.branch("WZG_lepton3_mass",  "F")
         self.out.branch("WZG_lepton3_genPartFlav",  "i")
+        self.out.branch("WZG_lepton3_index",  "i")
         self.out.branch("WZG_photon_pt",  "F")
         self.out.branch("WZG_photon_eta",  "F")
         self.out.branch("WZG_photon_phi",  "F")
         self.out.branch("WZG_photon_mass",  "F")
         self.out.branch("WZG_photon_genPartFlav",  "i")
+        self.out.branch("WZG_photon_index",  "i")
         self.out.branch("WZG_dileptonmass",  "F")
         self.out.branch("WZG_trileptonmass",  "F")
         self.out.branch("WZG_mlla",  "F")
@@ -95,20 +105,32 @@ class ApplyRegionFakeLeptonProducer(Module):
         self.out.branch("ttZ_lepton1_phi",  "F")
         self.out.branch("ttZ_lepton1_mass",  "F")
         self.out.branch("ttZ_lepton1_genPartFlav",  "i")
+        self.out.branch("ttZ_lepton1_index",  "i")
         self.out.branch("ttZ_lepton2_pt",  "F")
         self.out.branch("ttZ_lepton2_eta",  "F")
         self.out.branch("ttZ_lepton2_phi",  "F")
         self.out.branch("ttZ_lepton2_mass",  "F")
         self.out.branch("ttZ_lepton2_genPartFlav",  "i")
+        self.out.branch("ttZ_lepton2_index",  "i")
         self.out.branch("ttZ_lepton3_pt",  "F")
         self.out.branch("ttZ_lepton3_eta",  "F")
         self.out.branch("ttZ_lepton3_phi",  "F")
         self.out.branch("ttZ_lepton3_mass",  "F")
         self.out.branch("ttZ_lepton3_genPartFlav",  "i")
+        self.out.branch("ttZ_lepton3_index",  "i")
         self.out.branch("ttZ_dileptonmass",  "F")
         self.out.branch("ttZ_trileptonmass",  "F")
         self.out.branch("ttZ_MET",  "F")
 
+        self.out.branch("Muon_ID_Weight", "F")
+        self.out.branch("Muon_ID_Weight_UP", "F")
+        self.out.branch("Muon_ID_Weight_DOWN", "F")
+        self.out.branch("Electron_ID_Weight", "F")
+        self.out.branch("Electron_ID_Weight_UP", "F")
+        self.out.branch("Electron_ID_Weight_DOWN", "F")
+        self.out.branch("Electron_RECO_Weight", "F")
+        self.out.branch("Electron_RECO_Weight_UP", "F")
+        self.out.branch("Electron_RECO_Weight_DOWN", "F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -126,8 +148,10 @@ class ApplyRegionFakeLeptonProducer(Module):
         tight_muons = [] 
         tight_jets = [] 
         tight_bjets = []
-        loose_but_not_tight_muons = []
-        loose_but_not_tight_electrons = []
+        veto_muons = []
+        veto_electrons = []
+        tight_electrons_for_SF = []
+        veto_electrons_for_SF = []
 
         # selection on MET. Pass to next event directly if fail.
         if hasattr(event, "MET_T1Smear_pt"):
@@ -148,40 +172,90 @@ class ApplyRegionFakeLeptonProducer(Module):
                 continue
             if abs(muons[i].eta) > 2.4:
                 continue
-            # For Fake Lep Module, the 'tight_muons' actually include both 'loose' and 'tight' muons.
+            # For Fake Lep Module, the 'tight_muons' actually include both 'fake' and 'tight' muons.
             # It is just for the compability with former module
-            # Use muons_type to mark muon, 1: tight, 0: loose not tight
+            # Use muons_type to mark muon, 1: tight, 0: loose not tight (fake not tight)
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
-            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
+            elif muons[i].tightId and muons[i].pfRelIso04_all < 0.4:
                 tight_muons.append(i)
                 LooseNotTightMuon_pt.append(event.Muon_corrected_pt[i])
                 LooseNotTightMuon_eta.append(muons[i].eta)
+            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
+                veto_muons.append(i)
+            muons[i].p4().SetPtEtaPhiM(event.Muon_corrected_pt[i], muons[i].p4().Eta(), muons[i].p4().Phi(), muons[i].p4().M())
 
+        Muon_ID_Weight = 1
+        Muon_ID_Weight_UP = 1
+        Muon_ID_Weight_DOWN = 1
+        if hasattr(event, "Muon_CutBased_TightID_SF"):
+            for i in tight_muons:
+                Muon_ID_Weight = Muon_ID_Weight * event.Muon_CutBased_TightID_SF[i]
+                Muon_ID_Weight_UP = max(Muon_ID_Weight_UP * (event.Muon_CutBased_TightID_SF[i] + event.Muon_CutBased_TightID_SFerr[i]), Muon_ID_Weight_UP * (event.Muon_CutBased_TightID_SF[i] - event.Muon_CutBased_TightID_SFerr[i]))
+                Muon_ID_Weight_DOWN = min(Muon_ID_Weight_DOWN * (event.Muon_CutBased_TightID_SF[i] + event.Muon_CutBased_TightID_SFerr[i]), Muon_ID_Weight_DOWN * (event.Muon_CutBased_TightID_SF[i] - event.Muon_CutBased_TightID_SFerr[i]))
+            for i in veto_muons:
+                Muon_ID_Weight = Muon_ID_Weight * event.Muon_CutBased_LooseID_SF[i]
+                Muon_ID_Weight_UP = max(Muon_ID_Weight_UP * (event.Muon_CutBased_LooseID_SF[i] + event.Muon_CutBased_LooseID_SFerr[i]), Muon_ID_Weight_UP * (event.Muon_CutBased_LooseID_SF[i] - event.Muon_CutBased_LooseID_SFerr[i]))
+                Muon_ID_Weight_DOWN = min(Muon_ID_Weight_DOWN * (event.Muon_CutBased_LooseID_SF[i] + event.Muon_CutBased_LooseID_SFerr[i]), Muon_ID_Weight_DOWN * (event.Muon_CutBased_LooseID_SF[i] - event.Muon_CutBased_LooseID_SFerr[i]))
 
         # selection on electrons
-        electrons_type = []
         for i in range(0,len(electrons)):
             if electrons[i].pt < 10:
                 continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
-            # For Fake Lep Module, the 'tight_electrons' actually include both 'loose' and 'tight' electrons.
+            # For Fake Lep Module, the 'tight_electrons' actually include both 'fake' and 'tight' electrons.
             # It is just for the compability with former module
             # Use electrons_type to mark electron, 1: tight, 0: loose not tight
             if (abs(electrons[i].eta + electrons[i].deltaEtaSC) < 1.479 and abs(electrons[i].dz) < 0.1 and abs(electrons[i].dxy) < 0.05) or (abs(electrons[i].eta + electrons[i].deltaEtaSC) > 1.479 and abs(electrons[i].dz) < 0.2 and abs(electrons[i].dxy) < 0.1):
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
+                    tight_electrons_for_SF.append(i)
                 elif electrons[i].cutBased >= 1:
                     tight_electrons.append(i)
+                    veto_electrons_for_SF.append(i)
                     LooseNotTightElectron_pt.append(electrons[i].pt)
                     LooseNotTightElectron_eta.append(electrons[i].eta)
+
+        Electron_ID_Weight = 1
+        Electron_ID_Weight_UP = 1
+        Electron_ID_Weight_DOWN = 1
+        Electron_RECO_Weight = 1
+        Electron_RECO_Weight_UP = 1
+        Electron_RECO_Weight_DOWN = 1
+        if hasattr(event, "Electron_RECO_SF"):
+            for i in tight_electrons_for_SF:
+                Electron_ID_Weight = Electron_ID_Weight * event.Electron_CutBased_MediumID_SF[i]
+                Electron_ID_Weight_UP = max(Electron_ID_Weight_UP * (event.Electron_CutBased_MediumID_SF[i] + event.Electron_CutBased_MediumID_SFerr[i]), Electron_ID_Weight * (event.Electron_CutBased_MediumID_SF[i] - event.Electron_CutBased_MediumID_SFerr[i]))
+                Electron_ID_Weight_DOWN = min(Electron_ID_Weight_DOWN * (event.Electron_CutBased_MediumID_SF[i] + event.Electron_CutBased_MediumID_SFerr[i]), Electron_ID_Weight * (event.Electron_CutBased_MediumID_SF[i] - event.Electron_CutBased_MediumID_SFerr[i]))
+                Electron_RECO_Weight = Electron_RECO_Weight * event.Electron_RECO_SF[i]
+                Electron_RECO_Weight_UP = max(Electron_RECO_Weight_UP * (event.Electron_RECO_SF[i] + event.Electron_RECO_SFerr[i]), Electron_RECO_Weight_UP * (event.Electron_RECO_SF[i] - event.Electron_RECO_SFerr[i]))
+                Electron_RECO_Weight_DOWN = min(Electron_RECO_Weight_DOWN * (event.Electron_RECO_SF[i] + event.Electron_RECO_SFerr[i]), Electron_RECO_Weight_DOWN * (event.Electron_RECO_SF[i] - event.Electron_RECO_SFerr[i]))
+            for i in veto_electrons_for_SF:
+                Electron_ID_Weight = Electron_ID_Weight * event.Electron_CutBased_VetoID_SF[i]
+                Electron_ID_Weight_UP = max(Electron_ID_Weight_UP * (event.Electron_CutBased_VetoID_SF[i] + event.Electron_CutBased_VetoID_SFerr[i]), Electron_ID_Weight * (event.Electron_CutBased_VetoID_SF[i] - event.Electron_CutBased_VetoID_SFerr[i]))
+                Electron_ID_Weight_DOWN = min(Electron_ID_Weight_DOWN * (event.Electron_CutBased_VetoID_SF[i] + event.Electron_CutBased_VetoID_SFerr[i]), Electron_ID_Weight * (event.Electron_CutBased_VetoID_SF[i] - event.Electron_CutBased_VetoID_SFerr[i]))
+                Electron_RECO_Weight = Electron_RECO_Weight * event.Electron_RECO_SF[i]
+                Electron_RECO_Weight_UP = max(Electron_RECO_Weight_UP * (event.Electron_RECO_SF[i] + event.Electron_RECO_SFerr[i]), Electron_RECO_Weight_UP * (event.Electron_RECO_SF[i] - event.Electron_RECO_SFerr[i]))
+                Electron_RECO_Weight_DOWN = min(Electron_RECO_Weight_DOWN * (event.Electron_RECO_SF[i] + event.Electron_RECO_SFerr[i]), Electron_RECO_Weight_DOWN * (event.Electron_RECO_SF[i] - event.Electron_RECO_SFerr[i]))
+
+        if len(LooseNotTightElectron_pt) + len(LooseNotTightMuon_pt) == 0:
+            return False
 
         self.out.fillBranch("LooseNotTightMuon_pt", LooseNotTightMuon_pt)
         self.out.fillBranch("LooseNotTightMuon_eta", LooseNotTightMuon_eta)
         self.out.fillBranch("LooseNotTightElectron_pt", LooseNotTightElectron_pt)
         self.out.fillBranch("LooseNotTightElectron_eta", LooseNotTightElectron_eta)
 
+        self.out.fillBranch("Muon_ID_Weight", Muon_ID_Weight)
+        self.out.fillBranch("Muon_ID_Weight_UP", Muon_ID_Weight_UP)
+        self.out.fillBranch("Muon_ID_Weight_DOWN", Muon_ID_Weight_DOWN)
+        self.out.fillBranch("Electron_ID_Weight", Electron_ID_Weight)
+        self.out.fillBranch("Electron_ID_Weight_UP", Electron_ID_Weight_UP)
+        self.out.fillBranch("Electron_ID_Weight_DOWN", Electron_ID_Weight_DOWN)
+        self.out.fillBranch("Electron_RECO_Weight", Electron_RECO_Weight)
+        self.out.fillBranch("Electron_RECO_Weight_UP", Electron_RECO_Weight_UP)
+        self.out.fillBranch("Electron_RECO_Weight_DOWN", Electron_RECO_Weight_DOWN)
 
         # selection on photons, but not requirement on photon number in this module
         for i in range(0,len(photons)):
@@ -266,7 +340,8 @@ class ApplyRegionFakeLeptonProducer(Module):
             tight_jets.append(i)
 
             if jets[i].btagDeepB > 0.7738:
-                tight_bjets.append(i)
+                if event.Jet_pt_nom[i] >= 30:
+                    tight_bjets.append(i)
 
         self.out.fillBranch("nJets", len(tight_jets))
         self.out.fillBranch("nbJets", len(tight_bjets))
@@ -303,6 +378,7 @@ class ApplyRegionFakeLeptonProducer(Module):
         # Bjets veto
 
 
+        # lepton is ordered with z1(ll) z2(ll)
         if len(tight_electrons) + len(tight_muons) == 4:
 
             if len(tight_bjets) > 0:
@@ -320,11 +396,15 @@ class ApplyRegionFakeLeptonProducer(Module):
                     return False
                 if abs(dileptonmass_ze-91.188) < abs(dileptonmass_zm-91.188):
                     z_pair_mark = 1
-                    dilepton_mass = dileptonmass_ze
+                    mllz1 = dileptonmass_ze
+                    mllz2 = dileptonmass_zm
+                    trileptonmass = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4() + muons[tight_muons[0]].p4()).M()
                 else:
                     z_pair_mark = 2
-                    dilepton_mass = dileptonmass_zm
-                if (abs(dilepton_mass-91.188)>15):
+                    mllz1 = dileptonmass_zm
+                    mllz2 = dileptonmass_ze
+                    trileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4() + electrons[tight_electrons[0]].p4()).M()
+                if (abs(mllz1-91.188)>15):
                     return False
                 if z_pair_mark == 1:
                     self.out.fillBranch("channel_mark", 5)
@@ -332,18 +412,22 @@ class ApplyRegionFakeLeptonProducer(Module):
                     self.out.fillBranch("ZZ_lepton1_eta", electrons[tight_electrons[0]].eta)
                     self.out.fillBranch("ZZ_lepton1_phi", electrons[tight_electrons[0]].phi)
                     self.out.fillBranch("ZZ_lepton1_mass", electrons[tight_electrons[0]].mass)
+                    self.out.fillBranch("ZZ_lepton1_index", tight_electrons[0])
                     self.out.fillBranch("ZZ_lepton2_pt", electrons[tight_electrons[1]].pt)
                     self.out.fillBranch("ZZ_lepton2_eta", electrons[tight_electrons[1]].eta)
                     self.out.fillBranch("ZZ_lepton2_phi", electrons[tight_electrons[1]].phi)
                     self.out.fillBranch("ZZ_lepton2_mass", electrons[tight_electrons[1]].mass)
+                    self.out.fillBranch("ZZ_lepton2_index", tight_electrons[1])
                     self.out.fillBranch("ZZ_lepton3_pt", event.Muon_corrected_pt[tight_muons[0]])
                     self.out.fillBranch("ZZ_lepton3_eta", muons[tight_muons[0]].eta)
                     self.out.fillBranch("ZZ_lepton3_phi", muons[tight_muons[0]].phi)
                     self.out.fillBranch("ZZ_lepton3_mass", muons[tight_muons[0]].mass)
+                    self.out.fillBranch("ZZ_lepton3_index", tight_muons[0])
                     self.out.fillBranch("ZZ_lepton4_pt", event.Muon_corrected_pt[tight_muons[1]])
                     self.out.fillBranch("ZZ_lepton4_eta", muons[tight_muons[1]].eta)
                     self.out.fillBranch("ZZ_lepton4_phi", muons[tight_muons[1]].phi)
                     self.out.fillBranch("ZZ_lepton4_mass", muons[tight_muons[1]].mass)
+                    self.out.fillBranch("ZZ_lepton4_index", tight_muons[1])
                     if hasattr(muons[tight_muons[0]],"genPartFlav"):
                         self.out.fillBranch("ZZ_lepton1_genPartFlav", electrons[tight_electrons[0]].genPartFlav)
                         self.out.fillBranch("ZZ_lepton2_genPartFlav", electrons[tight_electrons[1]].genPartFlav)
@@ -355,25 +439,31 @@ class ApplyRegionFakeLeptonProducer(Module):
                     self.out.fillBranch("ZZ_lepton1_eta", muons[tight_muons[0]].eta)
                     self.out.fillBranch("ZZ_lepton1_phi", muons[tight_muons[0]].phi)
                     self.out.fillBranch("ZZ_lepton1_mass", muons[tight_muons[0]].mass)
+                    self.out.fillBranch("ZZ_lepton1_index", tight_muons[0])
                     self.out.fillBranch("ZZ_lepton2_pt", event.Muon_corrected_pt[tight_muons[1]])
                     self.out.fillBranch("ZZ_lepton2_eta", muons[tight_muons[1]].eta)
                     self.out.fillBranch("ZZ_lepton2_phi", muons[tight_muons[1]].phi)
                     self.out.fillBranch("ZZ_lepton2_mass", muons[tight_muons[1]].mass)
+                    self.out.fillBranch("ZZ_lepton2_index", tight_muons[1])
                     self.out.fillBranch("ZZ_lepton3_pt", electrons[tight_electrons[0]].pt)
                     self.out.fillBranch("ZZ_lepton3_eta", electrons[tight_electrons[0]].eta)
                     self.out.fillBranch("ZZ_lepton3_phi", electrons[tight_electrons[0]].phi)
                     self.out.fillBranch("ZZ_lepton3_mass", electrons[tight_electrons[0]].mass)
+                    self.out.fillBranch("ZZ_lepton3_index", tight_electrons[0])
                     self.out.fillBranch("ZZ_lepton4_pt", electrons[tight_electrons[1]].pt)
                     self.out.fillBranch("ZZ_lepton4_eta", electrons[tight_electrons[1]].eta)
                     self.out.fillBranch("ZZ_lepton4_phi", electrons[tight_electrons[1]].phi)
                     self.out.fillBranch("ZZ_lepton4_mass", electrons[tight_electrons[1]].mass)
+                    self.out.fillBranch("ZZ_lepton4_index", tight_electrons[1])
                     if hasattr(muons[tight_muons[0]],"genPartFlav"):
                         self.out.fillBranch("ZZ_lepton1_genPartFlav", muons[tight_muons[0]].genPartFlav)
                         self.out.fillBranch("ZZ_lepton2_genPartFlav", muons[tight_muons[1]].genPartFlav)
                         self.out.fillBranch("ZZ_lepton3_genPartFlav", electrons[tight_electrons[0]].genPartFlav)
                         self.out.fillBranch("ZZ_lepton4_genPartFlav", electrons[tight_electrons[1]].genPartFlav)
                     
-                self.out.fillBranch("ZZ_mllz1", dilepton_mass)
+                self.out.fillBranch("ZZ_mllz1", mllz1)
+                self.out.fillBranch("ZZ_mllz2", mllz2)
+                self.out.fillBranch("ZZ_trileptonmass", trileptonmass)
                 self.out.fillBranch("ZZ_MET", MET)
                 return True
 
@@ -406,18 +496,22 @@ class ApplyRegionFakeLeptonProducer(Module):
                 self.out.fillBranch("ZZ_lepton1_eta", electrons[tight_electrons[l1_index]].eta)
                 self.out.fillBranch("ZZ_lepton1_phi", electrons[tight_electrons[l1_index]].phi)
                 self.out.fillBranch("ZZ_lepton1_mass", electrons[tight_electrons[l1_index]].mass)
+                self.out.fillBranch("ZZ_lepton1_index", tight_electrons[l1_index])
                 self.out.fillBranch("ZZ_lepton2_pt", electrons[tight_electrons[l2_index]].pt)
                 self.out.fillBranch("ZZ_lepton2_eta", electrons[tight_electrons[l2_index]].eta)
                 self.out.fillBranch("ZZ_lepton2_phi", electrons[tight_electrons[l2_index]].phi)
                 self.out.fillBranch("ZZ_lepton2_mass", electrons[tight_electrons[l2_index]].mass)
+                self.out.fillBranch("ZZ_lepton2_index", tight_electrons[l2_index])
                 self.out.fillBranch("ZZ_lepton3_pt", electrons[tight_electrons[l3_index]].pt)
                 self.out.fillBranch("ZZ_lepton3_eta", electrons[tight_electrons[l3_index]].eta)
                 self.out.fillBranch("ZZ_lepton3_phi", electrons[tight_electrons[l3_index]].phi)
                 self.out.fillBranch("ZZ_lepton3_mass", electrons[tight_electrons[l3_index]].mass)
+                self.out.fillBranch("ZZ_lepton3_index", tight_electrons[l3_index])
                 self.out.fillBranch("ZZ_lepton4_pt", electrons[tight_electrons[l4_index]].pt)
                 self.out.fillBranch("ZZ_lepton4_eta", electrons[tight_electrons[l4_index]].eta)
                 self.out.fillBranch("ZZ_lepton4_phi", electrons[tight_electrons[l4_index]].phi)
                 self.out.fillBranch("ZZ_lepton4_mass", electrons[tight_electrons[l4_index]].mass)
+                self.out.fillBranch("ZZ_lepton4_index", tight_electrons[l4_index])
                 if hasattr(electrons[tight_electrons[0]],"genPartFlav"):
                     self.out.fillBranch("ZZ_lepton1_genPartFlav", electrons[tight_electrons[l1_index]].genPartFlav)
                     self.out.fillBranch("ZZ_lepton2_genPartFlav", electrons[tight_electrons[l2_index]].genPartFlav)
@@ -425,6 +519,8 @@ class ApplyRegionFakeLeptonProducer(Module):
                     self.out.fillBranch("ZZ_lepton4_genPartFlav", electrons[tight_electrons[l4_index]].genPartFlav)
                     
                 self.out.fillBranch("ZZ_mllz1", dileptonmass_temp[abs_mll_mz.index(min(abs_mll_mz))])
+                self.out.fillBranch("ZZ_mllz2", (electrons[tight_electrons[l3_index]].p4() + electrons[tight_electrons[l4_index]].p4()).M())
+                self.out.fillBranch("ZZ_trileptonmass", (electrons[tight_electrons[l1_index]].p4() + electrons[tight_electrons[l2_index]].p4() + electrons[tight_electrons[l3_index]].p4()).M())
                 self.out.fillBranch("ZZ_MET", MET)
                 return True
 
@@ -458,18 +554,22 @@ class ApplyRegionFakeLeptonProducer(Module):
                 self.out.fillBranch("ZZ_lepton1_eta", muons[tight_muons[l1_index]].eta)
                 self.out.fillBranch("ZZ_lepton1_phi", muons[tight_muons[l1_index]].phi)
                 self.out.fillBranch("ZZ_lepton1_mass", muons[tight_muons[l1_index]].mass)
+                self.out.fillBranch("ZZ_lepton1_index", tight_muons[l1_index])
                 self.out.fillBranch("ZZ_lepton2_pt", muons[tight_muons[l2_index]].pt)
                 self.out.fillBranch("ZZ_lepton2_eta", muons[tight_muons[l2_index]].eta)
                 self.out.fillBranch("ZZ_lepton2_phi", muons[tight_muons[l2_index]].phi)
                 self.out.fillBranch("ZZ_lepton2_mass", muons[tight_muons[l2_index]].mass)
+                self.out.fillBranch("ZZ_lepton2_index", tight_muons[l2_index])
                 self.out.fillBranch("ZZ_lepton3_pt", muons[tight_muons[l3_index]].pt)
                 self.out.fillBranch("ZZ_lepton3_eta", muons[tight_muons[l3_index]].eta)
                 self.out.fillBranch("ZZ_lepton3_phi", muons[tight_muons[l3_index]].phi)
                 self.out.fillBranch("ZZ_lepton3_mass", muons[tight_muons[l3_index]].mass)
+                self.out.fillBranch("ZZ_lepton3_index", tight_muons[l3_index])
                 self.out.fillBranch("ZZ_lepton4_pt", muons[tight_muons[l4_index]].pt)
                 self.out.fillBranch("ZZ_lepton4_eta", muons[tight_muons[l4_index]].eta)
                 self.out.fillBranch("ZZ_lepton4_phi", muons[tight_muons[l4_index]].phi)
                 self.out.fillBranch("ZZ_lepton4_mass", muons[tight_muons[l4_index]].mass)
+                self.out.fillBranch("ZZ_lepton4_index", tight_muons[l4_index])
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     self.out.fillBranch("ZZ_lepton1_genPartFlav", muons[tight_muons[l1_index]].genPartFlav)
                     self.out.fillBranch("ZZ_lepton2_genPartFlav", muons[tight_muons[l2_index]].genPartFlav)
@@ -477,6 +577,8 @@ class ApplyRegionFakeLeptonProducer(Module):
                     self.out.fillBranch("ZZ_lepton4_genPartFlav", muons[tight_muons[l4_index]].genPartFlav)
                     
                 self.out.fillBranch("ZZ_mllz1", dileptonmass_temp[abs_mll_mz.index(min(abs_mll_mz))])
+                self.out.fillBranch("ZZ_mllz2", (muons[tight_muons[l3_index]].p4() + muons[tight_muons[l4_index]].p4()).M())
+                self.out.fillBranch("ZZ_trileptonmass", (muons[tight_muons[l1_index]].p4() + muons[tight_muons[l2_index]].p4() + muons[tight_muons[l3_index]].p4()).M())
                 self.out.fillBranch("ZZ_MET", MET)
                 return True
 
@@ -495,16 +597,16 @@ class ApplyRegionFakeLeptonProducer(Module):
         # pt(lz1) > 25, pt(lz2) > 10, pt(lw) > 25
         # |m(lz1,lz2)-mz| <= 15
         # >=1 tight photon
-        # |m(lz1,lz2,a)+m(lz1,lz2)| >= 182
+        # |m(lz1,lz2,a)+m(lz1,lz2)| >= 182 !!abandoned!!
         # m(lz1,lz2) > 4
         # m(lll) > 100
         # Bjets veto
 
         if len(tight_electrons) + len(tight_muons) == 3:
-
-            if MET <= 30:
-                return False
-            if len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons) != 0:
+            # REMOVE MET cut in this module in order to vary up/down
+            # if MET <= 30:
+            #     return False
+            if len(veto_electrons)+len(veto_muons) != 0:
                 return False
 
             dileptonmass = float('inf')
@@ -531,9 +633,12 @@ class ApplyRegionFakeLeptonProducer(Module):
                     return False
                 
                 temp_wl1_p4 = electrons[tight_electrons[0]].p4()
+                temp_wl1_index = tight_electrons[0]
                 temp_zl1_p4 = muons[tight_muons[0]].p4()
+                temp_zl1_index = tight_muons[0]
                 temp_zl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_zl1_p4.Eta(), temp_zl1_p4.Phi(), temp_zl1_p4.M())
                 temp_zl2_p4 = muons[tight_muons[1]].p4()
+                temp_zl2_index = tight_muons[1]
                 temp_zl2_p4.SetPtEtaPhiM(event.Muon_corrected_pt[1], temp_zl2_p4.Eta(), temp_zl2_p4.Phi(), temp_zl2_p4.M())
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
@@ -563,9 +668,12 @@ class ApplyRegionFakeLeptonProducer(Module):
                     return False
 
                 temp_wl1_p4 = muons[tight_muons[0]].p4()
+                temp_wl1_index = tight_muons[0]
                 temp_wl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_wl1_p4.Eta(), temp_wl1_p4.Phi(), temp_wl1_p4.M())
                 temp_zl1_p4 = electrons[tight_electrons[0]].p4()
+                temp_zl1_index = tight_electrons[0]
                 temp_zl2_p4 = electrons[tight_electrons[1]].p4()
+                temp_zl2_index= tight_electrons[1]
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = muons[tight_muons[0]].genPartFlav
                     temp_zl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
@@ -616,8 +724,11 @@ class ApplyRegionFakeLeptonProducer(Module):
                     m_lla = (electrons[tight_electrons[1]].p4() + electrons[tight_electrons[2]].p4() + photons[tight_photons[0]].p4()).M()
 
                 temp_wl1_p4 = electrons[tight_electrons[0]].p4()
+                temp_wl1_index = tight_electrons[0]
                 temp_zl1_p4 = electrons[tight_electrons[1]].p4()
+                temp_zl1_index = tight_electrons[1]
                 temp_zl2_p4 = electrons[tight_electrons[2]].p4()
+                temp_zl2_index = tight_electrons[2]
                 if hasattr(electrons[tight_electrons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
                     temp_zl1_genPartFlav = electrons[tight_electrons[1]].genPartFlav
@@ -668,10 +779,13 @@ class ApplyRegionFakeLeptonProducer(Module):
                     m_lla = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4() + photons[tight_photons[0]].p4()).M()
 
                 temp_wl1_p4 = muons[tight_muons[0]].p4()
+                temp_wl1_index = tight_muons[0]
                 temp_wl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_wl1_p4.Eta(), temp_wl1_p4.Phi(), temp_wl1_p4.M())
                 temp_zl1_p4 = muons[tight_muons[1]].p4()
+                temp_zl1_index = tight_muons[1]
                 temp_zl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[1], temp_zl1_p4.Eta(), temp_zl1_p4.Phi(), temp_zl1_p4.M())
                 temp_zl2_p4 = muons[tight_muons[2]].p4()
+                temp_zl2_index = tight_muons[2]
                 temp_zl2_p4.SetPtEtaPhiM(event.Muon_corrected_pt[2], temp_zl2_p4.Eta(), temp_zl2_p4.Phi(), temp_zl2_p4.M())
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = muons[tight_muons[0]].genPartFlav
@@ -688,14 +802,17 @@ class ApplyRegionFakeLeptonProducer(Module):
                 self.out.fillBranch("ttZ_lepton1_eta", temp_wl1_p4.Eta())
                 self.out.fillBranch("ttZ_lepton1_phi", temp_wl1_p4.Phi())
                 self.out.fillBranch("ttZ_lepton1_mass", temp_wl1_p4.M())
+                self.out.fillBranch("ttZ_lepton1_index", temp_wl1_index)
                 self.out.fillBranch("ttZ_lepton2_pt", temp_zl1_p4.Pt())
                 self.out.fillBranch("ttZ_lepton2_eta", temp_zl1_p4.Eta())
                 self.out.fillBranch("ttZ_lepton2_phi", temp_zl1_p4.Phi())
                 self.out.fillBranch("ttZ_lepton2_mass", temp_zl1_p4.M())
+                self.out.fillBranch("ttZ_lepton2_index", temp_zl1_index)
                 self.out.fillBranch("ttZ_lepton3_pt", temp_zl2_p4.Pt())
                 self.out.fillBranch("ttZ_lepton3_eta", temp_zl2_p4.Eta())
                 self.out.fillBranch("ttZ_lepton3_phi", temp_zl2_p4.Phi())
                 self.out.fillBranch("ttZ_lepton3_mass", temp_zl2_p4.M())
+                self.out.fillBranch("ttZ_lepton3_index", temp_zl2_index)
                 if 'temp_wl1_genPartFlav' in locals():
                     self.out.fillBranch("ttZ_lepton1_genPartFlav", temp_wl1_genPartFlav)
                     self.out.fillBranch("ttZ_lepton2_genPartFlav", temp_zl1_genPartFlav)
@@ -711,8 +828,8 @@ class ApplyRegionFakeLeptonProducer(Module):
                 if len(tight_photons) == 0:
                     return False
                 
-                if abs(m_lla + dileptonmass) < 182:
-                    return False
+                # if abs(m_lla + dileptonmass) < 182:
+                #     return False
 
                 self.out.fillBranch("channel_mark", channel)
                 # l1: w, l2: zl1, l3: zl2
@@ -720,18 +837,22 @@ class ApplyRegionFakeLeptonProducer(Module):
                 self.out.fillBranch("WZG_lepton1_eta", temp_wl1_p4.Eta())
                 self.out.fillBranch("WZG_lepton1_phi", temp_wl1_p4.Phi())
                 self.out.fillBranch("WZG_lepton1_mass", temp_wl1_p4.M())
+                self.out.fillBranch("WZG_lepton1_index", temp_wl1_index)
                 self.out.fillBranch("WZG_lepton2_pt", temp_zl1_p4.Pt())
                 self.out.fillBranch("WZG_lepton2_eta", temp_zl1_p4.Eta())
                 self.out.fillBranch("WZG_lepton2_phi", temp_zl1_p4.Phi())
                 self.out.fillBranch("WZG_lepton2_mass", temp_zl1_p4.M())
+                self.out.fillBranch("WZG_lepton2_index", temp_zl1_index)
                 self.out.fillBranch("WZG_lepton3_pt", temp_zl2_p4.Pt())
                 self.out.fillBranch("WZG_lepton3_eta", temp_zl2_p4.Eta())
                 self.out.fillBranch("WZG_lepton3_phi", temp_zl2_p4.Phi())
                 self.out.fillBranch("WZG_lepton3_mass", temp_zl2_p4.M())
+                self.out.fillBranch("WZG_lepton3_index", temp_zl2_index)
                 self.out.fillBranch("WZG_photon_pt", photons[tight_photons[0]].pt)
                 self.out.fillBranch("WZG_photon_eta", photons[tight_photons[0]].eta)
                 self.out.fillBranch("WZG_photon_phi", photons[tight_photons[0]].phi)
                 self.out.fillBranch("WZG_photon_mass", photons[tight_photons[0]].mass)
+                self.out.fillBranch("WZG_photon_index", tight_photons[0])
                 if hasattr(photons[tight_photons[0]], "genPartFlav"):
                     self.out.fillBranch("WZG_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
                 if 'temp_wl1_genPartFlav' in locals():
@@ -743,7 +864,6 @@ class ApplyRegionFakeLeptonProducer(Module):
                 self.out.fillBranch("WZG_mlla", m_lla)
                 self.out.fillBranch("WZG_MET", MET)
                 return True
-
 
         return False
     
@@ -765,7 +885,6 @@ class FakeLep_first_Template_Producer(Module):
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
         # photons = Collection(event, "Photon")
-        tight_photons = []
         tight_electrons = [] 
         tight_muons = [] 
         loose_but_not_tight_muons = []
@@ -781,7 +900,7 @@ class FakeLep_first_Template_Producer(Module):
                 continue
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
-            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
+            elif muons[i].tightId and muons[i].pfRelIso04_all < 0.4:
                 loose_but_not_tight_muons.append(i)
 
         for i in range(0,len(electrons)):
@@ -795,10 +914,10 @@ class FakeLep_first_Template_Producer(Module):
                 elif electrons[i].cutBased >= 1:
                     loose_but_not_tight_electrons.append(i)
 
-        if (len(tight_electrons) + len(tight_muons) > 4):
+        if (len(tight_electrons) + len(tight_muons)) > 4:
             return False
         # For Fake Lepton application region, we need at least one loose not tight lep
-        if (len(loose_but_not_tight_electrons)) + len(loose_but_not_tight_muons) == 0:
+        if (len(loose_but_not_tight_electrons) + len(loose_but_not_tight_muons)) == 0:
             return False
         
         if (len(tight_muons)+len(tight_electrons)+len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons)) > 4:
