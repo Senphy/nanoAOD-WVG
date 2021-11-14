@@ -95,6 +95,35 @@ class WZG_Producer(Module):
         self.out.branch("WZG_mlla",  "F")
         self.out.branch("WZG_MET",  "F")
 
+        self.out.branch("ttG_lepton1_pt",  "F")
+        self.out.branch("ttG_lepton1_eta",  "F")
+        self.out.branch("ttG_lepton1_phi",  "F")
+        self.out.branch("ttG_lepton1_mass",  "F")
+        self.out.branch("ttG_lepton1_genPartFlav",  "i")
+        self.out.branch("ttG_lepton1_index",  "i")
+        self.out.branch("ttG_lepton2_pt",  "F")
+        self.out.branch("ttG_lepton2_eta",  "F")
+        self.out.branch("ttG_lepton2_phi",  "F")
+        self.out.branch("ttG_lepton2_mass",  "F")
+        self.out.branch("ttG_lepton2_genPartFlav",  "i")
+        self.out.branch("ttG_lepton2_index",  "i")
+        self.out.branch("ttG_lepton3_pt",  "F")
+        self.out.branch("ttG_lepton3_eta",  "F")
+        self.out.branch("ttG_lepton3_phi",  "F")
+        self.out.branch("ttG_lepton3_mass",  "F")
+        self.out.branch("ttG_lepton3_genPartFlav",  "i")
+        self.out.branch("ttG_lepton3_index",  "i")
+        self.out.branch("ttG_photon_pt",  "F")
+        self.out.branch("ttG_photon_eta",  "F")
+        self.out.branch("ttG_photon_phi",  "F")
+        self.out.branch("ttG_photon_mass",  "F")
+        self.out.branch("ttG_photon_genPartFlav",  "i")
+        self.out.branch("ttG_photon_index",  "i")
+        self.out.branch("ttG_dileptonmass",  "F")
+        self.out.branch("ttG_trileptonmass",  "F")
+        self.out.branch("ttG_mlla",  "F")
+        self.out.branch("ttG_MET",  "F")
+
         self.out.branch("ttZ_lepton1_pt",  "F")
         self.out.branch("ttZ_lepton1_eta",  "F")
         self.out.branch("ttZ_lepton1_phi",  "F")
@@ -762,36 +791,73 @@ class WZG_Producer(Module):
             
             if len(tight_bjets) > 0:
 
-                if abs(dileptonmass-91.188) <= 15:
-                    return False
+                if abs(dileptonmass - 91.188) <= 15:
 
-                channel += 10
-                self.out.fillBranch("channel_mark", channel)
-                # l1: w, l2: zl1, l3: zl2
-                self.out.fillBranch("ttZ_lepton1_pt", temp_wl1_p4.Pt())
-                self.out.fillBranch("ttZ_lepton1_eta", temp_wl1_p4.Eta())
-                self.out.fillBranch("ttZ_lepton1_phi", temp_wl1_p4.Phi())
-                self.out.fillBranch("ttZ_lepton1_mass", temp_wl1_p4.M())
-                self.out.fillBranch("ttZ_lepton1_index", temp_wl1_index)
-                self.out.fillBranch("ttZ_lepton2_pt", temp_zl1_p4.Pt())
-                self.out.fillBranch("ttZ_lepton2_eta", temp_zl1_p4.Eta())
-                self.out.fillBranch("ttZ_lepton2_phi", temp_zl1_p4.Phi())
-                self.out.fillBranch("ttZ_lepton2_mass", temp_zl1_p4.M())
-                self.out.fillBranch("ttZ_lepton2_index", temp_zl1_index)
-                self.out.fillBranch("ttZ_lepton3_pt", temp_zl2_p4.Pt())
-                self.out.fillBranch("ttZ_lepton3_eta", temp_zl2_p4.Eta())
-                self.out.fillBranch("ttZ_lepton3_phi", temp_zl2_p4.Phi())
-                self.out.fillBranch("ttZ_lepton3_mass", temp_zl2_p4.M())
-                self.out.fillBranch("ttZ_lepton3_index", temp_zl2_index)
-                if 'temp_wl1_genPartFlav' in locals():
-                    self.out.fillBranch("ttZ_lepton1_genPartFlav", temp_wl1_genPartFlav)
-                    self.out.fillBranch("ttZ_lepton2_genPartFlav", temp_zl1_genPartFlav)
-                    self.out.fillBranch("ttZ_lepton3_genPartFlav", temp_zl2_genPartFlav)
-                self.out.fillBranch("ttZ_dileptonmass", dileptonmass)
-                self.out.fillBranch("ttZ_trileptonmass", trileptonmass)
-                self.out.fillBranch("ttZ_MET", MET)
-                return True
+                    if len(tight_photons) == 0:
+                        return False
 
+                    channel += 20
+                    self.out.fillBranch("channel_mark", channel)
+                    # l1: w, l2: zl1, l3: zl2
+                    self.out.fillBranch("ttG_lepton1_pt", temp_wl1_p4.Pt())
+                    self.out.fillBranch("ttG_lepton1_eta", temp_wl1_p4.Eta())
+                    self.out.fillBranch("ttG_lepton1_phi", temp_wl1_p4.Phi())
+                    self.out.fillBranch("ttG_lepton1_mass", temp_wl1_p4.M())
+                    self.out.fillBranch("ttG_lepton1_index", temp_wl1_index)
+                    self.out.fillBranch("ttG_lepton2_pt", temp_zl1_p4.Pt())
+                    self.out.fillBranch("ttG_lepton2_eta", temp_zl1_p4.Eta())
+                    self.out.fillBranch("ttG_lepton2_phi", temp_zl1_p4.Phi())
+                    self.out.fillBranch("ttG_lepton2_mass", temp_zl1_p4.M())
+                    self.out.fillBranch("ttG_lepton2_index", temp_zl1_index)
+                    self.out.fillBranch("ttG_lepton3_pt", temp_zl2_p4.Pt())
+                    self.out.fillBranch("ttG_lepton3_eta", temp_zl2_p4.Eta())
+                    self.out.fillBranch("ttG_lepton3_phi", temp_zl2_p4.Phi())
+                    self.out.fillBranch("ttG_lepton3_mass", temp_zl2_p4.M())
+                    self.out.fillBranch("ttG_lepton3_index", temp_zl2_index)
+                    self.out.fillBranch("ttG_photon_pt", photons[tight_photons[0]].pt)
+                    self.out.fillBranch("ttG_photon_eta", photons[tight_photons[0]].eta)
+                    self.out.fillBranch("ttG_photon_phi", photons[tight_photons[0]].phi)
+                    self.out.fillBranch("ttG_photon_mass", photons[tight_photons[0]].mass)
+                    self.out.fillBranch("ttG_photon_index", tight_photons[0])
+                    if hasattr(photons[tight_photons[0]], "genPartFlav"):
+                        self.out.fillBranch("ttG_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
+                    if 'temp_wl1_genPartFlav' in locals():
+                        self.out.fillBranch("ttG_lepton1_genPartFlav", temp_wl1_genPartFlav)
+                        self.out.fillBranch("ttG_lepton2_genPartFlav", temp_zl1_genPartFlav)
+                        self.out.fillBranch("ttG_lepton3_genPartFlav", temp_zl2_genPartFlav)
+                    self.out.fillBranch("ttG_dileptonmass", dileptonmass)
+                    self.out.fillBranch("ttG_trileptonmass", trileptonmass)
+                    self.out.fillBranch("ttG_mlla", m_lla)
+                    self.out.fillBranch("ttG_MET", MET)
+                    return True
+
+                else:
+                    channel += 10
+                    self.out.fillBranch("channel_mark", channel)
+                    # l1: w, l2: zl1, l3: zl2
+                    self.out.fillBranch("ttZ_lepton1_pt", temp_wl1_p4.Pt())
+                    self.out.fillBranch("ttZ_lepton1_eta", temp_wl1_p4.Eta())
+                    self.out.fillBranch("ttZ_lepton1_phi", temp_wl1_p4.Phi())
+                    self.out.fillBranch("ttZ_lepton1_mass", temp_wl1_p4.M())
+                    self.out.fillBranch("ttZ_lepton1_index", temp_wl1_index)
+                    self.out.fillBranch("ttZ_lepton2_pt", temp_zl1_p4.Pt())
+                    self.out.fillBranch("ttZ_lepton2_eta", temp_zl1_p4.Eta())
+                    self.out.fillBranch("ttZ_lepton2_phi", temp_zl1_p4.Phi())
+                    self.out.fillBranch("ttZ_lepton2_mass", temp_zl1_p4.M())
+                    self.out.fillBranch("ttZ_lepton2_index", temp_zl1_index)
+                    self.out.fillBranch("ttZ_lepton3_pt", temp_zl2_p4.Pt())
+                    self.out.fillBranch("ttZ_lepton3_eta", temp_zl2_p4.Eta())
+                    self.out.fillBranch("ttZ_lepton3_phi", temp_zl2_p4.Phi())
+                    self.out.fillBranch("ttZ_lepton3_mass", temp_zl2_p4.M())
+                    self.out.fillBranch("ttZ_lepton3_index", temp_zl2_index)
+                    if 'temp_wl1_genPartFlav' in locals():
+                        self.out.fillBranch("ttZ_lepton1_genPartFlav", temp_wl1_genPartFlav)
+                        self.out.fillBranch("ttZ_lepton2_genPartFlav", temp_zl1_genPartFlav)
+                        self.out.fillBranch("ttZ_lepton3_genPartFlav", temp_zl2_genPartFlav)
+                    self.out.fillBranch("ttZ_dileptonmass", dileptonmass)
+                    self.out.fillBranch("ttZ_trileptonmass", trileptonmass)
+                    self.out.fillBranch("ttZ_MET", MET)
+                    return True
             
             if len(tight_bjets) == 0:
 

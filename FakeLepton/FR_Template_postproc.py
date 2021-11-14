@@ -18,6 +18,11 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.FakeLep_FR_Template_Module
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2       import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.eleRECOSFProducer import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.eleIDSFProducer import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.muonScaleResProducer import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.muonIDISOSFProducer import *
 
 parser = argparse.ArgumentParser(description='baseline selection')
 parser.add_argument('-f', dest='file', default='', help='File input. In local mode it will be the filepath. In condor mode it will be the dataset name')
