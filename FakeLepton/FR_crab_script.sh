@@ -36,11 +36,16 @@ else
             year="${i#*=}"
             ;;
         esac
+        case $i in
+            period=*)
+            period="${i#*=}"
+            ;;
+        esac
     done
 
     echo Found Proxy in: $X509_USER_PROXY
     if [ $isdata == "data" ]; then
-        python FR_Template_postproc.py -d -y $year
+        python FR_Template_postproc.py -d -y $year -p $period
     else
         python FR_Template_postproc.py -y $year
     fi

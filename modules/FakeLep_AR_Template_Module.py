@@ -16,7 +16,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 
 class ApplyRegionFakeLeptonProducer(Module):
-    def __init__(self):
+    def __init__(self, year):
+        self.year = year
         pass
     def ZZ_GetLepIndex(self, abs_mll_mz):
         lepton_index_mark = abs_mll_mz.index(min(abs_mll_mz))
@@ -240,11 +241,14 @@ class ApplyRegionFakeLeptonProducer(Module):
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
                     tight_electrons_for_SF.append(i)
-                elif electrons[i].cutBased >= 1:
+                elif electrons[i].cutBased == 1:
                     tight_electrons.append(i)
                     veto_electrons_for_SF.append(i)
                     LooseNotTightElectron_pt.append(electrons[i].pt)
                     LooseNotTightElectron_eta.append(electrons[i].eta)
+                elif electrons[i].cutBased > 1 :
+                    veto_electrons_for_SF.append(i)
+                    veto_electrons.append(i)
 
         Electron_ID_Weight = 1
         Electron_ID_Weight_UP = 1
@@ -368,9 +372,13 @@ class ApplyRegionFakeLeptonProducer(Module):
 
             tight_jets.append(i)
 
-            if jets[i].btagDeepB > 0.7738:
-                if event.Jet_pt_nom[i] >= 30:
-                    tight_bjets.append(i)
+            if event.Jet_pt_nom[i] >= 30:
+                if self.year == '2017':
+                    if jets[i].btagDeepB > 0.7738:
+                            tight_bjets.append(i)
+                elif self.year == '2018':
+                    if jets[i].btagDeepB > 0.7665:
+                            tight_bjets.append(i)
 
         self.out.fillBranch("nJets", len(tight_jets))
         self.out.fillBranch("nbJets", len(tight_bjets))
@@ -1002,4 +1010,7 @@ class FakeLep_first_Template_Producer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 ApplyRegionFakeLeptonModule = lambda : ApplyRegionFakeLeptonProducer()
+ApplyRegionFakeLeptonModule_16 = lambda : ApplyRegionFakeLeptonProducer("2016")
+ApplyRegionFakeLeptonModule_17 = lambda : ApplyRegionFakeLeptonProducer("2017")
+ApplyRegionFakeLeptonModule_18 = lambda : ApplyRegionFakeLeptonProducer("2018")
 FakeLep_first_Template_Module = lambda : FakeLep_first_Template_Producer()

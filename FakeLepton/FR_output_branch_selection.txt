@@ -1,31 +1,29 @@
-keep *
-#drop *
-#keep puWeight
-#keep puWeightUp
-#keep puWeightDown
-#keep PrefireWeight
-#keep PrefireWeight_Up
-#keep PrefireWeight_Down
-#keep run
-#keep lumi
-#keep event
-#keep met
-#keep mt
-#keep puppimet
-#keep puppimt
-#keep lepton_pdgid
-#keep lepton_pt
-#keep lepton_gen_matching
-#keep lepton_eta
-#keep is_lepton_tight
-#keep gen_weight
-#keep hlt
-# keep HLT_Ele27_WPTight_Gsf
-# keep HLT_IsoMu24
-# keep HLT_IsoTkMu24
-# keep HLT_Mu17_TrkIsoVVL
-# keep HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30
-#keep HLT*
-#keep lepton_jet_dr
-#keep jet_pt
-#keep lepton_pfRelIso04_all
+drop *
+keep puWeight
+keep puWeightUp
+keep puWeightDown
+keep PrefireWeight
+keep PrefireWeight_Up
+keep PrefireWeight_Down
+keep run
+keep lumi
+keep event
+keep met
+keep mt
+keep puppimet
+keep puppimt
+keep lepton_pdgid
+keep lepton_pt
+keep lepton_gen_matching
+keep lepton_eta
+keep lepton_jet_dr
+keep lepton_pfRelIso04_all
+keep lepton_sc_eta
+keep is_lepton_tight
+keep gen_weight
+keep hlt
+keep HLT*
+keep jet_pt
+keep Muon_ID_*
+keep Electron_ID_*
+keep Electron_RECO_*

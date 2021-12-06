@@ -15,7 +15,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 
 class WZG_Producer(Module):
-    def __init__(self):
+    def __init__(self, year):
+        self.year = year
         pass
     def ZZ_GetLepIndex(self, abs_mll_mz):
         lepton_index_mark = abs_mll_mz.index(min(abs_mll_mz))
@@ -337,9 +338,13 @@ class WZG_Producer(Module):
 
             tight_jets.append(i)
 
-            if jets[i].btagDeepB > 0.7738:
-                if event.Jet_pt_nom[i] >= 30:
-                    tight_bjets.append(i)
+            if event.Jet_pt_nom[i] >= 30:
+                if self.year == '2017':
+                    if jets[i].btagDeepB > 0.7738:
+                            tight_bjets.append(i)
+                elif self.year == '2018':
+                    if jets[i].btagDeepB > 0.7665:
+                            tight_bjets.append(i)
 
         self.out.fillBranch("nJets", len(tight_jets))
         self.out.fillBranch("nbJets", len(tight_bjets))
@@ -973,4 +978,7 @@ class first_Template_Producer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 WZG_select_Module = lambda : WZG_Producer()
+WZG_select_Module_16 = lambda : WZG_Producer("2016")
+WZG_select_Module_17 = lambda : WZG_Producer("2017")
+WZG_select_Module_18 = lambda : WZG_Producer("2018")
 first_Template_Module = lambda : first_Template_Producer()

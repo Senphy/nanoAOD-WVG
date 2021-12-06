@@ -62,6 +62,8 @@ def prepare_crab(name,sample_type,year,period):
                 f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt" \n\n')
             else:
                 f.write('config.Data.lumiMask = "" \n\n')
+        elif year == '2017':
+            f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt" \n\n')
 
         f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/final_skim/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')

@@ -28,13 +28,17 @@ parser.add_argument('-p', dest='period',default="B", help="Run period, only work
 args = parser.parse_args()
 
 
+PrefCorrUL16_preVFP = lambda : PrefCorr(jetroot="L1PrefiringMaps.root", jetmapname="L1prefiring_jetptvseta_UL2016preVFP", photonroot="L1PrefiringMaps.root", photonmapname="L1prefiring_photonptvseta_UL2016preVFP", branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"])
+PrefCorrUL16_postVFP = lambda : PrefCorr(jetroot="L1PrefiringMaps.root", jetmapname="L1prefiring_jetptvseta_UL2016postVFP", photonroot="L1PrefiringMaps.root", photonmapname="L1prefiring_photonptvseta_UL2016postVFP", branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"])
+PrefCorrUL17 = lambda : PrefCorr(jetroot="L1PrefiringMaps.root", jetmapname="L1prefiring_jetptvseta_UL2017BtoF", photonroot="L1PrefiringMaps.root", photonmapname="L1prefiring_photonptvseta_UL2017BtoF", branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"])
+
 if args.isdata:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2018", runPeriod=args.period, metBranchName="MET")
-        Modules = [muonScaleRes2018(),FakeLep_first_Template_Module(),jetmetCorrector(),ApplyRegionFakeLeptonModule()]
+        Modules = [muonScaleRes2018(),FakeLep_first_Template_Module(),jetmetCorrector(),ApplyRegionFakeLeptonModule_18()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
-        Modules = [muonScaleRes2017(),jetmetCorrector(),ApplyRegionFakeLeptonModule()]
+        Modules = [muonScaleRes2017(),FakeLep_first_Template_Module(),jetmetCorrector(),ApplyRegionFakeLeptonModule_17()]
     if args.year == '2016':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2016b(),jetmetCorrector(),ApplyRegionFakeLeptonModule()]
@@ -44,10 +48,10 @@ if args.isdata:
 else:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="Total", metBranchName="MET", splitJER=False, applyHEMfix=True)
-        Modules = [countHistogramsProducer(),muonScaleRes2018(),FakeLep_first_Template_Module(),puAutoWeight_2018(),muonIDISOSF2018(),eleRECOSF2018(),eleIDSF2018(),jetmetCorrector(),ApplyRegionFakeLeptonModule()]
+        Modules = [countHistogramsProducer(),muonScaleRes2018(),FakeLep_first_Template_Module(),puAutoWeight_2018(),muonIDISOSF2018(),eleRECOSF2018(),eleIDSF2018(),jetmetCorrector(),ApplyRegionFakeLeptonModule_18()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="Total", metBranchName="MET", splitJER=False)
-        Modules = [countHistogramsProducer(),puAutoWeight_2017(),PrefCorrUL17(),muonIDISOSF2017(),muonScaleRes2017(),eleRECOSF2017(),eleIDSF2017(),jetmetCorrector(),ApplyRegionFakeLeptonModule()]
+        Modules = [countHistogramsProducer(),muonScaleRes2017(),FakeLep_first_Template_Module(),puAutoWeight_2017(),PrefCorrUL17(),muonIDISOSF2017(),eleRECOSF2017(),eleIDSF2017(),jetmetCorrector(),ApplyRegionFakeLeptonModule_17()]
     if args.year == '2016':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_postVFP(),muonIDISOSF2016(),muonScaleRes2016b(),eleRECOSF2016(),eleIDSF2016(),jetmetCorrector(),ApplyRegionFakeLeptonModule()]

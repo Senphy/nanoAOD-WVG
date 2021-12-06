@@ -16,7 +16,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 
 class FakePho_Producer(Module):
-    def __init__(self):
+    def __init__(self, year):
+        self.year = year
         pass
     def ZZ_GetLepIndex(self, abs_mll_mz):
         lepton_index_mark = abs_mll_mz.index(min(abs_mll_mz))
@@ -41,16 +42,19 @@ class FakePho_Producer(Module):
         self.out.branch("WZG_lepton1_phi",  "F")
         self.out.branch("WZG_lepton1_mass",  "F")
         self.out.branch("WZG_lepton1_genPartFlav",  "i")
+        self.out.branch("WZG_lepton1_index",  "i")
         self.out.branch("WZG_lepton2_pt",  "F")
         self.out.branch("WZG_lepton2_eta",  "F")
         self.out.branch("WZG_lepton2_phi",  "F")
         self.out.branch("WZG_lepton2_mass",  "F")
         self.out.branch("WZG_lepton2_genPartFlav",  "i")
+        self.out.branch("WZG_lepton2_index",  "i")
         self.out.branch("WZG_lepton3_pt",  "F")
         self.out.branch("WZG_lepton3_eta",  "F")
         self.out.branch("WZG_lepton3_phi",  "F")
         self.out.branch("WZG_lepton3_mass",  "F")
         self.out.branch("WZG_lepton3_genPartFlav",  "i")
+        self.out.branch("WZG_lepton3_index",  "i")
         self.out.branch("WZG_photon_pt",  "F")
         self.out.branch("WZG_photon_eta",  "F")
         self.out.branch("WZG_photon_phi",  "F")
@@ -59,10 +63,43 @@ class FakePho_Producer(Module):
         self.out.branch("WZG_photon_vidNestedWPBitmap",  "L")
         self.out.branch("WZG_photon_pfRelIso03_chg", "F")
         self.out.branch("WZG_photon_sieie", "F")
+        self.out.branch("WZG_photon_index",  "i")
         self.out.branch("WZG_dileptonmass",  "F")
         self.out.branch("WZG_trileptonmass",  "F")
         self.out.branch("WZG_mlla",  "F")
         self.out.branch("WZG_MET",  "F")
+
+        self.out.branch("ttG_lepton1_pt",  "F")
+        self.out.branch("ttG_lepton1_eta",  "F")
+        self.out.branch("ttG_lepton1_phi",  "F")
+        self.out.branch("ttG_lepton1_mass",  "F")
+        self.out.branch("ttG_lepton1_genPartFlav",  "i")
+        self.out.branch("ttG_lepton1_index",  "i")
+        self.out.branch("ttG_lepton2_pt",  "F")
+        self.out.branch("ttG_lepton2_eta",  "F")
+        self.out.branch("ttG_lepton2_phi",  "F")
+        self.out.branch("ttG_lepton2_mass",  "F")
+        self.out.branch("ttG_lepton2_genPartFlav",  "i")
+        self.out.branch("ttG_lepton2_index",  "i")
+        self.out.branch("ttG_lepton3_pt",  "F")
+        self.out.branch("ttG_lepton3_eta",  "F")
+        self.out.branch("ttG_lepton3_phi",  "F")
+        self.out.branch("ttG_lepton3_mass",  "F")
+        self.out.branch("ttG_lepton3_genPartFlav",  "i")
+        self.out.branch("ttG_lepton3_index",  "i")
+        self.out.branch("ttG_photon_pt",  "F")
+        self.out.branch("ttG_photon_eta",  "F")
+        self.out.branch("ttG_photon_phi",  "F")
+        self.out.branch("ttG_photon_mass",  "F")
+        self.out.branch("ttG_photon_genPartFlav",  "i")
+        self.out.branch("ttG_photon_vidNestedWPBitmap",  "L")
+        self.out.branch("ttG_photon_pfRelIso03_chg", "F")
+        self.out.branch("ttG_photon_sieie", "F")
+        self.out.branch("ttG_photon_index",  "i")
+        self.out.branch("ttG_dileptonmass",  "F")
+        self.out.branch("ttG_trileptonmass",  "F")
+        self.out.branch("ttG_mlla",  "F")
+        self.out.branch("ttG_MET",  "F")
 
         self.out.branch("Muon_ID_Weight", "F")
         self.out.branch("Muon_ID_Weight_UP", "F")
@@ -92,6 +129,8 @@ class FakePho_Producer(Module):
         tight_bjets = []
         loose_but_not_tight_muons = []
         loose_but_not_tight_electrons = []
+        veto_muons = []
+        veto_electrons = []
 
         # selection on MET. Pass to next event directly if fail.
         if hasattr(event, "MET_T1Smear_pt"):
@@ -111,7 +150,8 @@ class FakePho_Producer(Module):
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
             elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
-                loose_but_not_tight_muons.append(i)
+                veto_muons.append(i)
+            muons[i].p4().SetPtEtaPhiM(event.Muon_corrected_pt[i], muons[i].p4().Eta(), muons[i].p4().Phi(), muons[i].p4().M())
 
         Muon_ID_Weight = 1
         Muon_ID_Weight_UP = 1
@@ -121,10 +161,11 @@ class FakePho_Producer(Module):
                 Muon_ID_Weight = Muon_ID_Weight * event.Muon_CutBased_TightID_SF[i]
                 Muon_ID_Weight_UP = max(Muon_ID_Weight_UP * (event.Muon_CutBased_TightID_SF[i] + event.Muon_CutBased_TightID_SFerr[i]), Muon_ID_Weight_UP * (event.Muon_CutBased_TightID_SF[i] - event.Muon_CutBased_TightID_SFerr[i]))
                 Muon_ID_Weight_DOWN = min(Muon_ID_Weight_DOWN * (event.Muon_CutBased_TightID_SF[i] + event.Muon_CutBased_TightID_SFerr[i]), Muon_ID_Weight_DOWN * (event.Muon_CutBased_TightID_SF[i] - event.Muon_CutBased_TightID_SFerr[i]))
-            for i in loose_but_not_tight_muons:
+            for i in veto_muons:
                 Muon_ID_Weight = Muon_ID_Weight * event.Muon_CutBased_LooseID_SF[i]
                 Muon_ID_Weight_UP = max(Muon_ID_Weight_UP * (event.Muon_CutBased_LooseID_SF[i] + event.Muon_CutBased_LooseID_SFerr[i]), Muon_ID_Weight_UP * (event.Muon_CutBased_LooseID_SF[i] - event.Muon_CutBased_LooseID_SFerr[i]))
                 Muon_ID_Weight_DOWN = min(Muon_ID_Weight_DOWN * (event.Muon_CutBased_LooseID_SF[i] + event.Muon_CutBased_LooseID_SFerr[i]), Muon_ID_Weight_DOWN * (event.Muon_CutBased_LooseID_SF[i] - event.Muon_CutBased_LooseID_SFerr[i]))
+
 
         # selection on electrons
         for i in range(0,len(electrons)):
@@ -136,7 +177,7 @@ class FakePho_Producer(Module):
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
                 elif electrons[i].cutBased >= 1:
-                    loose_but_not_tight_electrons.append(i)
+                    veto_electrons.append(i)
 
         Electron_ID_Weight = 1
         Electron_ID_Weight_UP = 1
@@ -245,8 +286,13 @@ class FakePho_Producer(Module):
 
             tight_jets.append(i)
 
-            if jets[i].btagDeepB > 0.7738:
-                tight_bjets.append(i)
+            if event.Jet_pt_nom[i] >= 30:
+                if self.year == '2017':
+                    if jets[i].btagDeepB > 0.7738:
+                            tight_bjets.append(i)
+                elif self.year == '2018':
+                    if jets[i].btagDeepB > 0.7665:
+                            tight_bjets.append(i)
 
         self.out.fillBranch("nJets", len(tight_jets))
         self.out.fillBranch("nbJets", len(tight_bjets))
@@ -305,10 +351,10 @@ class FakePho_Producer(Module):
         # Bjets veto
 
         if len(tight_electrons) + len(tight_muons) == 3:
-
-            if MET <= 30:
-                return False
-            if len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons) != 0:
+            # REMOVE MET cut in this module in order to vary up/down
+            # if MET <= 30:
+            #     return False
+            if len(veto_electrons)+len(veto_muons) != 0:
                 return False
 
             dileptonmass = float('inf')
@@ -328,16 +374,19 @@ class FakePho_Producer(Module):
                     if len(tight_photons) > 0:
                         m_lla = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4() + photons[tight_photons[0]].p4()).M()
 
-                if (dileptonmass <= 4) or (abs(dileptonmass-91.188) > 15): 
+                if (dileptonmass <= 4): 
                     return False
                 
                 if trileptonmass <= 100:
                     return False
                 
                 temp_wl1_p4 = electrons[tight_electrons[0]].p4()
+                temp_wl1_index = tight_electrons[0]
                 temp_zl1_p4 = muons[tight_muons[0]].p4()
+                temp_zl1_index = tight_muons[0]
                 temp_zl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_zl1_p4.Eta(), temp_zl1_p4.Phi(), temp_zl1_p4.M())
                 temp_zl2_p4 = muons[tight_muons[1]].p4()
+                temp_zl2_index = tight_muons[1]
                 temp_zl2_p4.SetPtEtaPhiM(event.Muon_corrected_pt[1], temp_zl2_p4.Eta(), temp_zl2_p4.Phi(), temp_zl2_p4.M())
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
@@ -360,16 +409,19 @@ class FakePho_Producer(Module):
                     if len(tight_photons) > 0:
                         m_lla = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4() + photons[tight_photons[0]].p4()).M()
 
-                if (dileptonmass <= 4) or (abs(dileptonmass-91.188) > 15): 
+                if (dileptonmass <= 4): 
                     return False
                 
                 if trileptonmass <= 100:
                     return False
 
                 temp_wl1_p4 = muons[tight_muons[0]].p4()
+                temp_wl1_index = tight_muons[0]
                 temp_wl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_wl1_p4.Eta(), temp_wl1_p4.Phi(), temp_wl1_p4.M())
                 temp_zl1_p4 = electrons[tight_electrons[0]].p4()
+                temp_zl1_index = tight_electrons[0]
                 temp_zl2_p4 = electrons[tight_electrons[1]].p4()
+                temp_zl2_index= tight_electrons[1]
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = muons[tight_muons[0]].genPartFlav
                     temp_zl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
@@ -413,15 +465,16 @@ class FakePho_Producer(Module):
                     return False
                 if (electrons[tight_electrons[1]].pt < 25) and (electrons[tight_electrons[2]].pt < 25):
                     return False
-                if abs(dileptonmass - 91.188) > 15:
-                    return False
 
                 if len(tight_photons) > 0:
                     m_lla = (electrons[tight_electrons[1]].p4() + electrons[tight_electrons[2]].p4() + photons[tight_photons[0]].p4()).M()
 
                 temp_wl1_p4 = electrons[tight_electrons[0]].p4()
+                temp_wl1_index = tight_electrons[0]
                 temp_zl1_p4 = electrons[tight_electrons[1]].p4()
+                temp_zl1_index = tight_electrons[1]
                 temp_zl2_p4 = electrons[tight_electrons[2]].p4()
+                temp_zl2_index = tight_electrons[2]
                 if hasattr(electrons[tight_electrons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = electrons[tight_electrons[0]].genPartFlav
                     temp_zl1_genPartFlav = electrons[tight_electrons[1]].genPartFlav
@@ -466,16 +519,17 @@ class FakePho_Producer(Module):
                     return False
                 if (muons[tight_muons[1]].pt < 25) and (muons[tight_muons[1]].pt < 25):
                     return False
-                if abs(dileptonmass - 91.188) > 15:
-                    return False
                 if len(tight_photons) > 0:
                     m_lla = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4() + photons[tight_photons[0]].p4()).M()
 
                 temp_wl1_p4 = muons[tight_muons[0]].p4()
+                temp_wl1_index = tight_muons[0]
                 temp_wl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[0], temp_wl1_p4.Eta(), temp_wl1_p4.Phi(), temp_wl1_p4.M())
                 temp_zl1_p4 = muons[tight_muons[1]].p4()
+                temp_zl1_index = tight_muons[1]
                 temp_zl1_p4.SetPtEtaPhiM(event.Muon_corrected_pt[1], temp_zl1_p4.Eta(), temp_zl1_p4.Phi(), temp_zl1_p4.M())
                 temp_zl2_p4 = muons[tight_muons[2]].p4()
+                temp_zl2_index = tight_muons[2]
                 temp_zl2_p4.SetPtEtaPhiM(event.Muon_corrected_pt[2], temp_zl2_p4.Eta(), temp_zl2_p4.Phi(), temp_zl2_p4.M())
                 if hasattr(muons[tight_muons[0]],"genPartFlav"):
                     temp_wl1_genPartFlav = muons[tight_muons[0]].genPartFlav
@@ -485,16 +539,63 @@ class FakePho_Producer(Module):
                 channel = 4
             
             if len(tight_bjets) > 0:
-                return False
 
+                if abs(dileptonmass - 91.188) <= 15:
+
+                    if len(tight_photons) == 0:
+                        return False
+
+                    channel += 20
+                    self.out.fillBranch("channel_mark", channel)
+                    # l1: w, l2: zl1, l3: zl2
+                    self.out.fillBranch("ttG_lepton1_pt", temp_wl1_p4.Pt())
+                    self.out.fillBranch("ttG_lepton1_eta", temp_wl1_p4.Eta())
+                    self.out.fillBranch("ttG_lepton1_phi", temp_wl1_p4.Phi())
+                    self.out.fillBranch("ttG_lepton1_mass", temp_wl1_p4.M())
+                    self.out.fillBranch("ttG_lepton1_index", temp_wl1_index)
+                    self.out.fillBranch("ttG_lepton2_pt", temp_zl1_p4.Pt())
+                    self.out.fillBranch("ttG_lepton2_eta", temp_zl1_p4.Eta())
+                    self.out.fillBranch("ttG_lepton2_phi", temp_zl1_p4.Phi())
+                    self.out.fillBranch("ttG_lepton2_mass", temp_zl1_p4.M())
+                    self.out.fillBranch("ttG_lepton2_index", temp_zl1_index)
+                    self.out.fillBranch("ttG_lepton3_pt", temp_zl2_p4.Pt())
+                    self.out.fillBranch("ttG_lepton3_eta", temp_zl2_p4.Eta())
+                    self.out.fillBranch("ttG_lepton3_phi", temp_zl2_p4.Phi())
+                    self.out.fillBranch("ttG_lepton3_mass", temp_zl2_p4.M())
+                    self.out.fillBranch("ttG_lepton3_index", temp_zl2_index)
+                    self.out.fillBranch("ttG_photon_pt", photons[tight_photons[0]].pt)
+                    self.out.fillBranch("ttG_photon_eta", photons[tight_photons[0]].eta)
+                    self.out.fillBranch("ttG_photon_phi", photons[tight_photons[0]].phi)
+                    self.out.fillBranch("ttG_photon_mass", photons[tight_photons[0]].mass)
+                    self.out.fillBranch("ttG_photon_vidNestedWPBitmap", photons[tight_photons[0]].vidNestedWPBitmap)
+                    self.out.fillBranch("ttG_photon_pfRelIso03_chg", photons[tight_photons[0]].pfRelIso03_chg)
+                    self.out.fillBranch("ttG_photon_sieie", photons[tight_photons[0]].sieie)
+                    self.out.fillBranch("ttG_photon_index", tight_photons[0])
+                    if hasattr(photons[tight_photons[0]], "genPartFlav"):
+                        self.out.fillBranch("ttG_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
+                    if 'temp_wl1_genPartFlav' in locals():
+                        self.out.fillBranch("ttG_lepton1_genPartFlav", temp_wl1_genPartFlav)
+                        self.out.fillBranch("ttG_lepton2_genPartFlav", temp_zl1_genPartFlav)
+                        self.out.fillBranch("ttG_lepton3_genPartFlav", temp_zl2_genPartFlav)
+                    self.out.fillBranch("ttG_dileptonmass", dileptonmass)
+                    self.out.fillBranch("ttG_trileptonmass", trileptonmass)
+                    self.out.fillBranch("ttG_mlla", m_lla)
+                    self.out.fillBranch("ttG_MET", MET)
+                    return True
+
+                else:
+                    return False
             
             if len(tight_bjets) == 0:
+
+                if abs(dileptonmass-91.188) > 15:
+                    return False
 
                 if len(tight_photons) == 0:
                     return False
                 
-                if abs(m_lla + dileptonmass) < 182:
-                    return False
+                # if abs(m_lla + dileptonmass) < 182:
+                #     return False
 
                 self.out.fillBranch("channel_mark", channel)
                 # l1: w, l2: zl1, l3: zl2
@@ -502,21 +603,25 @@ class FakePho_Producer(Module):
                 self.out.fillBranch("WZG_lepton1_eta", temp_wl1_p4.Eta())
                 self.out.fillBranch("WZG_lepton1_phi", temp_wl1_p4.Phi())
                 self.out.fillBranch("WZG_lepton1_mass", temp_wl1_p4.M())
+                self.out.fillBranch("WZG_lepton1_index", temp_wl1_index)
                 self.out.fillBranch("WZG_lepton2_pt", temp_zl1_p4.Pt())
                 self.out.fillBranch("WZG_lepton2_eta", temp_zl1_p4.Eta())
                 self.out.fillBranch("WZG_lepton2_phi", temp_zl1_p4.Phi())
                 self.out.fillBranch("WZG_lepton2_mass", temp_zl1_p4.M())
+                self.out.fillBranch("WZG_lepton2_index", temp_zl1_index)
                 self.out.fillBranch("WZG_lepton3_pt", temp_zl2_p4.Pt())
                 self.out.fillBranch("WZG_lepton3_eta", temp_zl2_p4.Eta())
                 self.out.fillBranch("WZG_lepton3_phi", temp_zl2_p4.Phi())
                 self.out.fillBranch("WZG_lepton3_mass", temp_zl2_p4.M())
-                self.out.fillBranch("WZG_photon_pfRelIso03_chg", photons[tight_photons[0]].pfRelIso03_chg)
-                self.out.fillBranch("WZG_photon_sieie", photons[tight_photons[0]].sieie)
+                self.out.fillBranch("WZG_lepton3_index", temp_zl2_index)
                 self.out.fillBranch("WZG_photon_pt", photons[tight_photons[0]].pt)
                 self.out.fillBranch("WZG_photon_eta", photons[tight_photons[0]].eta)
                 self.out.fillBranch("WZG_photon_phi", photons[tight_photons[0]].phi)
                 self.out.fillBranch("WZG_photon_mass", photons[tight_photons[0]].mass)
                 self.out.fillBranch("WZG_photon_vidNestedWPBitmap", photons[tight_photons[0]].vidNestedWPBitmap)
+                self.out.fillBranch("WZG_photon_pfRelIso03_chg", photons[tight_photons[0]].pfRelIso03_chg)
+                self.out.fillBranch("WZG_photon_sieie", photons[tight_photons[0]].sieie)
+                self.out.fillBranch("WZG_photon_index", tight_photons[0])
                 if hasattr(photons[tight_photons[0]], "genPartFlav"):
                     self.out.fillBranch("WZG_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
                 if 'temp_wl1_genPartFlav' in locals():
@@ -591,4 +696,7 @@ class FakePho_first_Template_Producer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 FakePho_Module = lambda : FakePho_Producer()
+FakePho_Module_16 = lambda : FakePho_Producer('2016')
+FakePho_Module_17 = lambda : FakePho_Producer('2017')
+FakePho_Module_18 = lambda : FakePho_Producer('2018')
 FakePho_first_Template_Module = lambda : FakePho_first_Template_Producer()

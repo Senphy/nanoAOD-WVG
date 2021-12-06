@@ -19,8 +19,8 @@ class ApplyWeightFakeLeptonProducer(Module):
     def __init__(self):
         pass
     def beginJob(self):
-        self.file_ele = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Ele_Fake_Rate_2D.root" % os.environ['CMSSW_BASE'],"READ")
-        self.file_mu = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Mu_Fake_Rate_2D.root" % os.environ['CMSSW_BASE'],"READ") 
+        self.file_ele = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Ele_Fake_Rate_2D_2018.root" % os.environ['CMSSW_BASE'],"READ")
+        self.file_mu = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Mu_Fake_Rate_2D_2018.root" % os.environ['CMSSW_BASE'],"READ") 
         self.FR_E = self.file_ele.Get("fake_rate_e")
         self.FR_M = self.file_mu.Get("fake_rate_mu")
         pass
