@@ -9,20 +9,22 @@ parser = argparse.ArgumentParser(description='prepare combined cards')
 parser.add_argument('-f', dest='file', default='./combine.json', help='input json with configuration')
 args = parser.parse_args()
 
-def GetHist(file, variable, process):
-    hist = file.Get(str(process + '_' + variable))
+def GetHist(region, file, variable, process):
+    print str(region + '_' +  variable + '_' + process+ '_None')
+    hist = file.Get(str(region + '_' +  variable + '_' + process+ '_None'))
     hist.SetDirectory(0)
     return hist
 
-def auto_cal(file, variable, process, uncertainty, bin):
+def auto_cal(region, file, variable, process, uncertainty, bin):
 
     cal_unc = 1.0
+    hist_name = str(region + '_' +  variable + '_' + process)
 
     if 'JES' in uncertainty:
         
-        JES_nominal = file.Get(str(process + '_' + variable)).GetBinContent(bin)
-        JES_up = file.Get(str(process + '_' + variable + '_JESup')).GetBinContent(bin)
-        JES_down = file.Get(str(process + '_' + variable + '_JESdown')).GetBinContent(bin)
+        JES_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
+        JES_up = file.Get(str(hist_name + '_jesTotalUp')).GetBinContent(bin)
+        JES_down = file.Get(str(hist_name + '_jesTotalDown')).GetBinContent(bin)
         if JES_nominal == 0:
             print 'JES_nominal equals zero in: ', file, process, variable, ' bin: ', bin
             cal_unc = 1
@@ -32,9 +34,9 @@ def auto_cal(file, variable, process, uncertainty, bin):
     
     elif 'JER' in uncertainty:
         
-        JER_nominal = file.Get(str(process + '_' + variable)).GetBinContent(bin)
-        JER_up = file.Get(str(process + '_' + variable + '_JERup')).GetBinContent(bin)
-        JER_down = file.Get(str(process + '_' + variable + '_JERdown')).GetBinContent(bin)
+        JER_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
+        JER_up = file.Get(str(hist_name + '_jerUp')).GetBinContent(bin)
+        JER_down = file.Get(str(hist_name + '_jerDown')).GetBinContent(bin)
         if JER_nominal == 0:
             print 'JER_nominal equals zero in: ', file, process, variable, ' bin: ', bin
             cal_unc = 1
@@ -42,9 +44,9 @@ def auto_cal(file, variable, process, uncertainty, bin):
             cal_unc = 1 + (max(abs(JER_up-JER_nominal), abs(JER_down-JER_nominal)) / JER_nominal)
         return Decimal(cal_unc).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
 
-    elif 'stat' in uncertainty:
-        stat_unc = file.Get(str(process + '_' + variable)).GetBinError(bin)
-        nominal = file.Get(str(process + '_' + variable)).GetBinContent(bin)
+    elif 'stat' in uncertainty and (not 'HLT' in uncertainty):
+        stat_unc = file.Get(str(hist_name + '_None')).GetBinError(bin)
+        nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
         if nominal == 0:
             print 'stat counts equals zero in: ', file, process, variable, ' bin: ', bin
             cal_unc = 1
@@ -62,10 +64,13 @@ if __name__ == '__main__':
         jsons = json.load(f)
         f.close()
     imax = jsons['utils']['imax']
-    tag = jsons['utils']['tag']
-    variable = jsons['utils']['variable']
 
     for region in jsons['regions']:
+        region_name = jsons['regions'][region]['file_name']
+        region_plotname = jsons['regions'][region]['final_name']
+        tag = jsons['regions'][region]['tag']
+        variable = jsons['regions'][region]['variable']
+        variable_plotname = jsons['regions'][region]['variable_plotname']
 
         # Get All Process
         df = pd.read_csv(jsons['regions'][region]['csv'])
@@ -75,22 +80,23 @@ if __name__ == '__main__':
             if ('type' in process) or ('uncertainty' in process):
                 continue
             processes.append(process)
+        print region_name + '_' + str(tag) + '.root'
         print "processes: ", processes, "\n"
 
         # Get all histogram
-        file_region = ROOT.TFile.Open(jsons['regions'][region]['name'] + '_' + str(tag) + '.root', 'READ')
+        file_region = ROOT.TFile.Open(region_name + '_' + str(tag) + '.root', 'READ')
         hist_region = {}
         for process in processes:
-            hist_region[process] = GetHist(file_region, variable, process)
-        hist_region['data'] = GetHist(file_region, variable, 'data')
+            hist_region[process] = GetHist(region_name, file_region, variable, process)
+        hist_region['data'] = GetHist(region_name, file_region, variable, 'data')
         
-        print 'preparing cards for: ', str(jsons['regions'][region]['name'] + '_' + str(tag))
-        path_region = str('cards_' + jsons['regions'][region]['name'] + '_' + str(tag))
+        print 'preparing cards for: ', str(region_plotname + '_' + str(tag))
+        path_region = str('cards_' + region_plotname + '_' + str(tag))
         if not os.path.exists(path_region):
             os.mkdir(path_region)
 
-        for bin in range(1, jsons['utils']['bins']+1):
-            bin_content = jsons['regions'][region]['name'] + '_' + variable + '_bin' + str(bin)
+        for bin in range(1, jsons['regions'][region]['bins']+1):
+            bin_content = region_plotname + '_' + variable_plotname + '_bin' + str(bin)
             with open(path_region + '/card_' + bin_content + '.txt', 'w+') as f:
                 f.write('imax \t' + str(imax) + '\tnumber of channels\n')
                 f.write('jmax \t' + str(len(df.columns)-2-imax) + '\tnumber of bkgs\n')
@@ -104,6 +110,7 @@ if __name__ == '__main__':
                     f.write('observation\t' + str(observation) + '\n')
                 else:
                     observation = Decimal(sum([hist_region[process].GetBinContent(bin) for process in processes])).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+                    # observation = Decimal(hist_region['data'].GetBinContent(bin)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
                     f.write('observation\t' + str(observation) + '\n')
                     # f.write('observation\t' + str(hist_region['data'].GetBinContent(bin)) + '\n')
                 f.write('----------------\n')
@@ -147,7 +154,7 @@ if __name__ == '__main__':
                 for row in df.index:
                     # print uncertainty source 
                     if "stat" in str(df.iloc[row,0]):
-                        f.write((str(jsons["regions"][region]["name"]) + '_' + str(df.iloc[row,0])+"_bin"+str(bin)).ljust(print_length_1,' '))
+                        f.write((str(region_plotname) + '_' + str(df.iloc[row,0])+"_bin"+str(bin)).ljust(print_length_1,' '))
                     else:
                         f.write(str(df.iloc[row,0]).ljust(print_length_1,' '))
                     # print uncertainty type
@@ -160,7 +167,7 @@ if __name__ == '__main__':
                         elif str(para) != 'auto_cal':
                             f.write(str(para).ljust(print_length_2,' '))
                         elif str(para) == 'auto_cal':
-                            f.write(str(auto_cal(file_region, variable, processes[i], str(df.iloc[row,0]), bin)).ljust(print_length_2,' '))
+                            f.write(str(auto_cal(region_name, file_region, variable, processes[i], str(df.iloc[row,0]), bin)).ljust(print_length_2,' '))
                     f.write('\n')
 
 

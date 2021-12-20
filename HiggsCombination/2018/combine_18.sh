@@ -1,5 +1,5 @@
 name=test18
-combineCards.py cards_ZZ_2018/*.txt cards_t_enriched_2018/*.txt cards_wza_2018/*.txt >& ${name}.txt
+combineCards.py cards_CR1_2018/*.txt cards_CR2_2018/*.txt cards_SR_2018/*.txt >& ${name}.txt
 
 combine -M Significance --expectSignal=1 -t -1 ${name}.txt > result_${name}.txt
 combine -M Significance --expectSignal=1 -t -1 ${name}.txt --freezeParameters all > result_freezeAll${name}.txt
