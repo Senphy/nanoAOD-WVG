@@ -1,0 +1,20 @@
+universe = vanilla
+executable = slc7_active_WZG_production_UL18_v9.sh
+requirements = (OpSysAndVer =?= "CentOS7")
+
+Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
+arguments = $(Proxy_path)
+use_x509userproxy  = true
++JobFlavour = "testmatch"
+
+should_transfer_files = YES
+transfer_input_files = $(Proxy_path),randomizeSeeds.py,WZAToLNuLLA_4f_NLO_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz,filepath_Neutrino_E-10_gun_2018.txt,wrapper_WZG_production_UL18_v9.sh,cmssw-cc7
+
+RequestCpus = 4
+error = log/job_WZG_UL18_v9.err_$(Cluster)-$(Process)
+output = log/job_WZG_UL18_v9.out_$(Cluster)-$(Process)
+log = log/job_WZG_UL18.log_v9_$(Cluster)-$(Process)
+transfer_output_remaps  = "SMP-RunIISummer20UL18NanoAODv9-00091.root = /eos/user/s/sdeng/WZG_analysis/final/2018/Nanov9/WZA_UL18_$(Cluster)_$(Process).root"
+when_to_transfer_output = ON_EXIT
+queue 10
+
