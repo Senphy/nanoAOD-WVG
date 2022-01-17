@@ -127,7 +127,7 @@ cmsDriver.py  --python_filename SMP-RunIISummer20UL16RECOAPV-00092_1_cfg.py \
             --era Run2_2016_HIPM \
             --runUnscheduled \
             --no_exec --mc -n $EVENTS || exit $? ;
-cmsRun SMP-RunIISummer20UL16HLT-00091_1_cfg.py
+cmsRun SMP-RunIISummer20UL16RECOAPV-00092_1_cfg.py
 
 # MINIAODSIM LEVEL
 if [ -r CMSSW_10_6_25/src ] ; then
