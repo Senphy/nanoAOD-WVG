@@ -142,12 +142,15 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
         elif ((channel >= 20) and (channel <= 24)):
             arrays = arrays.loc[lep_pho_cut_ttG]
         arrays['Generator_weight_sgn'] = arrays['Generator_weight'].apply(lambda x: 1 if x >= 0 else -1)
+        arrays['Muon_ID_Weight'] = arrays['Muon_ID_Weight'].apply(lambda x: 1 if x==0 else x)
         arrays['Muon_ID_Weight_UP'] = arrays['Muon_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
-        arrays['Muon_ID_Weight_DOWN'] = arrays['Muon_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
+        arrays['Muon_ID_Weight_DOWN'] = arrays['Muon_ID_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
+        arrays['Electron_ID_Weight'] = arrays['Electron_ID_Weight'].apply(lambda x: 1 if x==0 else x)
         arrays['Electron_ID_Weight_UP'] = arrays['Electron_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_ID_Weight_DOWN'] = arrays['Electron_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
+        arrays['Electron_ID_Weight_DOWN'] = arrays['Electron_ID_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
+        arrays['Electron_RECO_Weight'] = arrays['Electron_RECO_Weight'].apply(lambda x: 1 if x==0 else x)
         arrays['Electron_RECO_Weight_UP'] = arrays['Electron_RECO_Weight_UP'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_RECO_Weight_DOWN'] = arrays['Electron_RECO_Weight_UP'].apply(lambda x: 1 if x==0 else x)
+        arrays['Electron_RECO_Weight_DOWN'] = arrays['Electron_RECO_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
         arrays['true_weight'] = arrays['Muon_ID_Weight'] * arrays['Electron_ID_Weight'] * arrays['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
         if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
             MET_cut = (arrays.loc[:,f'MET_T1Smear_pt'] > 30)
