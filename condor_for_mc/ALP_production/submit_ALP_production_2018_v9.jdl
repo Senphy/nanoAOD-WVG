@@ -1,0 +1,20 @@
+universe = vanilla
+executable = EXECUTABLE.sh
+requirements = (OpSysAndVer =?= "CentOS7")
+
+Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
+arguments = $(Proxy_path)
+use_x509userproxy  = true
++JobFlavour = "testmatch"
+
+should_transfer_files = YES
+transfer_input_files = $(Proxy_path),randomizeSeeds.py,TARBALLNAME,filepath_Neutrino_E-10_gun_YEAR.txt,WRAPPER.sh,cmssw-cc7
+
+RequestCpus = 4
+error = log/job_ROOTNAME_YEAR_v9.err_$(Cluster)-$(Process)
+output = log/job_ROOTNAME_YEAR_v9.out_$(Cluster)-$(Process)
+log = log/job_ROOTNAME_YEAR.log_v9_$(Cluster)-$(Process)
+transfer_output_remaps  = "SMP-RunIISummer20UL18NanoAODv9-00091.root = /eos/user/s/sdeng/WZG_analysis/ALP/YEAR/ROOTNAME/ROOTNAME_$(Cluster)_$(Process).root"
+when_to_transfer_output = ON_EXIT
+queue 100
+
