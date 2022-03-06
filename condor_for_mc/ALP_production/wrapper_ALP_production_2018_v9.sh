@@ -179,7 +179,6 @@ cmsDriver.py  --python_filename SMP-RunIISummer20UL18NanoAODv9-00091_1_cfg.py \
 sed -i -e 's/PoolOutputModule/NanoAODOutputModule/g' SMP-RunIISummer20UL18NanoAODv9-00091_1_cfg.py
 cmsRun SMP-RunIISummer20UL18NanoAODv9-00091_1_cfg.py
 
-
 end=`date +%s`
 time=`echo $start $end | awk '{print $2-$1}'`
 echo $time

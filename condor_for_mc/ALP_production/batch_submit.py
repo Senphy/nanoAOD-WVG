@@ -17,7 +17,7 @@ def ALP_batch_condor():
             os.makedirs(eospath + str(year) + '/' + Sample_Name)
 
 
-        shutil.copyfile('cmssw-cc7', Sample_Name+'/cmssw-cc7')
+        shutil.copyfile('cmssw-cc7.sh', Sample_Name+'/cmssw-cc7.sh')
         shutil.copyfile('filepath_Neutrino_E-10_gun_%s.txt' %(str(year)), Sample_Name+'/filepath_Neutrino_E-10_gun_%s.txt' %(str(year)))
         shutil.copyfile('randomizeSeeds.py', Sample_Name+'/randomizeSeeds.py')
         shutil.copyfile('slc7_active_ALP_production_%s_v9.sh' %(str(year)), Sample_Name+'/slc7_active_ALP_m%s_production_%s_v9.sh' %(str(mass), str(year)))
@@ -32,6 +32,7 @@ def ALP_batch_condor():
         os.popen('sed -i "s/TARBALLNAME/ALP_lvlla_4f_LO_m%s_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz/g" %s/submit_ALP_m%s_production_%s_v9.jdl' %(str(mass), Sample_Name, str(mass), str(year)))
         os.popen('sed -i "s/TARBALLNAME/ALP_lvlla_4f_LO_m%s_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz/g" %s/wrapper_ALP_m%s_production_%s_v9.sh' %(str(mass), Sample_Name, str(mass), str(year)))
         os.popen('sed -i "s/WRAPPER.sh/wrapper_ALP_m%s_production_%s_v9.sh/g" %s/slc7_active_ALP_m%s_production_%s_v9.sh' %(str(mass), str(year), Sample_Name, str(mass), str(year)))
+        os.popen('sed -i "s/ROOTNAME/ALP_lvlla_4f_LO_m%s/g" %s/slc7_active_ALP_m%s_production_%s_v9.sh' %(str(mass), Sample_Name, str(mass), str(year)))
         
         # Have some potential bugs here! *FIXME*
         os.chdir(Sample_Name)

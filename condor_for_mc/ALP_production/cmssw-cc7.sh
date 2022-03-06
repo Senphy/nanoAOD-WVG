@@ -2,7 +2,8 @@
 SINGULARITY_OPTS=
 BASE_SCRIPT="cmssw-env"
 CMD_TO_RUN="/bin/bash"
-CMS_IMAGE=$(basename $0)
+#CMS_IMAGE=$(basename $0)
+CMS_IMAGE="cmssw-cc7"
 THISDIR=$(dirname $0)
 while [ "$#" != 0 ]; do
   case "$1" in
