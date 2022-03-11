@@ -52,8 +52,12 @@ def Plot():
         plot_branch = branch[branch_name]["name"]
         c1 = ROOT.TCanvas("","",1000,800)
 
-        MC_err = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
-        ggZZ_sum = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
+        if branch[branch_name].__contains__("bin_array"):
+            MC_err = ROOT.TH1D("","",len(branch[plot_branch]["bin_array"])-1,array('d', branch[plot_branch]["bin_array"]))
+            ggZZ_sum = ROOT.TH1D("","",len(branch[plot_branch]["bin_array"])-1,array('d', branch[plot_branch]["bin_array"]))
+        else:
+            MC_err = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
+            ggZZ_sum = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
         SetHistStyle(ggZZ_sum, filelist_MC["ggZZ_4e"]["color"])
         MC_err.Sumw2()
         MC_err.SetFillColor(ROOT.kGray+2)
