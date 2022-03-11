@@ -26,6 +26,7 @@ channel_map = {
 }
 
 lumi = 59.7
+year = "2018"
 
 UpDown = 0
 UpDown_map={
@@ -46,7 +47,7 @@ branch = {
         "name":"WZG_dileptonmass",
         "axis_name":"m_{Z} [GeV]",
         "bin_strategy":"average",
-        "xbins":5,
+        "xbins":3,
         "xleft":75,
         "xright":105,
     },

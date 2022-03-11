@@ -26,6 +26,7 @@ channel_map = {
 }
 
 lumi = 59.7
+year = "2018"
 
 UpDown = 0
 UpDown_map={
@@ -45,14 +46,14 @@ branch = {
     "ttZ_dileptonmass":{
         "name":"ttZ_dileptonmass",
         "axis_name":"m_{Z} [GeV]",
-        "xbins":20,
+        "xbins":10,
         "xleft":0,
         "xright":200,
     },
     "ttZ_trileptonmass":{
         "name":"ttZ_trileptonmass",
         "axis_name":"m_{lll} [GeV]",
-        "xbins":10,
+        "xbins":5,
         "xleft":100,
         "xright":500,
     },

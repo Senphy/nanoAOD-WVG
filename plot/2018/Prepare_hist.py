@@ -15,6 +15,7 @@ from copy import deepcopy
 import time
 
 sys.path.append('..')
+sys.path.append(os.getcwd())
 from lumi import CMS_lumi
 from AddHist_help import AddHist
 from AddHist_help import AddHist_FakeLepton
@@ -40,7 +41,10 @@ def Prepare_hist():
     hist_data = {}
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
-        hist_data_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
+        if branch[branch_name].__contains__("bin_array"):
+            hist_data_temp = ROOT.TH1F("", "", len(branch[branch_name]["bin_array"])-1, array('d', branch[branch_name]["bin_array"]))
+        else:
+            hist_data_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
         hist_data_temp.SetXTitle(f'{branch[branch_name]["axis_name"]}')
         hist_data_temp.SetYTitle(f'events / bin')
         SetHistStyle(hist_data_temp, 1)
@@ -52,7 +56,10 @@ def Prepare_hist():
         hist_MC = {}
         for branch_name in branch:
             plot_branch = branch[branch_name]["name"]
-            hist_MC_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
+            if branch[branch_name].__contains__("bin_array"):
+                hist_MC_temp = ROOT.TH1F("", "", len(branch[branch_name]["bin_array"])-1, array('d', branch[branch_name]["bin_array"]))
+            else:
+                hist_MC_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
             SetHistStyle(hist_MC_temp, filelist_MC[file]["color"])
             hist_MC_temp.SetXTitle(f'{branch[branch_name]["axis_name"]}')
             for UpDown in range(0,5):
@@ -70,7 +77,10 @@ def Prepare_hist():
     hist_FakeLep = {}
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
-        hist_FakeLep_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
+        if branch[branch_name].__contains__("bin_array"):
+            hist_FakeLep_temp = ROOT.TH1F("", "", len(branch[branch_name]["bin_array"])-1, array('d', branch[branch_name]["bin_array"]))
+        else:
+            hist_FakeLep_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
         hist_FakeLep_temp.SetXTitle(f'{branch[branch_name]["axis_name"]}')
         hist_FakeLep_temp.SetYTitle(f'events / bin')
         SetHistStyle(hist_FakeLep_temp,23)
@@ -83,7 +93,10 @@ def Prepare_hist():
     hist_FakePho= {}
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
-        hist_FakePho_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
+        if branch[branch_name].__contains__("bin_array"):
+            hist_FakePho_temp = ROOT.TH1F("", "", len(branch[branch_name]["bin_array"])-1, array('d', branch[branch_name]["bin_array"]))
+        else:
+            hist_FakePho_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
         hist_FakePho_temp.SetXTitle(f'{branch[branch_name]["axis_name"]}')
         hist_FakePho_temp.SetYTitle(f'events / bin')
         SetHistStyle(hist_FakePho_temp,30)

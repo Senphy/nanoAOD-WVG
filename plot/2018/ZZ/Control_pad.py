@@ -26,6 +26,7 @@ channel_map = {
 }
 
 lumi = 59.7
+year = "2018"
 
 UpDown = 0
 UpDown_map={
@@ -45,7 +46,7 @@ branch = {
     "ZZ_mllz1":{
         "name":"ZZ_mllz1",
         "axis_name":"m_{Z1} [GeV]",
-        "xbins":5,
+        "xbins":3,
         "xleft":75,
         "xright":105,
     },
@@ -59,7 +60,8 @@ branch = {
     "ZZ_trileptonmass":{
         "name":"ZZ_trileptonmass",
         "axis_name":"m_{lll} [GeV]",
-        "xbins":10,
+        "bin_array":[100,200,300,500],
+        "xbins":5,
         "xleft":100,
         "xright":500,
     },

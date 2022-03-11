@@ -4,6 +4,7 @@ import os,sys
 from array import array
 import time
 
+sys.path.append(os.getcwd())
 from Control_pad import channel_map
 from Control_pad import channel
 from Control_pad import UpDown_map
