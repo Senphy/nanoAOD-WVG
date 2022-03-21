@@ -4,6 +4,7 @@ import os,sys
 from array import array
 import time
 
+sys.path.append(os.getcwd())
 from Control_pad import channel_map
 from Control_pad import channel
 from Control_pad import UpDown_map
@@ -51,8 +52,12 @@ def Plot():
         plot_branch = branch[branch_name]["name"]
         c1 = ROOT.TCanvas("","",1000,800)
 
-        MC_err = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
-        ggZZ_sum = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
+        if branch[branch_name].__contains__("bin_array"):
+            MC_err = ROOT.TH1D("","",len(branch[plot_branch]["bin_array"])-1,array('d', branch[plot_branch]["bin_array"]))
+            ggZZ_sum = ROOT.TH1D("","",len(branch[plot_branch]["bin_array"])-1,array('d', branch[plot_branch]["bin_array"]))
+        else:
+            MC_err = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
+            ggZZ_sum = ROOT.TH1D("","",branch[plot_branch]["xbins"],branch[plot_branch]["xleft"],branch[plot_branch]["xright"])
         SetHistStyle(ggZZ_sum, filelist_MC["ggZZ_4e"]["color"])
         MC_err.Sumw2()
         MC_err.SetFillColor(ROOT.kGray+2)
@@ -137,14 +142,14 @@ def Plot():
             SetHistStyle(hist_data[plot_branch], 1)
             hist_data[plot_branch].Draw("E0X0p")
             # hist_data.SetMinimum(10)
-            hist_data[plot_branch].SetMaximum(3*hist_data[plot_branch].GetMaximum())
+            hist_data[plot_branch].SetMaximum(2.5*hist_data[plot_branch].GetMaximum())
             stack_mc.Draw("HIST SAME")
             MC_err.Draw("e2 SAME")
             hist_data[plot_branch].Draw("E0X0p SAME")
             hist_data[plot_branch].GetXaxis().SetLabelSize(0)
         else:
             MC_err.Draw("e2")
-            MC_err.SetMaximum(3 * MC_err.GetMaximum())
+            MC_err.SetMaximum(3.0 * MC_err.GetMaximum())
             stack_mc.Draw("HIST SAME")
             MC_err.Draw("e2 SAME")
         legend.Draw("SAME")
