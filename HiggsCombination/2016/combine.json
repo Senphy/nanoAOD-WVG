@@ -11,7 +11,7 @@
             "variable":"ttZ_trileptonmass",
             "variable_plotname":"mWZ",
             "csv":"combine_CR.csv",
-            "tag":2018
+            "tag":"2016"
         },
         "CR_2":{
             "final_name":"CR2",
@@ -20,16 +20,16 @@
             "variable":"ZZ_trileptonmass",
             "variable_plotname":"mWZ",
             "csv":"combine_CR.csv",
-            "tag":2018
+            "tag":"2016"
         },
         "SR_1":{
             "final_name":"SR",
             "file_name":"WZG",
-            "bins":4,
+            "bins":2,
             "variable":"WZG_trileptonmass",
             "variable_plotname":"mWZ",
             "csv":"combine_SR.csv",
-            "tag":2018
+            "tag":"2016"
         }
     }
 }

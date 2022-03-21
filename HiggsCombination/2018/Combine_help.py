@@ -4,6 +4,7 @@ import json
 import argparse
 import pandas as pd
 from decimal import Decimal
+import shutil
 
 parser = argparse.ArgumentParser(description='prepare combined cards')
 parser.add_argument('-f', dest='file', default='./combine.json', help='input json with configuration')
@@ -15,12 +16,18 @@ def GetHist(region, file, variable, process):
     hist.SetDirectory(0)
     return hist
 
+def valid_unc(cal_unc):
+    if cal_unc < 1 or cal_unc < 0:
+        print "Not enough accuracy for:", file, process, variable, ' bin: ', bin, ", Unc Set to 1"
+        cal_unc = 1
+    return cal_unc    
+
 def auto_cal(region, file, variable, process, uncertainty, bin):
 
     cal_unc = 1.0
     hist_name = str(region + '_' +  variable + '_' + process)
 
-    if 'JES' in uncertainty:
+    if 'jes' in uncertainty.lower():
         
         JES_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
         JES_up = file.Get(str(hist_name + '_jesTotalUp')).GetBinContent(bin)
@@ -30,9 +37,9 @@ def auto_cal(region, file, variable, process, uncertainty, bin):
             cal_unc = 1
         else:
             cal_unc = 1 + (max(abs(JES_up-JES_nominal), abs(JES_down-JES_nominal)) / JES_nominal)
-        return Decimal(cal_unc).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+        return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
     
-    elif 'JER' in uncertainty:
+    elif 'jer' in uncertainty.lower():
         
         JER_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
         JER_up = file.Get(str(hist_name + '_jerUp')).GetBinContent(bin)
@@ -42,9 +49,9 @@ def auto_cal(region, file, variable, process, uncertainty, bin):
             cal_unc = 1
         else:
             cal_unc = 1 + (max(abs(JER_up-JER_nominal), abs(JER_down-JER_nominal)) / JER_nominal)
-        return Decimal(cal_unc).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+        return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
 
-    elif 'stat' in uncertainty and (not 'HLT' in uncertainty):
+    elif 'stat' in uncertainty.lower() and (not 'hlt' in uncertainty.lower()):
         stat_unc = file.Get(str(hist_name + '_None')).GetBinError(bin)
         nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
         if nominal == 0:
@@ -52,7 +59,43 @@ def auto_cal(region, file, variable, process, uncertainty, bin):
             cal_unc = 1
         else:
             cal_unc = 1 + abs(stat_unc/nominal)
-        return Decimal(cal_unc).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+        return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+
+    elif 'muon_id' in uncertainty.lower():
+        
+        MuonID_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
+        MuonID_up = file.Get(str(hist_name + '_MuonIDup')).GetBinContent(bin)
+        MuonID_down = file.Get(str(hist_name + '_MuonIDdown')).GetBinContent(bin)
+        if MuonID_nominal == 0:
+            print 'MuonID_nominal equals zero in: ', file, process, variable, ' bin: ', bin
+            cal_unc = 1
+        else:
+            cal_unc = 1 + (max(abs(MuonID_up-MuonID_nominal), abs(MuonID_down-MuonID_nominal)) / MuonID_nominal)
+        return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+
+    elif 'ele_id' in uncertainty.lower():
+        
+        ElectronID_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
+        ElectronID_up = file.Get(str(hist_name + '_ElectronIDup')).GetBinContent(bin)
+        ElectronID_down = file.Get(str(hist_name + '_ElectronIDdown')).GetBinContent(bin)
+        if ElectronID_nominal == 0:
+            print 'ElectronID_nominal equals zero in: ', file, process, variable, ' bin: ', bin
+            cal_unc = 1
+        else:
+            cal_unc = 1 + (max(abs(ElectronID_up-ElectronID_nominal), abs(ElectronID_down-ElectronID_nominal)) / ElectronID_nominal)
+        return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+
+    elif 'ele_reco' in uncertainty.lower():
+        
+        ElectronRECO_nominal = file.Get(str(hist_name + '_None')).GetBinContent(bin)
+        ElectronRECO_up = file.Get(str(hist_name + '_ElectronRECOup')).GetBinContent(bin)
+        ElectronRECO_down = file.Get(str(hist_name + '_ElectronRECOdown')).GetBinContent(bin)
+        if ElectronRECO_nominal == 0:
+            print 'ElectronRECO_nominal equals zero in: ', file, process, variable, ' bin: ', bin
+            cal_unc = 1
+        else:
+            cal_unc = 1 + (max(abs(ElectronRECO_up-ElectronRECO_nominal), abs(ElectronRECO_down-ElectronRECO_nominal)) / ElectronRECO_nominal)
+        return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
 
     else:
         print "Unknown nuissance parameters: ", uncertainty, " ,Set to 1.0"
@@ -92,7 +135,11 @@ if __name__ == '__main__':
         
         print 'preparing cards for: ', str(region_plotname + '_' + str(tag))
         path_region = str('cards_' + region_plotname + '_' + str(tag))
-        if not os.path.exists(path_region):
+        if os.path.exists(path_region):
+            print("existing %s, removing" %(path_region))
+            shutil.rmtree(path_region)
+            os.mkdir(path_region)
+        else:
             os.mkdir(path_region)
 
         for bin in range(1, jsons['regions'][region]['bins']+1):
@@ -143,7 +190,7 @@ if __name__ == '__main__':
                 f.write(' '.ljust(print_length_1,' '))
                 for process in processes:
                     rate = Decimal(hist_region[process].GetBinContent(bin)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
-                    if rate < 0:
+                    if rate <= 0:
                         print region, process, bin, "rate < 0, set to 0"
                         f.write(str(0.00).ljust(print_length_2, ' '))
                     else:   
@@ -170,7 +217,10 @@ if __name__ == '__main__':
                             f.write(str(auto_cal(region_name, file_region, variable, processes[i], str(df.iloc[row,0]), bin)).ljust(print_length_2,' '))
                     f.write('\n')
 
-
+            if observation == 0:
+                print "no obs_data in path_%s/card_%s.txt, cleaning..." % (path_region, bin_content)
+                os.remove(path_region + '/card_' + bin_content + '.txt')
                 pass
+
         file_region.Close()
 

@@ -1,5 +1,5 @@
 uncertainty,type,WZG,FakeLep,Top,VV,VVV
-lumi_17,lnN,1.017,1.017,1.017,1.017,1.017
+lumi_17,lnN,1.023,1.023,1.023,1.023,1.023
 JES_17,lnN,auto_cal,,auto_cal,auto_cal,auto_cal
 JER_17,lnN,auto_cal,,auto_cal,auto_cal,auto_cal
 FakeLep_17,lnN,,1.030,,,
