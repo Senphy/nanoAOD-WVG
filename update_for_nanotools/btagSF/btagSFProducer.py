@@ -36,7 +36,7 @@ class btagSFProducer(Module):
     """
 
     def __init__(
-            self, era, algo='deepcsv', selectedWPs=['M', 'shape_corr'],
+            self, era, algo='deepcsv', selectedWPs=['T','shape_corr'],
             sfFileName=None, verbose=0, jesSystsForShape=["jes"]
     ):
         self.era = era
@@ -93,8 +93,17 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL2016': {
-                    'inputFileName': "DeepCSV_106XUL16SF.csv",
+                'UL2016Pre': {
+                    'inputFileName': "test_DeepCSV_106XUL16preVFPSF_v1.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL2016Post': {
+                    'inputFileName': "test_DeepCSV_106XUL16postVFPSF_v2.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -103,7 +112,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2017': {
-                    'inputFileName': "DeepCSV_106XUL17SF.csv",
+                    'inputFileName': "test_DeepCSV_106XUL17SF.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -121,7 +130,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2018': {
-                    'inputFileName': "DeepCSV_106XUL18SF.csv",
+                    'inputFileName': "test_DeepCSV_106XUL18SF.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -254,6 +263,13 @@ class btagSFProducer(Module):
     def beginJob(self):
         # initialize BTagCalibrationReader
         # (cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration )
+
+        print "input file path for btagSF: ", self.inputFilePath
+        print "input file for btagSF: ", self.inputFileName
+        # print type(os.path.join(self.inputFilePath, self.inputFileName))
+        # print os.path.join(self.inputFilePath, self.inputFileName)
+        # print self.algo
+
         self.calibration = ROOT.BTagCalibration(
             self.algo, os.path.join(self.inputFilePath, self.inputFileName))
         self.readers = {}
@@ -390,5 +406,7 @@ class btagSFProducer(Module):
 
 
 # btagSFUL2016 = lambda: btagSFProducer("2016")
+btagSFUL2016Pre = lambda: btagSFProducer("UL2016Pre")
+btagSFUL2016Post = lambda: btagSFProducer("UL2016Post")
 btagSFUL2017 = lambda: btagSFProducer("UL2017")
 btagSFUL2018 = lambda: btagSFProducer("UL2018")

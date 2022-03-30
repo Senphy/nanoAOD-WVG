@@ -5,7 +5,7 @@ echo "Current path: $prev_path"
 
 echo "Update for btv"
 echo "Updating btag SF"
-cp $WORKING_PATH/nanoAOD-WVG/update_for_nanotools/btagSF/DeepCSV*.csv $WORKING_PATH/data/btagSF/
+cp $WORKING_PATH/nanoAOD-WVG/update_for_nanotools/btagSF/*DeepCSV*.csv $WORKING_PATH/data/btagSF/
 echo "Updating btagSF module"
 cp $WORKING_PATH/nanoAOD-WVG/update_for_nanotools/btagSF/btagSFProducer.py $WORKING_PATH/python/postprocessing/modules/btv/
 
