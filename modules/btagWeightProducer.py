@@ -43,7 +43,8 @@ class btagWeightProduce(Module):
                     self.branchNames_central_and_systs_shape_corr[central_or_syst] = "btagWeight_%s" % central_or_syst
                 self.out.branch(self.branchNames_central_and_systs_shape_corr[central_or_syst],'F')     
 
-        self.h_neventsgenweighted_btag = ROOT.TH1D('nEventsGenWeighted_btag','nEventsGenWeighted_btag', 1, 0, 1)
+        self.h_neventsgenweighted_btag = ROOT.TH1D('h_nEventsGenWeighted_btag','h_nEventsGenWeighted_btag', 1, 0, 1)
+        self.h_neventsgenweighted = ROOT.TH1D('h_nEventsGenWeighted','h_nEventsGenWeighted', 1, 0, 1)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         prevdir = ROOT.gDirectory
@@ -51,6 +52,10 @@ class btagWeightProduce(Module):
         # self.h_nevents.Write()
         #        self.h_nweightedevents.Write()
         self.h_neventsgenweighted_btag.Write()
+        self.h_neventsgenweighted.Write()
+        self.h_neventsgenweighted_ratio = self.h_neventsgenweighted.Clone("h_nEventsGenWeighted_ratio")
+        self.h_neventsgenweighted_ratio.Divide(self.h_neventsgenweighted_btag)
+        self.h_neventsgenweighted_ratio.Write()
         prevdir.cd()
         pass
 
@@ -158,14 +163,15 @@ class btagWeightProduce(Module):
             else:
                 for idx in tight_bjets:
                     btag_weight *= getattr(event, "Jet_btagSF_deepcsv_shape_%s" %central_or_syst)[idx]
-            print btag_weight
+            # print btag_weight
             self.out.fillBranch(self.branchNames_central_and_systs_shape_corr[central_or_syst], btag_weight)
 
         if hasattr(event, 'Generator_weight') and event.Generator_weight < 0:
-            self.h_neventsgenweighted_btag.Fill(0.5, -1 * btag_weight)
-#            self.h_nweightedevents.Fill(-0.5)
+            self.h_neventsgenweighted_btag.Fill(len(tight_jets), -1 * btag_weight)
+            self.h_neventsgenweighted.Fill(len(tight_jets), -1)
         else:
-            self.h_neventsgenweighted_btag.Fill(0.5, 1 * btag_weight)
+            self.h_neventsgenweighted_btag.Fill(len(tight_jets), 1 * btag_weight)
+            self.h_neventsgenweighted.Fill(len(tight_jets), 1)
 
         return True
 

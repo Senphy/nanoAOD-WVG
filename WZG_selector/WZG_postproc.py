@@ -6,6 +6,7 @@ from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModule import countHistogramsProducer
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2       import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.eleRECOSFProducer import *
@@ -13,6 +14,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.eleIDSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.muonScaleResProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.muonIDISOSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.WZG_Module import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.btagWeightProducer import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.photonIDSFProducer import *
 
 import argparse
 import re
@@ -41,25 +44,25 @@ if args.isdata:
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2017(),first_Template_Module(),jetmetCorrector(),WZG_select_Module_17()]
-    if args.year == '2016':
+    if args.year == '2016Post':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2016b(),jetmetCorrector(),WZG_select_Module()]
-    if args.year == '2016_PreVFP':
+    if args.year == '2016Pre':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016_PreVFP", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2016a(),jetmetCorrector(),WZG_select_Module()]
 else:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="Total", metBranchName="MET", splitJER=False, applyHEMfix=True)
-        Modules = [countHistogramsProducer(),muonScaleRes2018(),first_Template_Producer(),puAutoWeight_2018(),muonIDISOSF2018(),eleRECOSF2018(),eleIDSF2018(),jetmetCorrector(),WZG_select_Module_18()]
+        Modules = [countHistogramsProducer(),muonScaleRes2018(),first_Template_Producer(),puAutoWeight_2018(),muonIDISOSF2018(),eleRECOSF2018(),eleIDSF2018(),phoIDSF2018(),jetmetCorrector(),btagSFUL2018(),btagWeightModule_18(),WZG_select_Module_18()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="Total", metBranchName="MET", splitJER=False)
-        Modules = [countHistogramsProducer(),muonScaleRes2017(),first_Template_Producer(),puAutoWeight_2017(),PrefCorrUL17(),muonIDISOSF2017(),eleRECOSF2017(),eleIDSF2017(),jetmetCorrector(),WZG_select_Module_17()]
-    if args.year == '2016':
+        Modules = [countHistogramsProducer(),muonScaleRes2017(),first_Template_Producer(),puAutoWeight_2017(),PrefCorrUL17(),muonIDISOSF2017(),eleRECOSF2017(),eleIDSF2017(),phoIDSF2017(),jetmetCorrector(),btagSFUL2017(),btagWeightModule_17(),WZG_select_Module_17()]
+    if args.year == '2016Post':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="Total", metBranchName="MET", splitJER=False)
-        Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_postVFP(),muonIDISOSF2016(),muonScaleRes2016b(),eleRECOSF2016(),eleIDSF2016(),jetmetCorrector(),WZG_select_Module()]
-    if args.year == '2016_PreVFP':
+        Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_postVFP(),muonIDISOSF2016(),muonScaleRes2016b(),eleRECOSF2016(),eleIDSF2016(),phoIDSF2016Post(),jetmetCorrector(),WZG_select_Module()]
+    if args.year == '2016Pre':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016_PreVFP", jesUncert="Total", metBranchName="MET", splitJER=False)
-        Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_preVFP(),muonIDISOSF2016(),muonScaleRes2016a(),eleRECOSF2016(),eleIDSF2016(),jetmetCorrector(),WZG_select_Module()]
+        Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_preVFP(),muonIDISOSF2016(),muonScaleRes2016a(),eleRECOSF2016(),eleIDSF2016(),phoIDSF2016Post(),jetmetCorrector(),WZG_select_Module()]
 
 if args.file:
 

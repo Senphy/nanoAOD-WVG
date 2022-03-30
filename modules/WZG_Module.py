@@ -37,6 +37,30 @@ class WZG_Producer(Module):
         self.out.branch("nbJets","i")
         self.out.branch("nvetoMuon","i")
         self.out.branch("nvetoElectron","i")
+        self.out.branch("dr_wla", "F")
+        self.out.branch("dr_zl1a", "F")
+        self.out.branch("dr_zl2a", "F")
+
+        self.out.branch("ZGJ_lepton1_pt",  "F")
+        self.out.branch("ZGJ_lepton1_eta",  "F")
+        self.out.branch("ZGJ_lepton1_phi",  "F")
+        self.out.branch("ZGJ_lepton1_mass",  "F")
+        self.out.branch("ZGJ_lepton1_genPartFlav",  "i")
+        self.out.branch("ZGJ_lepton1_index",  "i")
+        self.out.branch("ZGJ_lepton2_pt",  "F")
+        self.out.branch("ZGJ_lepton2_eta",  "F")
+        self.out.branch("ZGJ_lepton2_phi",  "F")
+        self.out.branch("ZGJ_lepton2_mass",  "F")
+        self.out.branch("ZGJ_lepton2_genPartFlav",  "i")
+        self.out.branch("ZGJ_lepton2_index",  "i")
+        self.out.branch("ZGJ_photon_pt",  "F")
+        self.out.branch("ZGJ_photon_eta",  "F")
+        self.out.branch("ZGJ_photon_phi",  "F")
+        self.out.branch("ZGJ_photon_mass",  "F")
+        self.out.branch("ZGJ_photon_genPartFlav",  "i")
+        self.out.branch("ZGJ_photon_index",  "i")
+        self.out.branch("ZGJ_dileptonmass",  "F")
+        self.out.branch("ZGJ_mlla",  "F")
 
         self.out.branch("ZZ_lepton1_pt",  "F")
         self.out.branch("ZZ_lepton1_eta",  "F")
@@ -147,6 +171,9 @@ class WZG_Producer(Module):
         self.out.branch("ttZ_trileptonmass",  "F")
         self.out.branch("ttZ_MET",  "F")
 
+        self.out.branch("Photon_ID_Weight", "F")
+        self.out.branch("Photon_ID_Weight_UP", "F")
+        self.out.branch("Photon_ID_Weight_DOWN", "F")
         self.out.branch("Muon_ID_Weight", "F")
         self.out.branch("Muon_ID_Weight_UP", "F")
         self.out.branch("Muon_ID_Weight_DOWN", "F")
@@ -246,16 +273,6 @@ class WZG_Producer(Module):
                 Electron_RECO_Weight_UP = max(Electron_RECO_Weight_UP * (event.Electron_RECO_SF[i] + event.Electron_RECO_SFerr[i]), Electron_RECO_Weight_UP * (event.Electron_RECO_SF[i] - event.Electron_RECO_SFerr[i]))
                 Electron_RECO_Weight_DOWN = min(Electron_RECO_Weight_DOWN * (event.Electron_RECO_SF[i] + event.Electron_RECO_SFerr[i]), Electron_RECO_Weight_DOWN * (event.Electron_RECO_SF[i] - event.Electron_RECO_SFerr[i]))
 
-        self.out.fillBranch("Muon_ID_Weight", Muon_ID_Weight)
-        self.out.fillBranch("Muon_ID_Weight_UP", Muon_ID_Weight_UP)
-        self.out.fillBranch("Muon_ID_Weight_DOWN", Muon_ID_Weight_DOWN)
-        self.out.fillBranch("Electron_ID_Weight", Electron_ID_Weight)
-        self.out.fillBranch("Electron_ID_Weight_UP", Electron_ID_Weight_UP)
-        self.out.fillBranch("Electron_ID_Weight_DOWN", Electron_ID_Weight_DOWN)
-        self.out.fillBranch("Electron_RECO_Weight", Electron_RECO_Weight)
-        self.out.fillBranch("Electron_RECO_Weight_UP", Electron_RECO_Weight_UP)
-        self.out.fillBranch("Electron_RECO_Weight_DOWN", Electron_RECO_Weight_DOWN)
-
         # selection on photons, but not requirement on photon number in this module
         for i in range(0,len(photons)):
 
@@ -293,10 +310,31 @@ class WZG_Producer(Module):
 
             tight_photons.append(i)
 
+        Photon_ID_Weight = 1
+        Photon_ID_Weight_UP = 1
+        Photon_ID_Weight_DOWN = 1
+        if hasattr(event, "Photon_CutBased_MediumID_SF"):
+            for i in tight_photons:
+                Photon_ID_Weight = Photon_ID_Weight * event.Photon_CutBased_TightID_SF[i]
+                Photon_ID_Weight_UP = max(Photon_ID_Weight_UP * (event.Photon_CutBased_TightID_SF[i] + event.Photon_CutBased_TightID_SFerr[i]), Photon_ID_Weight_UP * (event.Photon_CutBased_TightID_SF[i] - event.Photon_CutBased_TightID_SFerr[i]))
+                Photon_ID_Weight_DOWN = min(Photon_ID_Weight_DOWN * (event.Photon_CutBased_TightID_SF[i] + event.Photon_CutBased_TightID_SFerr[i]), Photon_ID_Weight_DOWN * (event.Photon_CutBased_TightID_SF[i] - event.Photon_CutBased_TightID_SFerr[i]))
+
+        self.out.fillBranch("Photon_ID_Weight", Photon_ID_Weight)
+        self.out.fillBranch("Photon_ID_Weight_UP", Photon_ID_Weight_UP)
+        self.out.fillBranch("Photon_ID_Weight_DOWN", Photon_ID_Weight_DOWN)
+        self.out.fillBranch("Muon_ID_Weight", Muon_ID_Weight)
+        self.out.fillBranch("Muon_ID_Weight_UP", Muon_ID_Weight_UP)
+        self.out.fillBranch("Muon_ID_Weight_DOWN", Muon_ID_Weight_DOWN)
+        self.out.fillBranch("Electron_ID_Weight", Electron_ID_Weight)
+        self.out.fillBranch("Electron_ID_Weight_UP", Electron_ID_Weight_UP)
+        self.out.fillBranch("Electron_ID_Weight_DOWN", Electron_ID_Weight_DOWN)
+        self.out.fillBranch("Electron_RECO_Weight", Electron_RECO_Weight)
+        self.out.fillBranch("Electron_RECO_Weight_UP", Electron_RECO_Weight_UP)
+        self.out.fillBranch("Electron_RECO_Weight_DOWN", Electron_RECO_Weight_DOWN)
 
         for i in range(0,len(jets)): 
 
-            if event.Jet_pt_nom[i] < 10:
+            if event.Jet_pt_nom[i] < 30:
                 continue
 
             if abs(jets[i].eta) > 2.4:
@@ -358,10 +396,16 @@ class WZG_Producer(Module):
         # 12: ttZ_mee
         # 13: ttZ_eee
         # 14: ttZ_mmm
+        # 21: ttG_emm
+        # 22: ttG_mee
+        # 23: ttG_eee
+        # 24: ttG_mmm
         # 5: ZZ_eemm
         # 6: ZZ_mmee
         # 7: ZZ_eeee
         # 8: ZZ_mmmm        
+        # 31: ZGJets_ee
+        # 32: ZGJets_mm
 
         # nonprompt lepton application region
         # others are same with Signal Region except:
@@ -373,13 +417,86 @@ class WZG_Producer(Module):
         # Only one photon, with sieie cut removed
         # This part has been moved to Fake Photon Module part
 
+        # ZGJets Control Region
+        # Zjets + photon region is designed to validate nonprompt photon.
+        # |mll-mz| <= 15
+        # min mll > 4
+        # >=0 tight photon
+        # >0 b jets
+        # MET < 40
+
+        if len(tight_electrons) + len(tight_muons) == 2:
+            # REMOVE MET cut in this module in order to vary up/down
+            if len(tight_photons) == 0:
+                return False
+            if len(tight_bjets) == 0:
+                return False
+            # OSSF selection has been added in pre-selection module
+            if len(tight_electrons) == 2:
+                dileptonmass = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4()).M()
+                m_lla = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4() + photons[tight_photons[0]].p4()).M()
+                self.out.fillBranch("channel_mark", 31)
+                self.out.fillBranch("ZGJ_lepton1_pt", electrons[tight_electrons[0]].pt)
+                self.out.fillBranch("ZGJ_lepton1_eta", electrons[tight_electrons[0]].eta)
+                self.out.fillBranch("ZGJ_lepton1_phi", electrons[tight_electrons[0]].phi)
+                self.out.fillBranch("ZGJ_lepton1_mass", electrons[tight_electrons[0]].mass)
+                self.out.fillBranch("ZGJ_lepton1_index", tight_electrons[0])
+                self.out.fillBranch("ZGJ_lepton2_pt", electrons[tight_electrons[1]].pt)
+                self.out.fillBranch("ZGJ_lepton2_eta", electrons[tight_electrons[1]].eta)
+                self.out.fillBranch("ZGJ_lepton2_phi", electrons[tight_electrons[1]].phi)
+                self.out.fillBranch("ZGJ_lepton2_mass", electrons[tight_electrons[1]].mass)
+                self.out.fillBranch("ZGJ_lepton2_index", tight_electrons[1])
+                self.out.fillBranch("ZGJ_dileptonmass", dileptonmass)
+                self.out.fillBranch("ZGJ_mlla", m_lla)
+                self.out.fillBranch("ZGJ_photon_pt", photons[tight_photons[0]].pt)
+                self.out.fillBranch("ZGJ_photon_eta", photons[tight_photons[0]].eta)
+                self.out.fillBranch("ZGJ_photon_phi", photons[tight_photons[0]].phi)
+                self.out.fillBranch("ZGJ_photon_mass", photons[tight_photons[0]].mass)
+                self.out.fillBranch("ZGJ_photon_index", tight_photons[0])
+                if hasattr(photons[tight_photons[0]], "genPartFlav"):
+                    self.out.fillBranch("ZGJ_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
+                if hasattr(electrons[tight_electrons[0]], "genPartFlav"):
+                    self.out.fillBranch("ZGJ_lepton1_genPartFlav", electrons[tight_electrons[0]].genPartFlav)
+                    self.out.fillBranch("ZGJ_lepton2_genPartFlav", electrons[tight_electrons[1]].genPartFlav)
+                return True
+
+            elif len(tight_muons) == 2:
+                dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
+                m_lla = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4() + photons[tight_photons[0]].p4()).M()
+                dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
+                m_lla = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4() + photons[tight_photons[0]].p4()).M()
+                self.out.fillBranch("channel_mark", 31)
+                self.out.fillBranch("ZGJ_lepton1_pt", muons[tight_muons[0]].pt)
+                self.out.fillBranch("ZGJ_lepton1_eta", muons[tight_muons[0]].eta)
+                self.out.fillBranch("ZGJ_lepton1_phi", muons[tight_muons[0]].phi)
+                self.out.fillBranch("ZGJ_lepton1_mass", muons[tight_muons[0]].mass)
+                self.out.fillBranch("ZGJ_lepton1_index", tight_muons[0])
+                self.out.fillBranch("ZGJ_lepton2_pt", muons[tight_muons[1]].pt)
+                self.out.fillBranch("ZGJ_lepton2_eta", muons[tight_muons[1]].eta)
+                self.out.fillBranch("ZGJ_lepton2_phi", muons[tight_muons[1]].phi)
+                self.out.fillBranch("ZGJ_lepton2_mass", muons[tight_muons[1]].mass)
+                self.out.fillBranch("ZGJ_lepton2_index", tight_muons[1])
+                self.out.fillBranch("ZGJ_dileptonmass", dileptonmass)
+                self.out.fillBranch("ZGJ_mlla", m_lla)
+                self.out.fillBranch("ZGJ_photon_pt", photons[tight_photons[0]].pt)
+                self.out.fillBranch("ZGJ_photon_eta", photons[tight_photons[0]].eta)
+                self.out.fillBranch("ZGJ_photon_phi", photons[tight_photons[0]].phi)
+                self.out.fillBranch("ZGJ_photon_mass", photons[tight_photons[0]].mass)
+                self.out.fillBranch("ZGJ_photon_index", tight_photons[0])
+                if hasattr(photons[tight_photons[0]], "genPartFlav"):
+                    self.out.fillBranch("ZGJ_photon_genPartFlav", photons[tight_photons[0]].genPartFlav)
+                if hasattr(muons[tight_muons[0]], "genPartFlav"):
+                    self.out.fillBranch("ZGJ_lepton1_genPartFlav", muons[tight_muons[0]].genPartFlav)
+                    self.out.fillBranch("ZGJ_lepton2_genPartFlav", muons[tight_muons[1]].genPartFlav)
+                return True
+
+
         # ZZ leptonic Control Region
         # 4 tight leptons, 2 OSSF lepton pairs, mll cloest to mz as z(l1 l2) leptons.
         # |m(zl1,zl2)-mz| <= 15
         # min mll > 4
         # >=0 tight photon
         # Bjets veto
-
 
         # lepton is ordered with z1(ll) z2(ll)
         if len(tight_electrons) + len(tight_muons) == 4:
@@ -773,7 +890,7 @@ class WZG_Producer(Module):
                 
                 if muons[tight_muons[0]].pt < 25:
                     return False
-                if (muons[tight_muons[1]].pt < 25) and (muons[tight_muons[1]].pt < 25):
+                if (muons[tight_muons[1]].pt < 25) and (muons[tight_muons[2]].pt < 25):
                     return False
                 if len(tight_photons) > 0:
                     m_lla = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4() + photons[tight_photons[0]].p4()).M()
@@ -800,6 +917,10 @@ class WZG_Producer(Module):
 
                     if len(tight_photons) == 0:
                         return False
+
+                    dr_wla = deltaR(temp_wl1_p4.Eta(),temp_wl1_p4.Phi(),photons[tight_photons[0]].eta,photons[tight_photons[0]].phi)
+                    dr_zl1a = deltaR(temp_zl1_p4.Eta(),temp_zl1_p4.Phi(),photons[tight_photons[0]].eta,photons[tight_photons[0]].phi)
+                    dr_zl2a = deltaR(temp_zl2_p4.Eta(),temp_zl2_p4.Phi(),photons[tight_photons[0]].eta,photons[tight_photons[0]].phi)
 
                     channel += 20
                     self.out.fillBranch("channel_mark", channel)
@@ -834,6 +955,9 @@ class WZG_Producer(Module):
                     self.out.fillBranch("ttG_trileptonmass", trileptonmass)
                     self.out.fillBranch("ttG_mlla", m_lla)
                     self.out.fillBranch("ttG_MET", MET)
+                    self.out.fillBranch("dr_wla", dr_wla)
+                    self.out.fillBranch("dr_zl1a", dr_zl1a)
+                    self.out.fillBranch("dr_zl2a", dr_zl2a)
                     return True
 
                 else:
@@ -864,7 +988,7 @@ class WZG_Producer(Module):
                     self.out.fillBranch("ttZ_MET", MET)
                     return True
             
-            if len(tight_bjets) == 0:
+            elif len(tight_bjets) == 0:
 
                 if abs(dileptonmass-91.188) > 15:
                     return False
@@ -874,6 +998,10 @@ class WZG_Producer(Module):
                 
                 # if abs(m_lla + dileptonmass) < 182:
                 #     return False
+
+                dr_wla = deltaR(temp_wl1_p4.Eta(),temp_wl1_p4.Phi(),photons[tight_photons[0]].eta,photons[tight_photons[0]].phi)
+                dr_zl1a = deltaR(temp_zl1_p4.Eta(),temp_zl1_p4.Phi(),photons[tight_photons[0]].eta,photons[tight_photons[0]].phi)
+                dr_zl2a = deltaR(temp_zl2_p4.Eta(),temp_zl2_p4.Phi(),photons[tight_photons[0]].eta,photons[tight_photons[0]].phi)
 
                 self.out.fillBranch("channel_mark", channel)
                 # l1: w, l2: zl1, l3: zl2
@@ -907,6 +1035,9 @@ class WZG_Producer(Module):
                 self.out.fillBranch("WZG_trileptonmass", trileptonmass)
                 self.out.fillBranch("WZG_mlla", m_lla)
                 self.out.fillBranch("WZG_MET", MET)
+                self.out.fillBranch("dr_wla", dr_wla)
+                self.out.fillBranch("dr_zl1a", dr_zl1a)
+                self.out.fillBranch("dr_zl2a", dr_zl2a)
                 return True
 
         return False
@@ -933,16 +1064,15 @@ class first_Template_Producer(Module):
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
         # photons = Collection(event, "Photon")
-        tight_photons = []
         tight_electrons = [] 
         tight_muons = [] 
-        loose_but_not_tight_muons = []
-        loose_but_not_tight_electrons = []
+        veto_muons = []
+        veto_electrons = []
 
         if (event.nElectron + event.nMuon) < 2:
             return False
 
-        for i in range (0,len(muons)):
+        for i in range(0,len(muons)):
             if event.Muon_corrected_pt[i] < 10:
                 continue
             if abs(muons[i].eta) > 2.4:
@@ -950,8 +1080,10 @@ class first_Template_Producer(Module):
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
             elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
-                loose_but_not_tight_muons.append(i)
+                veto_muons.append(i)
+            muons[i].p4().SetPtEtaPhiM(event.Muon_corrected_pt[i], muons[i].p4().Eta(), muons[i].p4().Phi(), muons[i].p4().M())
 
+        # selection on electrons
         for i in range(0,len(electrons)):
             if electrons[i].pt < 10:
                 continue
@@ -961,17 +1093,30 @@ class first_Template_Producer(Module):
                 if electrons[i].cutBased >= 3:
                     tight_electrons.append(i)
                 elif electrons[i].cutBased >= 1:
-                    loose_but_not_tight_electrons.append(i)
+                    veto_electrons.append(i)
 
-        if (len(tight_electrons) + len(tight_muons) > 4) or (len(tight_electrons) + len(tight_muons) <= 2):
+        if len(veto_electrons)+len(veto_muons) != 0:
             return False
 
-        self.out.fillBranch("nLooseNotTightLep", len(loose_but_not_tight_muons)+len(loose_but_not_tight_electrons))
+        if (len(tight_electrons) + len(tight_muons) > 4) or (len(tight_electrons) + len(tight_muons) < 2):
+            return False
+        
+        if (len(tight_electrons) + len(tight_muons) == 2):
+            if len(tight_muons) == 1 or len(tight_electrons) == 1:
+                return False
+            elif len(tight_muons) == 2:
+                if muons[tight_muons[0]].charge == muons[tight_muons[1]].charge:
+                    return False
+            elif len(tight_electrons) == 2:
+                if electrons[tight_electrons[0]].charge == electrons[tight_electrons[1]].charge:
+                    return False
+
+        self.out.fillBranch("nLooseNotTightLep", len(veto_muons)+len(veto_electrons))
         self.out.fillBranch("nTightLep", len(tight_muons)+len(tight_electrons))
         self.out.fillBranch("nTightMuon", len(tight_muons))
         self.out.fillBranch("nTightElectron", len(tight_electrons))
-        self.out.fillBranch("nLooseNotTightMuon", len(loose_but_not_tight_muons))
-        self.out.fillBranch("nLooseNotTightElectron", len(loose_but_not_tight_electrons))
+        self.out.fillBranch("nLooseNotTightMuon", len(veto_muons))
+        self.out.fillBranch("nLooseNotTightElectron", len(veto_electrons))
 
         return True
 
