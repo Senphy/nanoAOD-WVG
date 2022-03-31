@@ -45,12 +45,15 @@ class HLT_template_Producer(Module):
         self.out.branch("z_lepton1_pt",  "F")
         self.out.branch("z_lepton1_eta",  "F")
         self.out.branch("z_lepton1_phi",  "F")
+        self.out.branch("z_lepton1_index",  "i")
         self.out.branch("z_lepton2_pt",  "F")
         self.out.branch("z_lepton2_eta",  "F")
         self.out.branch("z_lepton2_phi",  "F")
+        self.out.branch("z_lepton2_index",  "i")
         self.out.branch("w_lepton_pt",  "F")
         self.out.branch("w_lepton_eta",  "F")
         self.out.branch("w_lepton_phi",  "F")
+        self.out.branch("w_lepton_index",  "i")
         self.out.branch("dilepton_mass",  "F")
         self.out.branch("Generator_weight","F")
         # self.out.branch("max_CMVA","F")
@@ -107,7 +110,7 @@ class HLT_template_Producer(Module):
         for i in range(0,len(muons)):
             if muons[i].pt < 10:
                 continue
-            if abs(muons[i].eta) > 2.5:
+            if abs(muons[i].eta) > 2.4:
                 continue
             if abs(muons[i].dz) > 0.1 or abs(muons[i].dxy) > 0.05:
                 continue
@@ -248,6 +251,8 @@ class HLT_template_Producer(Module):
             mll23 = -1.0
             mll13 = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[2]].p4()).M()
             mll23 = (electrons[tight_electrons[1]].p4() + electrons[tight_electrons[2]].p4()).M()
+            if mll13 < 4 or mll23 < 4:
+                return False
             if abs(mll13 - 91.188) > abs(mll23 - 91.188):
                 dileptonmass = mll23
                 if electrons[tight_electrons[1]].pt < electrons[tight_electrons[2]].pt:
@@ -288,6 +293,8 @@ class HLT_template_Producer(Module):
             mll23 = -1.0
             mll13 = (muons[tight_muons[0]].p4() + muons[tight_muons[2]].p4()).M()
             mll23 = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4()).M()
+            if mll13 < 4 or mll23 < 4:
+                return False
             if abs(mll13 - 91.188) > abs(mll23 - 91.188):
                 dileptonmass = mll23
                 if muons[tight_muons[1]].pt < muons[tight_muons[2]].pt:
@@ -353,42 +360,54 @@ class HLT_template_Producer(Module):
             self.out.fillBranch("w_lepton_pt",  electrons[tight_electrons[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[tight_electrons[0]].eta)
             self.out.fillBranch("w_lepton_phi", electrons[tight_electrons[0]].phi)
+            self.out.fillBranch("w_lepton_index", tight_electrons[0])
             self.out.fillBranch("z_lepton1_pt", muons[tight_muons[0]].pt)
             self.out.fillBranch("z_lepton1_eta",muons[tight_muons[0]].eta)
             self.out.fillBranch("z_lepton1_phi",muons[tight_muons[0]].phi)
+            self.out.fillBranch("z_lepton1_index", tight_muons[0])
             self.out.fillBranch("z_lepton2_pt", muons[tight_muons[1]].pt)
             self.out.fillBranch("z_lepton2_eta",muons[tight_muons[1]].eta)
             self.out.fillBranch("z_lepton2_phi",muons[tight_muons[1]].phi)
+            self.out.fillBranch("z_lepton2_index", tight_muons[1])
         elif channel == 2:
             self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
             self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
             self.out.fillBranch("w_lepton_phi", muons[tight_muons[0]].phi)
+            self.out.fillBranch("w_lepton_index", tight_muons[0])
             self.out.fillBranch("z_lepton1_pt", electrons[tight_electrons[0]].pt)
             self.out.fillBranch("z_lepton1_eta",electrons[tight_electrons[0]].eta)
             self.out.fillBranch("z_lepton1_phi",electrons[tight_electrons[0]].phi)
+            self.out.fillBranch("z_lepton1_index", tight_electrons[0])
             self.out.fillBranch("z_lepton2_pt", electrons[tight_electrons[1]].pt)
             self.out.fillBranch("z_lepton2_eta",electrons[tight_electrons[1]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[tight_electrons[1]].phi)
+            self.out.fillBranch("z_lepton2_index", tight_electrons[1])
         elif channel == 3:
             self.out.fillBranch("w_lepton_pt",  electrons[tight_electrons[0]].pt)
             self.out.fillBranch("w_lepton_eta", electrons[tight_electrons[0]].eta)
             self.out.fillBranch("w_lepton_phi", electrons[tight_electrons[0]].phi)
+            self.out.fillBranch("w_lepton_index", tight_electrons[0])
             self.out.fillBranch("z_lepton1_pt", electrons[tight_electrons[1]].pt)
             self.out.fillBranch("z_lepton1_eta",electrons[tight_electrons[1]].eta)
             self.out.fillBranch("z_lepton1_phi",electrons[tight_electrons[1]].phi)
+            self.out.fillBranch("z_lepton1_index", tight_electrons[1])
             self.out.fillBranch("z_lepton2_pt", electrons[tight_electrons[2]].pt)
             self.out.fillBranch("z_lepton2_eta",electrons[tight_electrons[2]].eta)
             self.out.fillBranch("z_lepton2_phi",electrons[tight_electrons[2]].phi)
+            self.out.fillBranch("z_lepton2_index", tight_electrons[2])
         elif channel == 4:
             self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
             self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
             self.out.fillBranch("w_lepton_phi", muons[tight_muons[0]].phi)
+            self.out.fillBranch("w_lepton_index", tight_muons[0])
             self.out.fillBranch("z_lepton1_pt", muons[tight_muons[1]].pt)
             self.out.fillBranch("z_lepton1_eta",muons[tight_muons[1]].eta)
             self.out.fillBranch("z_lepton1_phi",muons[tight_muons[1]].phi)
+            self.out.fillBranch("z_lepton1_index", tight_muons[1])
             self.out.fillBranch("z_lepton2_pt", muons[tight_muons[2]].pt)
             self.out.fillBranch("z_lepton2_eta",muons[tight_muons[2]].eta)
             self.out.fillBranch("z_lepton2_phi",muons[tight_muons[2]].phi)
+            self.out.fillBranch("z_lepton2_index", tight_muons[2])
         self.out.fillBranch("event",event.event)
         self.out.fillBranch("dilepton_mass",dileptonmass)
         if hasattr(event, "Generator_weight"):
