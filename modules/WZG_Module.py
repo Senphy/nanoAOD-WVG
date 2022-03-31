@@ -215,7 +215,7 @@ class WZG_Producer(Module):
 
         #selection on muons
         for i in range(0,len(muons)):
-            if event.Muon_corrected_pt[i] < 10:
+            if event.Muon_corrected_pt[i] < 15:
                 continue
             if abs(muons[i].eta) > 2.4:
                 continue
@@ -241,7 +241,7 @@ class WZG_Producer(Module):
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            if electrons[i].pt < 10:
+            if electrons[i].pt < 15:
                 continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
@@ -715,7 +715,7 @@ class WZG_Producer(Module):
         # MET > 30
         # 3 leptons with an OSSF lepton pair, mll cloest to mz as z leptons
         # loose lepton veto
-        # pt(lz1) > 25, pt(lz2) > 10, pt(lw) > 25
+        # pt(lz1) > 25, pt(lz2) > 15, pt(lw) > 25
         # |m(lz1,lz2)-mz| <= 15
         # >=1 tight photon
         # |m(lz1,lz2,a)+m(lz1,lz2)| >= 182 !!abandoned!!
@@ -1073,7 +1073,7 @@ class first_Template_Producer(Module):
             return False
 
         for i in range(0,len(muons)):
-            if event.Muon_corrected_pt[i] < 10:
+            if event.Muon_corrected_pt[i] < 15:
                 continue
             if abs(muons[i].eta) > 2.4:
                 continue
@@ -1085,7 +1085,7 @@ class first_Template_Producer(Module):
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            if electrons[i].pt < 10:
+            if electrons[i].pt < 15:
                 continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
