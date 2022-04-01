@@ -1,0 +1,8 @@
+[
+    {"name":"/MET/Run2017B-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD", "type":"data", "year":"2017"},
+    {"name":"/MET/Run2017C-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD", "type":"data", "year":"2017"},
+    {"name":"/MET/Run2017D-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD", "type":"data", "year":"2017"},
+    {"name":"/MET/Run2017E-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD", "type":"data", "year":"2017"},
+    {"name":"/MET/Run2017F-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD", "type":"data", "year":"2017"},
+    {"name":"/LLWA_WToLNu_4FS_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM", "type":"MC", "year":"2017"}
+]
