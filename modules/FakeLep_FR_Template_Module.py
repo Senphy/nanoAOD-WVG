@@ -72,7 +72,7 @@ class FR_FakeLeptonProducer(Module):
         # the numerator is extracted by a different pfRelIso04_all in further analysis
         for i in range(0,len(muons)):
 
-            if event.Muon_corrected_pt[i] < 10:
+            if event.Muon_corrected_pt[i] < 15:
             # if muons[i].pt < 20:
                 continue
 
@@ -104,7 +104,7 @@ class FR_FakeLeptonProducer(Module):
 
         for i in range (0,len(electrons)):
 
-            if electrons[i].pt < 10:
+            if electrons[i].pt < 15:
                 continue
             
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) > 2.5:
@@ -157,8 +157,8 @@ class FR_FakeLeptonProducer(Module):
 
             for i in range(0,len(jets)):
                 
-                if jets[i].pt < 10:
-                # if jets[i].pt < 30:
+                # if jets[i].pt < # :
+                if event.Jet_pt_nom[i] < 30:
                     continue
 
                 if abs(jets[i].eta) > 2.4:
@@ -231,7 +231,8 @@ class FR_FakeLeptonProducer(Module):
 
             for i in range(0,len(jets)):
                 
-                if jets[i].pt < 10:
+                # if jets[i].pt < 30:
+                if event.Jet_pt_nom[i] < 30:
                     continue
 
                 if abs(jets[i].eta) > 2.4:
@@ -327,12 +328,12 @@ class FR_FakeLep_first_Template_Producer(Module):
         # if (event.nElectron + event.nMuon) < 2:
         #     return False
         hlt = event.HLT_Mu8_TrkIsoVVL or event.HLT_Mu17_TrkIsoVVL\
-              or event.HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30 or event.HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30 or event.HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30
+            or event.HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30 or event.HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30 or event.HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30
         if not hlt:
             return False
 
         for i in range (0,len(muons)):
-            if event.Muon_corrected_pt[i] < 10:
+            if event.Muon_corrected_pt[i] < 15:
                 continue
             if abs(muons[i].eta) > 2.4:
                 continue
@@ -343,7 +344,7 @@ class FR_FakeLep_first_Template_Producer(Module):
                 loose_but_not_tight_muons.append(i)
 
         for i in range(0,len(electrons)):
-            if electrons[i].pt < 10:
+            if electrons[i].pt < 15:
                 continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue

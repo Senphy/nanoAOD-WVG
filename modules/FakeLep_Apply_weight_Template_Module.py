@@ -16,11 +16,16 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 
 class ApplyWeightFakeLeptonProducer(Module):
-    def __init__(self):
+    def __init__(self,year):
+        self.year = year
         pass
     def beginJob(self):
-        self.file_ele = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Ele_Fake_Rate_2D_2018.root" % os.environ['CMSSW_BASE'],"READ")
-        self.file_mu = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Mu_Fake_Rate_2D_2018.root" % os.environ['CMSSW_BASE'],"READ") 
+        if self.year == '2018':
+            self.file_ele = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Ele_Fake_Rate_2D_2018_v9.root" % os.environ['CMSSW_BASE'],"READ")
+            self.file_mu = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Mu_Fake_Rate_2D_2018_v9.root" % os.environ['CMSSW_BASE'],"READ") 
+        elif self.year == '2017':
+            self.file_ele = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Ele_Fake_Rate_2D_2017.root" % os.environ['CMSSW_BASE'],"READ")
+            self.file_mu = ROOT.TFile("%s/src/PhysicsTools/NanoAODTools/nanoAOD-WVG/plot/Fake_Lepton/Mu_Fake_Rate_2D_2017.root" % os.environ['CMSSW_BASE'],"READ") 
         self.FR_E = self.file_ele.Get("fake_rate_e")
         self.FR_M = self.file_mu.Get("fake_rate_mu")
         pass
@@ -69,3 +74,6 @@ class ApplyWeightFakeLeptonProducer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 ApplyWeightFakeLeptonModule = lambda : ApplyWeightFakeLeptonProducer()
+ApplyWeightFakeLeptonModule_17 = lambda : ApplyWeightFakeLeptonProducer("2017")
+ApplyWeightFakeLeptonModule_18 = lambda : ApplyWeightFakeLeptonProducer("2018")
+ApplyWeightFakeLeptonModule_16 = lambda : ApplyWeightFakeLeptonProducer()
