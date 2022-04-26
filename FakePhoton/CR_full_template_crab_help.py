@@ -43,19 +43,27 @@ def prepare_crab(name,sample_type,year,period):
 
         f.write('config.section_("Data")\n')
         f.write('config.Data.inputDataset = "' + name + '" \n')
-        # f.write('config.Data.inputDBS = "phys03"\n')
+        f.write('#config.Data.inputDBS = "phys03"\n')
         f.write('config.Data.inputDBS = "global"\n')
-        # f.write('config.Data.splitting = "LumiBased"\n')
-        f.write('config.Data.splitting = "FileBased"\n')
-        # f.write('config.Data.splitting = "EventAwareLumiBased" \n')
+        if sample_type == 'MC' or ('MuonEG_Run2018D' in abbre_name):
+            f.write('config.Data.splitting = "FileBased"\n')
+            f.write('config.Data.unitsPerJob = 1\n')
+        elif sample_type == 'data' and ('MuonEG_Run2018D' not in abbre_name):
+            f.write('config.Data.splitting = "LumiBased"\n')
+            f.write('config.Data.unitsPerJob = 80\n')
+        # f.write('#config.Data.splitting = "EventAwareLumiBased" \n')
         # f.write('config.Data.splitting = "Automatic" \n')
-        f.write('config.Data.unitsPerJob = 1\n')
 
         if sample_type == 'MC':
             pass
         elif year == '2018':
             # f.write('config.Data.lumiMask = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" \n\n')
-            f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt" \n\n')
+            if 'MuonEG_Run2018' not in abbre_name:
+                f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt" \n\n')
+            else:
+                f.write('config.Data.lumiMask = "" \n\n')
+        elif year == '2017':
+            f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt" \n\n')
 
         f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/fake_photon_template/CR/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
@@ -128,14 +136,16 @@ def hadd_help(name,sample_type,year):
         return True
 
     run_number = os.listdir(f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}')[0]
-    path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/0000/'
+    path = f'{store_path}/{sample_type}/{year}/{first_name}/{abbre_name}/{run_number}/'
     print (f'hadding root files in {path}')
-    r=subprocess.run(args=f"haddnano.py {abbre_name}.root {path}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
+    for i in os.listdir(path):
+        # print (f'{path}/{i}/*.root')
+        r=subprocess.run(args=f"andrew_haddnano.py {abbre_name}_{i}.root {path}/{i}/*.root ", shell=True,stdout=subprocess.PIPE,encoding='utf-8')
     
-    if os.path.exists(f'{abbre_name}.root'):
-        print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}.root\n')
-    else:
-        print (f'hadd \033[31m fail \033[0m!!')
+        if os.path.exists(f'{abbre_name}_{i}.root'):
+            print (f'hadd \033[32mcomplete\033[0m, please check {abbre_name}_{i}.root\n')
+        else:
+            print (f'hadd \033[31m fail \033[0m!!')
 
 def report_lumi(name,sample_type,year):
 

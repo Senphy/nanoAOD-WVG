@@ -16,7 +16,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 
 class CR_FakePhotonFullProducer(Module):
-    def __init__(self):
+    def __init__(self, year):
+        self.year = year
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
@@ -29,30 +30,15 @@ class CR_FakePhotonFullProducer(Module):
         self.out.branch("photon_sieie",  "F")
         self.out.branch("photon_pfRelIso03_all",  "F")
         self.out.branch("photon_pfRelIso03_chg",  "F")
-        self.out.branch("z_lepton1_genPartFlav",  "I")
-        self.out.branch("z_lepton2_genPartFlav",  "I")
-        self.out.branch("w_lepton_genPartFlav",  "I")
-        self.out.branch("z_lepton1_pt",  "F")
-        self.out.branch("z_lepton1_eta",  "F")
-        self.out.branch("z_lepton1_phi",  "F")
-        self.out.branch("z_lepton2_pt",  "F")
-        self.out.branch("z_lepton2_eta",  "F")
-        self.out.branch("z_lepton2_phi",  "F")
-        self.out.branch("w_lepton_pt",  "F")
-        self.out.branch("w_lepton_eta",  "F")
-        self.out.branch("w_lepton_phi",  "F")
         self.out.branch("dilepton_mass",  "F")
         self.out.branch("Generator_weight","F")
 
-        # not needed in this module, just to keep the structure
-        self.out.branch("More_than_three_tight_lep","I")
-
-        self.out.branch("have_loose_lep","I")
         # self.out.branch("max_CMVA","F")
         # self.out.branch("max_CSVV2","F")
         # self.out.branch("max_DeepB","F")
         self.out.branch("channel_mark","i")
         self.out.branch("nJets","i")
+        self.out.branch("nbJets","i")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -68,6 +54,8 @@ class CR_FakePhotonFullProducer(Module):
         tight_photons = []
         tight_electrons = [] 
         tight_muons = [] 
+        tight_jets = []
+        tight_bjets = []
         loose_but_not_tight_muons = []
         loose_but_not_tight_electrons = []
         tight_without_iso_sigmaietaieta_photons = []
@@ -81,19 +69,19 @@ class CR_FakePhotonFullProducer(Module):
 
         #selection on muons
         for i in range(0,len(muons)):
-            if muons[i].pt < 10:
+            if muons[i].pt < 15:
                 continue
             if abs(muons[i].eta) > 2.4:
                 continue
             if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
                 tight_muons.append(i)
-            elif muons[i].pfRelIso04_all < 0.4:
+            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
                 loose_but_not_tight_muons.append(i)
 
 
         # selection on electrons
         for i in range(0,len(electrons)):
-            if electrons[i].pt < 10:
+            if electrons[i].pt < 15:
                 continue
             if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
                 continue
@@ -107,8 +95,9 @@ class CR_FakePhotonFullProducer(Module):
         if len(tight_electrons)+len(tight_muons) < 2:
             return False
         elif len(tight_electrons)+len(tight_muons) > 3:
-            self.out.fillBranch("More_than_three_tight_lep", 1)
-            return True
+            return False
+        if len(loose_but_not_tight_electrons) + len(loose_but_not_tight_muons) > 0:
+            return False
 
         # selection on photons, but not requirement on photon number in this module
         for i in range(0,len(photons)):
@@ -158,13 +147,15 @@ class CR_FakePhotonFullProducer(Module):
             return False
 
 
-        nJets = 0
         for i in range(0,len(jets)): 
 
-            if jets[i].pt < 10:
+            if event.Jet_pt_nom[i] < 30:
                 continue
 
             if abs(jets[i].eta) > 2.4:
+                continue
+            
+            if not jets[i].jetId == 6:
                 continue
 
             pass_lepton_dr_cut = True
@@ -184,13 +175,32 @@ class CR_FakePhotonFullProducer(Module):
             if not pass_lepton_dr_cut: 
                 continue
 
-            if jets[i].btagDeepB > 0.7665:
-                nJets += 1
+            # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL17
+            # https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation106XUL18
+            # https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Jets
+            # tightLepVeto PF jets (ak4), UL 2016/2017/2018 (jetId 110=6), medium B-tag WP
+            # UL17 DeepCSV=(nanoaod btagDeepB) loose: 0.1355, medium: 0.4506, tight: 0.7738
+            # UL18 DeepCSV=(nanoaod btagDeepB) loose: 0.1208, medium: 0.4168, tight: 0.7665
+            # UL17 DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0532, medium: 0.3040, tight: 0.7476
+            # UL18 DeepFlavor=(nanoaod btagDeepFlavB) loose: 0.0490, medium: 0.2783, tight: 0.7100
 
-        if len(loose_but_not_tight_muons) + len(loose_but_not_tight_electrons) != 0:
-            self.out.fillBranch("have_loose_lep", 1)
-        else:
-            self.out.fillBranch("have_loose_lep", 0)
+            # c-jet tag is based on two-D cuts, medium DeepJet WP:
+            # UL17 CvsL=btagDeepFlavCvL: 0.085, CvsB=btagDeepFlavCvB: 0.34
+            # UL18 CvsL=btagDeepFlavCvL: 0.099, CvsB=btagDeepFlavCvB: 0.325
+            # c-tag not available in NANOAOD yet
+
+            tight_jets.append(i)
+
+            if event.Jet_pt_nom[i] >= 30:
+                if self.year == '2017':
+                    if jets[i].btagDeepB > 0.7738:
+                            tight_bjets.append(i)
+                elif self.year == '2018':
+                    if jets[i].btagDeepB > 0.7665:
+                            tight_bjets.append(i)
+
+        self.out.fillBranch("nJets", len(tight_jets))
+        self.out.fillBranch("nbJets", len(tight_bjets))
 
         #dilepton mass selection and channel selection
         channel = 0 
@@ -198,15 +208,20 @@ class CR_FakePhotonFullProducer(Module):
         # muee:      2
         # eee:       3 
         # mumumu:    4 
+        # ee         31
+        # mumu       32
+
         if len(tight_electrons)+len(tight_muons) == 2:
             if len(tight_electrons) == 2:
                 dileptonmass = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4()).M()
+                channel = 31
             elif len(tight_muons) == 2:
                 dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
+                channel = 32
             else:
-                dileptonmass = (muons[tight_muons[0]].p4() + electrons[tight_electrons[0]].p4()).M()
+                return False
             
-            if dileptonmass < 4:
+            if dileptonmass < 4 or abs(dileptonmass-91.188) > 15:
                 return False
 
             self.out.fillBranch("photon_pt",photons[tight_without_iso_sigmaietaieta_photons[0]].pt)
@@ -226,13 +241,10 @@ class CR_FakePhotonFullProducer(Module):
             else:
                 self.out.fillBranch("Generator_weight",0)
             self.out.fillBranch("channel_mark",channel)
-            self.out.fillBranch("nJets",nJets)
             self.out.fillBranch("dilepton_mass",dileptonmass)
             return True
 
         elif len(tight_electrons)+len(tight_muons) == 3:
-            self.out.fillBranch("More_than_three_tight_lep", 0)
-
             # emumu
             dileptonmass = -1.0
             if len(tight_muons)==2 and len(tight_electrons)==1:  # emumu channel 
@@ -305,65 +317,12 @@ class CR_FakePhotonFullProducer(Module):
                     if (muons[tight_muons[0]].pt >= 25) and (muons[tight_muons[1]].pt >= 25):
                         channel = 4
 
-            if dileptonmass < 4:
+            if dileptonmass < 4 or abs(dileptonmass-91.188) > 15:
                 return False
 
-            if channel == 1:
-                self.out.fillBranch("w_lepton_pt",  electrons[tight_electrons[0]].pt)
-                self.out.fillBranch("w_lepton_eta", electrons[tight_electrons[0]].eta)
-                self.out.fillBranch("w_lepton_phi", electrons[tight_electrons[0]].phi)
-                self.out.fillBranch("z_lepton1_pt", muons[tight_muons[0]].pt)
-                self.out.fillBranch("z_lepton1_eta",muons[tight_muons[0]].eta)
-                self.out.fillBranch("z_lepton1_phi",muons[tight_muons[0]].phi)
-                self.out.fillBranch("z_lepton2_pt", muons[tight_muons[1]].pt)
-                self.out.fillBranch("z_lepton2_eta",muons[tight_muons[1]].eta)
-                self.out.fillBranch("z_lepton2_phi",muons[tight_muons[1]].phi)
-                if hasattr(muons[tight_muons[0]], "genPartFlav"):
-                    self.out.fillBranch("w_lepton_genPartFlav",electrons[tight_electrons[0]].genPartFlav)
-                    self.out.fillBranch("z_lepton1_genPartFlav",muons[tight_muons[0]].genPartFlav)
-                    self.out.fillBranch("z_lepton2_genPartFlav",muons[tight_muons[1]].genPartFlav)
-            elif channel == 2:
-                self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
-                self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
-                self.out.fillBranch("w_lepton_phi", muons[tight_muons[0]].phi)
-                self.out.fillBranch("z_lepton1_pt", electrons[tight_electrons[0]].pt)
-                self.out.fillBranch("z_lepton1_eta",electrons[tight_electrons[0]].eta)
-                self.out.fillBranch("z_lepton1_phi",electrons[tight_electrons[0]].phi)
-                self.out.fillBranch("z_lepton2_pt", electrons[tight_electrons[1]].pt)
-                self.out.fillBranch("z_lepton2_eta",electrons[tight_electrons[1]].eta)
-                self.out.fillBranch("z_lepton2_phi",electrons[tight_electrons[1]].phi)
-                if hasattr(muons[tight_muons[0]], "genPartFlav"):
-                    self.out.fillBranch("w_lepton_genPartFlav",muons[tight_muons[0]].genPartFlav)
-                    self.out.fillBranch("z_lepton1_genPartFlav",electrons[tight_electrons[0]].genPartFlav)
-                    self.out.fillBranch("z_lepton2_genPartFlav",electrons[tight_electrons[1]].genPartFlav)
-            elif channel == 3:
-                self.out.fillBranch("w_lepton_pt",  electrons[tight_electrons[0]].pt)
-                self.out.fillBranch("w_lepton_eta", electrons[tight_electrons[0]].eta)
-                self.out.fillBranch("w_lepton_phi", electrons[tight_electrons[0]].phi)
-                self.out.fillBranch("z_lepton1_pt", electrons[tight_electrons[1]].pt)
-                self.out.fillBranch("z_lepton1_eta",electrons[tight_electrons[1]].eta)
-                self.out.fillBranch("z_lepton1_phi",electrons[tight_electrons[1]].phi)
-                self.out.fillBranch("z_lepton2_pt", electrons[tight_electrons[2]].pt)
-                self.out.fillBranch("z_lepton2_eta",electrons[tight_electrons[2]].eta)
-                self.out.fillBranch("z_lepton2_phi",electrons[tight_electrons[2]].phi)
-                if hasattr(electrons[tight_electrons[0]], "genPartFlav"):
-                    self.out.fillBranch("w_lepton_genPartFlav",electrons[tight_electrons[0]].genPartFlav)
-                    self.out.fillBranch("z_lepton1_genPartFlav",electrons[tight_electrons[1]].genPartFlav)
-                    self.out.fillBranch("z_lepton2_genPartFlav",electrons[tight_electrons[2]].genPartFlav)
-            elif channel == 4:
-                self.out.fillBranch("w_lepton_pt",  muons[tight_muons[0]].pt)
-                self.out.fillBranch("w_lepton_eta", muons[tight_muons[0]].eta)
-                self.out.fillBranch("w_lepton_phi", muons[tight_muons[0]].phi)
-                self.out.fillBranch("z_lepton1_pt", muons[tight_muons[1]].pt)
-                self.out.fillBranch("z_lepton1_eta",muons[tight_muons[1]].eta)
-                self.out.fillBranch("z_lepton1_phi",muons[tight_muons[1]].phi)
-                self.out.fillBranch("z_lepton2_pt", muons[tight_muons[2]].pt)
-                self.out.fillBranch("z_lepton2_eta",muons[tight_muons[2]].eta)
-                self.out.fillBranch("z_lepton2_phi",muons[tight_muons[2]].phi)
-                if hasattr(muons[tight_muons[0]], "genPartFlav"):
-                    self.out.fillBranch("w_lepton_genPartFlav",muons[tight_muons[0]].genPartFlav)
-                    self.out.fillBranch("z_lepton1_genPartFlav",muons[tight_muons[1]].genPartFlav)
-                    self.out.fillBranch("z_lepton2_genPartFlav",muons[tight_muons[2]].genPartFlav)
+            if channel == 0:
+                return False
+
             self.out.fillBranch("photon_pt",photons[tight_without_iso_sigmaietaieta_photons[0]].pt)
             self.out.fillBranch("photon_eta",photons[tight_without_iso_sigmaietaieta_photons[0]].eta)
             self.out.fillBranch("photon_phi",photons[tight_without_iso_sigmaietaieta_photons[0]].phi)
@@ -381,11 +340,11 @@ class CR_FakePhotonFullProducer(Module):
             else:
                 self.out.fillBranch("Generator_weight",0)
             self.out.fillBranch("channel_mark",channel)
-            self.out.fillBranch("nJets",nJets)
             self.out.fillBranch("dilepton_mass",dileptonmass)
 
             return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-CR_FakePhotonFullModule = lambda : CR_FakePhotonFullProducer()
+CR_FakePhotonFullModule_18 = lambda : CR_FakePhotonFullProducer("2018")
+CR_FakePhotonFullModule_17 = lambda : CR_FakePhotonFullProducer("2017")
