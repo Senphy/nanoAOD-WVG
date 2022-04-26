@@ -15,10 +15,14 @@ import optparse
 
 parser = argparse.ArgumentParser(description='create attachment NanoAOD-like fake lepton result')
 parser.add_argument('-f', dest='file', default='', help='File input')
+parser.add_argument('-y', dest='year', default='2018', help='year')
 args = parser.parse_args()
 
-
-Modules = [ApplyWeightFakeLeptonModule()]
+if args.year == '2018':
+    Modules = [ApplyWeightFakeLeptonModule_18()]
+elif args.year == '2017':
+    Modules = [ApplyWeightFakeLeptonModule_17()]
+    
 infilelist = [args.file]
 jsoninput = None
 fwkjobreport = False

@@ -3,12 +3,12 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import argparse
 
-parser = argparse.ArgumentParser()
-
-parser.add_argument('-f',dest='infile',help="if an input file is not provide, assume this is a crab job")
-parser.add_argument('-d',dest='isdata',action='store_true',default=False)
+parser = argparse.ArgumentParser(description='baseline selection')
+parser.add_argument('-f', dest='file', default='', help='File input. In local mode it will be the filepath. In condor mode it will be the dataset name')
+parser.add_argument('-m', dest='mode', default='local', help='runmode local/condor')
 parser.add_argument('-y', dest='year', default='2018', help='year')
-
+parser.add_argument('-d', dest='isdata',action='store_true',default=False)
+parser.add_argument('-p', dest='period',default="B", help="Run period, only work for data")
 args = parser.parse_args()
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
@@ -23,14 +23,6 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.eleRECOSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.eleIDSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.muonScaleResProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.muonIDISOSFProducer import *
-
-parser = argparse.ArgumentParser(description='baseline selection')
-parser.add_argument('-f', dest='file', default='', help='File input. In local mode it will be the filepath. In condor mode it will be the dataset name')
-parser.add_argument('-m', dest='mode', default='local', help='runmode local/condor')
-parser.add_argument('-y', dest='year', default='2018', help='year')
-parser.add_argument('-d', dest='isdata',action='store_true',default=False)
-parser.add_argument('-p', dest='period',default="B", help="Run period, only work for data")
-args = parser.parse_args()
 
 PrefCorrUL16_preVFP = lambda : PrefCorr(jetroot="L1PrefiringMaps.root", jetmapname="L1prefiring_jetptvseta_UL2016preVFP", photonroot="L1PrefiringMaps.root", photonmapname="L1prefiring_photonptvseta_UL2016preVFP", branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"])
 PrefCorrUL16_postVFP = lambda : PrefCorr(jetroot="L1PrefiringMaps.root", jetmapname="L1prefiring_jetptvseta_UL2016postVFP", photonroot="L1PrefiringMaps.root", photonmapname="L1prefiring_photonptvseta_UL2016postVFP", branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"])

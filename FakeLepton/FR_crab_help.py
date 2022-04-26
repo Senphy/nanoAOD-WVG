@@ -35,7 +35,7 @@ def prepare_crab(name,sample_type,year,period):
         f.write('config.JobType.pluginName = "Analysis"\n')
         f.write('config.JobType.psetName = "PSet.py"\n')
         f.write('config.JobType.scriptExe = "./FR_crab_script.sh" \n')
-        f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","./FR_Template_postproc.py","./FR_Template_Module.py","./FR_keep_and_drop.txt","./FR_output_branch_selection.txt"] #hadd nano will not be needed once nano tools are in cmssw \n')
+        f.write('config.JobType.inputFiles = ["../../scripts/haddnano.py","./FR_Template_postproc.py","./FR_keep_and_drop.txt","./FR_output_branch_selection.txt"] #hadd nano will not be needed once nano tools are in cmssw \n')
         f.write('config.JobType.scriptArgs = ["isdata=' + sample_type + '","year=' + year + '","period=' + period + '"] \n')
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n\n')
@@ -64,7 +64,7 @@ def prepare_crab(name,sample_type,year,period):
         elif year == '2017':
             f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt" \n\n')
 
-        f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/fake_lepton_template/' + sample_type + '/' + year + '"\n')
+        f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/fake_lepton_template/CR/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
         f.write('config.Data.ignoreLocality = True\n')
         f.write('config.Data.allowNonValidInputDataset = True\n')
@@ -120,7 +120,7 @@ def status(name,sample_type,year):
 def hadd_help(name,sample_type,year):
 
     abbre_name = get_abbre(name,sample_type,year)
-    store_path = '/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/'
+    store_path = '/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/CR/'
     first_name = name.split('/')[1]
 
     if os.path.exists(f'{abbre_name}.root'):
