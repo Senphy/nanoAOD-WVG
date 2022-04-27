@@ -115,7 +115,7 @@ def Plot():
             legend.AddEntry(hist_data[plot_branch], f'data: {format(hist_data[plot_branch].GetSumOfWeights(), ".2f")}')
         else:
             legend.AddEntry(hist_FakePho[plot_branch],f'Nonprompt Photon: {format(hist_FakePho[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
-        if channel in [20,21,22,23,24]:
+        if channel in [30,31,32,20,21,22,23,24]:
             legend.AddEntry(hist_FakePho[plot_branch],f'Nonprompt Photon: {format(hist_FakePho[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
         Stat_Unc_Total = sum([MC_err.GetBinError(Bin) for Bin in range(1, MC_err.GetNbinsX()+1)])
         legend.AddEntry(MC_err, f'Stat Unc.: {format(Stat_Unc_Total, ".2f")}', 'F')

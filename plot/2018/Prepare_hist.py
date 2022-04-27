@@ -102,12 +102,9 @@ def Prepare_hist():
         SetHistStyle(hist_FakePho_temp,30)
         hist_FakePho[plot_branch] = deepcopy(hist_FakePho_temp)
 
-    if channel in [0,1,2,3,4,20,21,22,23,24]:
+    if channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
         for file in filelist_data_FakePho:
             AddHist_FakePhoton(file, hist_FakePho, 1, 0, 0, channel, branch)
-    else:
-        pass
-    if channel in [0,1,2,3,4,20,21,22,23,24]:
         for file in filelist_MC_FakePho:
             AddHist_FakePhoton(filelist_MC_FakePho[file]["path"], hist_FakePho, 0, filelist_MC_FakePho[file]["xsec"], lumi, channel, branch)
     else:
