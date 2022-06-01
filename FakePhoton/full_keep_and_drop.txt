@@ -1,2 +1,18 @@
 #pt, eta, phi, and mass are all used in in the p4 function in https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/framework/datamodel.py, so if you do not keep all of them and you use p4, it will cause runtime dependent behavior
-keep *
+# keep *
+drop *
+keep run
+keep luminosityBlock
+keep event
+keep Generator_weight
+keep *MET*
+keep Electron*
+keep Photon*
+keep Jet*
+keep Muon*
+keep HLT*
+keep *GenPart*
+keep *GenJet*
+keep Pileup*
+keep *Corr*
+keep fixedGridRhoFastjetAll
