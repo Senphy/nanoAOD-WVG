@@ -11,6 +11,10 @@
 # }
 echo $1 $2 $3
 
+random_number=`expr $RANDOM / 100 + 1`
+echo "sleep ${random_number} s to avoid singularity conflict"
+sleep ${random_number}
+
 # set up cmssw
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
@@ -20,4 +24,4 @@ echo ${filename}
 cat WRAPPER.sh | bash cmssw-cc7.sh
 
 echo ${filename}
-cp SMP-RunIISummer20UL18NanoAODv9-00091.root /eos/user/s/sdeng/WZG_analysis/ALP/2018/ROOTNAME/${filename}
+cp SMP-RunIISummer20UL18NanoAODv9-00091.root /eos/user/s/sdeng/WZG_analysis/ALP/fa_200G/2018/ROOTNAME/${filename}

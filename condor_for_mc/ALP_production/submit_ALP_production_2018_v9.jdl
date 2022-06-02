@@ -14,7 +14,7 @@ RequestCpus = 4
 error = log/job_ROOTNAME_YEAR_v9.err_$(Cluster)-$(Process)
 output = log/job_ROOTNAME_YEAR_v9.out_$(Cluster)-$(Process)
 log = log/job_ROOTNAME_YEAR.log_v9_$(Cluster)-$(Process)
-# transfer_output_remaps  = "SMP-RunIISummer20UL18NanoAODv9-00091.root = /eos/user/s/sdeng/WZG_analysis/ALP/YEAR/ROOTNAME/ROOTNAME_$(Cluster)_$(Process).root"
+# transfer_output_remaps  = "SMP-RunIISummer20UL18NanoAODv9-00091.root = /eos/user/s/sdeng/WZG_analysis/ALP/fa_200G/YEAR/ROOTNAME/ROOTNAME_$(Cluster)_$(Process).root"
 when_to_transfer_output = ON_EXIT
 queue 100
 
