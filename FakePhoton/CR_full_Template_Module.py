@@ -344,7 +344,72 @@ class CR_FakePhotonFullProducer(Module):
 
             return True
 
+class first_Template_Producer(Module):
+    def __init__(self):
+        pass
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.out = wrappedOutputTree
+        self.out.branch("nLooseNotTightLep","I")
+        self.out.branch("nTightLep","I")
+        self.out.branch("nTightMuon","I")
+        self.out.branch("nTightElectron","I")
+        self.out.branch("nLooseNotTightMuon","I")
+        self.out.branch("nLooseNotTightElectron","I")
+        pass
+
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        pass
+
+    def analyze(self, event):
+        """process event, return True (go to next module) or False (fail, go to next event)"""
+        electrons = Collection(event, "Electron")
+        muons = Collection(event, "Muon")
+        # photons = Collection(event, "Photon")
+        tight_electrons = [] 
+        tight_muons = [] 
+        veto_muons = []
+        veto_electrons = []
+
+        if (event.nElectron + event.nMuon) < 2:
+            return False
+
+        for i in range(0,len(muons)):
+            if muons[i].pt < 15:
+                continue
+            if abs(muons[i].eta) > 2.4:
+                continue
+            if muons[i].tightId and muons[i].pfRelIso04_all < 0.15:
+                tight_muons.append(i)
+            elif muons[i].looseId and muons[i].pfRelIso04_all < 0.4:
+                veto_muons.append(i)
+
+        # selection on electrons
+        for i in range(0,len(electrons)):
+            if electrons[i].pt < 15:
+                continue
+            if abs(electrons[i].eta + electrons[i].deltaEtaSC) >  2.5:
+                continue
+            if (abs(electrons[i].eta + electrons[i].deltaEtaSC) < 1.479 and abs(electrons[i].dz) < 0.1 and abs(electrons[i].dxy) < 0.05) or (abs(electrons[i].eta + electrons[i].deltaEtaSC) > 1.479 and abs(electrons[i].dz) < 0.2 and abs(electrons[i].dxy) < 0.1):
+                if electrons[i].cutBased >= 3:
+                    tight_electrons.append(i)
+                elif electrons[i].cutBased >= 1:
+                    veto_electrons.append(i)
+
+        if len(veto_electrons)+len(veto_muons) != 0:
+            return False
+
+        if (len(tight_electrons) + len(tight_muons) > 3) or (len(tight_electrons) + len(tight_muons) < 2):
+            return False
+        
+        self.out.fillBranch("nLooseNotTightLep", len(veto_muons)+len(veto_electrons))
+        self.out.fillBranch("nTightLep", len(tight_muons)+len(tight_electrons))
+        self.out.fillBranch("nTightMuon", len(tight_muons))
+        self.out.fillBranch("nTightElectron", len(tight_electrons))
+        self.out.fillBranch("nLooseNotTightMuon", len(veto_muons))
+        self.out.fillBranch("nLooseNotTightElectron", len(veto_electrons))
+
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 CR_FakePhotonFullModule_18 = lambda : CR_FakePhotonFullProducer("2018")
 CR_FakePhotonFullModule_17 = lambda : CR_FakePhotonFullProducer("2017")
+first_Template_Module = lambda : first_Template_Producer()

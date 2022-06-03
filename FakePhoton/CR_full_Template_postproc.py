@@ -32,10 +32,10 @@ args = parser.parse_args()
 if args.isdata:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2018", runPeriod=args.period, metBranchName="MET")
-        Modules = [countHistogramsProducer(),jetmetCorrector(),CR_FakePhotonFullModule_18()]
+        Modules = [countHistogramsProducer(),first_Template_Module(),jetmetCorrector(),CR_FakePhotonFullModule_18()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
-        Modules = [countHistogramsProducer(),jetmetCorrector(),CR_FakePhotonFullModule_17()]
+        Modules = [countHistogramsProducer(),first_Template_Module(),jetmetCorrector(),CR_FakePhotonFullModule_17()]
     if args.year == '2016':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016", runPeriod=args.period, metBranchName="MET")
     if args.year == '2016_PreVFP':
@@ -44,10 +44,10 @@ if args.isdata:
 else:
     if args.year == '2018':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2018", jesUncert="Total", metBranchName="MET", splitJER=False, applyHEMfix=True)
-        Modules = [countHistogramsProducer(),jetmetCorrector(),CR_FakePhotonFullModule_18(),puWeight_2018()]
+        Modules = [countHistogramsProducer(),first_Template_Module(),jetmetCorrector(),CR_FakePhotonFullModule_18(),puWeight_2018()]
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="Total", metBranchName="MET", splitJER=False)
-        Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),CR_FakePhotonFullModule_17(),puWeight_2017()]
+        Modules = [countHistogramsProducer(),first_Template_Module(),PrefCorr(),jetmetCorrector(),CR_FakePhotonFullModule_17(),puWeight_2017()]
     if args.year == '2016':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),PrefCorr(),jetmetCorrector(),CR_FakePhotonFullModule(),puWeight_2016()]
