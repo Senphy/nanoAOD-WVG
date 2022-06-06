@@ -42,10 +42,16 @@ def channel_cut(channel, arrays):
         30: (arrays.loc[:,'channel_mark'] >= 31) & (arrays.loc[:,'channel_mark'] <= 32)
     }
     if channel in mark.keys():
-        return arrays.loc[mark[channel], :]
+        arrays = arrays.loc[mark[channel], :]
     else:
         cut = arrays.loc[:,'channel_mark'] == channel
-        return arrays.loc[cut, :]
+        arrays = arrays.loc[cut, :]
+    
+    if channel in [5,6,7,8,9]:
+        sel = 'ZZ_mllz2>75 & ZZ_mllz2<105'
+        arrays = arrays.query(sel)
+
+    return arrays
 
 def lep_gen_cut(channel, arrays):
     lep_gen_cut_WZG = ((arrays.loc[:,'WZG_lepton1_genPartFlav'] == 1) | (arrays.loc[:,'WZG_lepton1_genPartFlav'] == 15)) &\
@@ -175,6 +181,8 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
     if isData:
         if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)):
             MET_cut = (arrays.loc[:,'MET'] > 30)
+        elif channel in [5,6,7,8,9]:
+            MET_cut = (arrays.loc[:,'MET'] <= 30)
         else:
             MET_cut = (arrays.loc[:,'MET'] >= 0)
         arrays = arrays.loc[MET_cut,:]
@@ -201,6 +209,9 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
         arrays['true_weight'] = btag_weight_ratio * arrays['btagWeight'] * arrays['Muon_ID_Weight'] * arrays['Electron_ID_Weight'] * arrays['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
         if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
             MET_cut = (arrays.loc[:,f'MET_T1Smear_pt'] > 30)
+            arrays_copy_nominal = arrays.loc[MET_cut,:].copy()
+        elif channel in [5,6,7,8,9]:
+            MET_cut = (arrays.loc[:,f'MET_T1Smear_pt'] <= 30)
             arrays_copy_nominal = arrays.loc[MET_cut,:].copy()
         else:
             arrays_copy_nominal = arrays.copy()
@@ -235,6 +246,9 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
             print(f"Filling JES {str(UpDown_map[UpDown])}:")
             if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
                 MET_cut = (arrays.loc[:,f'MET_T1Smear_pt_{UpDown_map[UpDown]}'] > 30)
+                arrays_copy = arrays.loc[MET_cut,:].copy()
+            elif channel in [5,6,7,8,9]:
+                MET_cut = (arrays.loc[:,f'MET_T1Smear_pt_{UpDown_map[UpDown]}'] <= 30)
                 arrays_copy = arrays.loc[MET_cut,:].copy()
             else:
                 arrays_copy = arrays.copy()
