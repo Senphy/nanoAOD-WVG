@@ -51,6 +51,12 @@ def channel_cut(channel, arrays):
         sel = 'ZZ_mllz2>75 & ZZ_mllz2<105'
         arrays = arrays.query(sel)
 
+    if channel in [30,31,32]:
+        # sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
+        # sel = '(ZGJ_mlla<75 | ZGJ_mlla>105) & (ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105)'
+        sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182)'
+        # arrays = arrays.query(sel)
+
     return arrays
 
 def lep_gen_cut(channel, arrays):
@@ -107,7 +113,7 @@ def lep_gen_cut(channel, arrays):
 def pho_gen_cut(channel, arrays):
     pho_gen_cut_WZG = (arrays.loc[:,'WZG_photon_genPartFlav'] > 0)
     pho_gen_cut_ttG = (arrays.loc[:,'ttG_photon_genPartFlav'] > 0)
-    pho_gen_cut_ZGJ = (arrays.loc[:,'ZGJ_photon_genPartFlav'] > 0)
+    pho_gen_cut_ZGJ = (arrays.loc[:,'ZGJ_photon_genPartFlav'] == 1)
     pho_gen_cut_map = {
                     0:pho_gen_cut_WZG,
                     1:pho_gen_cut_WZG,
@@ -161,6 +167,8 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
         lepID_weight_branches= uproot.open(file+':Events').keys(filter_name='*ID_Weight*')
         lepRECO_weight_branches= uproot.open(file+':Events').keys(filter_name='*RECO_Weight*')
         btag_weight_branches= uproot.open(file+':Events').keys(filter_name='*btagWeight*')
+        l1_weight_branches = uproot.open(file+':Events').keys(filter_name='L1PreFiringWeight*')
+        pu_branches = uproot.open(file+':Events').keys(filter_name='puWeight*')
         true_events = uproot.open(file)['nEventsGenWeighted'].values()[0]
         btag_weight_ratio = uproot.open(file)['h_nEventsGenWeighted'].values()[0] / uproot.open(file)['h_nEventsGenWeighted_btag'].values()[0]
         init_branches.extend(add_branches)
@@ -170,6 +178,8 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
         init_branches.extend(lepID_weight_branches)
         init_branches.extend(lepRECO_weight_branches)
         init_branches.extend(btag_weight_branches)
+        init_branches.extend(l1_weight_branches)
+        init_branches.extend(pu_branches)
         for branch_name in branch:
             if branch[branch_name]["name"] not in init_branches:
                 init_branches.append(branch[branch_name]["name"])
@@ -179,7 +189,7 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
     arrays = channel_cut(channel, arrays)
     
     if isData:
-        if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)):
+        if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
             MET_cut = (arrays.loc[:,'MET'] > 30)
         elif channel in [5,6,7,8,9]:
             MET_cut = (arrays.loc[:,'MET'] <= 30)
@@ -196,18 +206,21 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
         arrays = pho_gen_cut(channel, arrays)
 
         arrays['Generator_weight_sgn'] = arrays['Generator_weight'].apply(lambda x: 1 if x >= 0 else -1)
-        arrays['Muon_ID_Weight'] = arrays['Muon_ID_Weight'].apply(lambda x: 1 if x==0 else x)
-        arrays['Muon_ID_Weight_UP'] = arrays['Muon_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
-        arrays['Muon_ID_Weight_DOWN'] = arrays['Muon_ID_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_ID_Weight'] = arrays['Electron_ID_Weight'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_ID_Weight_UP'] = arrays['Electron_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_ID_Weight_DOWN'] = arrays['Electron_ID_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_RECO_Weight'] = arrays['Electron_RECO_Weight'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_RECO_Weight_UP'] = arrays['Electron_RECO_Weight_UP'].apply(lambda x: 1 if x==0 else x)
-        arrays['Electron_RECO_Weight_DOWN'] = arrays['Electron_RECO_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
-        arrays['btagWeight'] = arrays['btagWeight'].apply(lambda x: 1 if x==0 else x)
-        arrays['true_weight'] = btag_weight_ratio * arrays['btagWeight'] * arrays['Muon_ID_Weight'] * arrays['Electron_ID_Weight'] * arrays['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
-        if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
+
+        # Temp bugs *FIXME*
+        # arrays['Muon_ID_Weight'] = arrays['Muon_ID_Weight'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Muon_ID_Weight_UP'] = arrays['Muon_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Muon_ID_Weight_DOWN'] = arrays['Muon_ID_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Electron_ID_Weight'] = arrays['Electron_ID_Weight'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Electron_ID_Weight_UP'] = arrays['Electron_ID_Weight_UP'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Electron_ID_Weight_DOWN'] = arrays['Electron_ID_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Electron_RECO_Weight'] = arrays['Electron_RECO_Weight'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Electron_RECO_Weight_UP'] = arrays['Electron_RECO_Weight_UP'].apply(lambda x: 1 if x==0 else x)
+        # arrays['Electron_RECO_Weight_DOWN'] = arrays['Electron_RECO_Weight_DOWN'].apply(lambda x: 1 if x==0 else x)
+        # arrays['btagWeight'] = arrays['btagWeight'].apply(lambda x: 1 if x==0 else x)
+
+        arrays['true_weight'] = arrays['puWeight'] * arrays['L1PreFiringWeight_Nom'] * btag_weight_ratio * arrays['btagWeight'] * arrays['Muon_ID_Weight'] * arrays['Electron_ID_Weight'] * arrays['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
+        if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
             MET_cut = (arrays.loc[:,f'MET_T1Smear_pt'] > 30)
             arrays_copy_nominal = arrays.loc[MET_cut,:].copy()
         elif channel in [5,6,7,8,9]:
@@ -224,13 +237,17 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
         print("\n")
         
         #Fill lep ID RECO up down
-        print("Filling Lep ID RECO up down:")
-        arrays_copy_nominal['true_weight_MuonIDup'] = arrays_copy_nominal['Muon_ID_Weight_UP'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
-        arrays_copy_nominal['true_weight_MuonIDdown'] = arrays_copy_nominal['Muon_ID_Weight_DOWN'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
-        arrays_copy_nominal['true_weight_ElectronIDup'] = arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight_UP'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
-        arrays_copy_nominal['true_weight_ElectronIDdown'] = arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight_DOWN'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
-        arrays_copy_nominal['true_weight_ElectronRECOup'] = arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight_UP'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
-        arrays_copy_nominal['true_weight_ElectronRECOdown'] = arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight_DOWN'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        print("Filling up down:")
+        arrays_copy_nominal['true_weight_MuonIDup'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight_UP'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_MuonIDdown'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight_DOWN'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_ElectronIDup'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight_UP'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_ElectronIDdown'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight_DOWN'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_ElectronRECOup'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight_UP'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_ElectronRECOdown'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight_DOWN'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_l1up'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Up'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_l1down'] = arrays_copy_nominal['puWeight'] * arrays_copy_nominal['L1PreFiringWeight_Dn'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_puup'] = arrays_copy_nominal['puWeightUp'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
+        arrays_copy_nominal['true_weight_pudown'] = arrays_copy_nominal['puWeightDown'] * arrays_copy_nominal['L1PreFiringWeight_Nom'] * arrays_copy_nominal['Muon_ID_Weight'] * arrays_copy_nominal['Electron_ID_Weight'] * arrays_copy_nominal['Electron_RECO_Weight'] * lumi * xsec * 1000 * arrays_copy_nominal['Generator_weight_sgn'] / true_events
         for branch_name in branch:
             for i in trange(0, len(arrays_copy_nominal[branch[branch_name]["name"]]), desc=f'fill {branch[branch_name]["name"]} for {file} in {UpDown_map[0]}'):
                 hist[branch_name+f"_MuonIDup"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_MuonIDup'].values[i]))
@@ -239,12 +256,16 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
                 hist[branch_name+f"_ElectronIDdown"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_ElectronIDdown'].values[i]))
                 hist[branch_name+f"_ElectronRECOup"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_ElectronRECOup'].values[i]))
                 hist[branch_name+f"_ElectronRECOdown"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_ElectronRECOdown'].values[i]))
+                hist[branch_name+f"_l1up"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_l1up'].values[i]))
+                hist[branch_name+f"_l1down"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_l1down'].values[i]))
+                hist[branch_name+f"_puup"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_puup'].values[i]))
+                hist[branch_name+f"_pudown"].Fill(float(arrays_copy_nominal[branch[branch_name]["name"]].values[i]), float(arrays_copy_nominal['true_weight_pudown'].values[i]))
         print("\n")
 
         #Fill JES JER up down
         for UpDown in range(1,5):
             print(f"Filling JES {str(UpDown_map[UpDown])}:")
-            if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
+            if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
                 MET_cut = (arrays.loc[:,f'MET_T1Smear_pt_{UpDown_map[UpDown]}'] > 30)
                 arrays_copy = arrays.loc[MET_cut,:].copy()
             elif channel in [5,6,7,8,9]:
@@ -296,8 +317,10 @@ def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch):
     arrays = channel_cut(channel, arrays)
     
     if isData:
-        if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)):
+        if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
             MET_cut = (arrays.loc[:,'MET'] > 30)
+        elif channel in [5,6,7,8,9]:
+            MET_cut = (arrays.loc[:,'MET'] <= 30)
         else:
             MET_cut = (arrays.loc[:,'MET'] >= 0)
         arrays = arrays.loc[MET_cut,:]
@@ -307,8 +330,10 @@ def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch):
             print (f"SumOfWeights for {branch_name}: ", hist[branch_name].GetSumOfWeights())
     else:
         arrays = lep_gen_cut(channel, arrays)
-        if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
+        if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
             MET_cut = (arrays.loc[:,'MET'] > 30)
+        elif channel in [5,6,7,8,9]:
+            MET_cut = (arrays.loc[:,'MET'] <= 30)
         else:
             MET_cut = (arrays.loc[:,'MET'] >= 0)
         arrays = arrays.loc[MET_cut,:]
@@ -327,9 +352,9 @@ def AddHist_FakePhoton(file, hist, isData, xsec, lumi, channel, branch):
     
     init_time = time.time()
     init_branches = ['fake_photon_weight','channel_mark',\
-                    'WZG_photon_genPartFlav','WZG_photon_pt','WZG_photon_pfRelIso03_chg',\
-                    'ttG_photon_genPartFlav','ttG_photon_pt','ttG_photon_pfRelIso03_chg',\
-                    'ZGJ_photon_genPartFlav','ZGJ_photon_pt','ZGJ_photon_pfRelIso03_chg',\
+                    'WZG_photon_genPartFlav','WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
+                    'ttG_photon_genPartFlav','ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
+                    'ZGJ_photon_genPartFlav','ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
                     'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',\
                     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',\
                     'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',\
@@ -360,31 +385,41 @@ def AddHist_FakePhoton(file, hist, isData, xsec, lumi, channel, branch):
     
     if ((channel >= 0) and (channel <=4)):
         chg_cut = ((arrays.loc[:,"WZG_photon_pfRelIso03_chg"]*arrays.loc[:,"WZG_photon_pt"]) > 4) & ((arrays.loc[:,"WZG_photon_pfRelIso03_chg"]*arrays.loc[:,"WZG_photon_pt"]) < 10)
+        sieie_sel = '(WZG_photon_sieie>0.01015 & WZG_photon_sieie<0.05030 & WZG_photon_eta<1.4442) | (WZG_photon_sieie>0.0272 & WZG_photon_sieie<0.1360 & WZG_photon_eta>1.566)'
     elif ((channel >= 20) and (channel <=24)):
         chg_cut = ((arrays.loc[:,"ttG_photon_pfRelIso03_chg"]*arrays.loc[:,"ttG_photon_pt"]) > 4) & ((arrays.loc[:,"ttG_photon_pfRelIso03_chg"]*arrays.loc[:,"ttG_photon_pt"]) < 10)
+        sieie_sel = '(ttG_photon_sieie>0.01015 & ttG_photon_sieie<0.05030 & ttG_photon_eta<1.4442) | (ttG_photon_sieie>0.0272 & ttG_photon_sieie<0.1360 & ttG_photon_eta>1.566)'
     elif ((channel >= 30) and (channel <=32)):
         chg_cut = ((arrays.loc[:,"ZGJ_photon_pfRelIso03_chg"]*arrays.loc[:,"ZGJ_photon_pt"]) > 4) & ((arrays.loc[:,"ZGJ_photon_pfRelIso03_chg"]*arrays.loc[:,"ZGJ_photon_pt"]) < 10)
+        sieie_sel = '(ZGJ_photon_sieie>0.01015 & ZGJ_photon_sieie<0.05030 & ZGJ_photon_eta<1.4442) | (ZGJ_photon_sieie>0.0272 & ZGJ_photon_sieie<0.1360 & ZGJ_photon_eta>1.566)'
+    arrays = arrays.query(sieie_sel)
 
     if isData:
         arrays = arrays.loc[chg_cut,:]
-    else:
-        arrays = lep_gen_cut(channel, arrays)
-        arrays = pho_gen_cut(channel, arrays)
-        if ((channel >= 10) and (channel <= 14)) or ((channel >= 0) and (channel <= 4)) or ((channel >= 20) and (channel <= 24)):
+        if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
             MET_cut = (arrays.loc[:,'MET'] > 30)
+        elif channel in [5,6,7,8,9]:
+            MET_cut = (arrays.loc[:,'MET'] <= 30)
         else:
             MET_cut = (arrays.loc[:,'MET'] >= 0)
-        if ((channel >= 0) and (channel <=4)):
-            arrays = arrays.loc[chg_cut & MET_cut,:]
-        elif ((channel >= 20) and (channel <=24)):
-            arrays = arrays.loc[chg_cut & MET_cut,:]
-    
-    if isData:
+        arrays = arrays.loc[chg_cut & MET_cut,:]
+
         for branch_name in branch:
             for i in trange(0, len(arrays[branch[branch_name]["name"]]), desc=f'fill {branch[branch_name]["name"]} for {file}'):
                 hist[branch_name].Fill(float(arrays[branch[branch_name]["name"]].values[i]), float(arrays['fake_photon_weight'].values[i]))
             print (f"SumOfWeights for {branch_name}: ", hist[branch_name].GetSumOfWeights())
+
     else:
+        arrays = lep_gen_cut(channel, arrays)
+        arrays = pho_gen_cut(channel, arrays)
+        if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
+            MET_cut = (arrays.loc[:,'MET'] > 30)
+        elif channel in [5,6,7,8,9]:
+            MET_cut = (arrays.loc[:,'MET'] <= 30)
+        else:
+            MET_cut = (arrays.loc[:,'MET'] >= 0)
+        arrays = arrays.loc[chg_cut & MET_cut,:]
+    
         arrays['Generator_weight_sgn'] = arrays['Generator_weight'].apply(lambda x: 1 if x >= 0 else -1)
         arrays['true_weight'] = lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
         for branch_name in branch:
@@ -407,21 +442,21 @@ def SetHistStyle(hist, color):
     hist.SetMarkerColor(1)
     hist.SetYTitle('events/bin')
     hist.SetStats(0)
-    hist.Sumw2()
+    # hist.Sumw2()
 
     # Adjust y-axis settings
     # hist.GetYaxis().SetNdivisions(105)
-    hist.GetYaxis().SetTitleSize(35)
+    hist.GetYaxis().SetTitleSize(45)
     hist.GetYaxis().SetTitleFont(43)
-    hist.GetYaxis().SetTitleOffset(1.55)
+    hist.GetYaxis().SetTitleOffset(1.65)
     hist.GetYaxis().SetLabelFont(43)
-    hist.GetYaxis().SetLabelSize(28)
-    hist.GetYaxis().SetLabelOffset(0.012)
+    hist.GetYaxis().SetLabelSize(38)
+    hist.GetYaxis().SetLabelOffset(0.015)
 
     # Adjust x-axis settings
-    hist.GetXaxis().SetTitleSize(35)
+    hist.GetXaxis().SetTitleSize(45)
     hist.GetXaxis().SetTitleFont(43)
-    hist.GetXaxis().SetTitleOffset(3.0)
+    hist.GetXaxis().SetTitleOffset(3.3)
     hist.GetXaxis().SetLabelFont(43)
-    hist.GetXaxis().SetLabelSize(28)
-    hist.GetXaxis().SetLabelOffset(0.012)
+    hist.GetXaxis().SetLabelSize(38)
+    hist.GetXaxis().SetLabelOffset(0.015)

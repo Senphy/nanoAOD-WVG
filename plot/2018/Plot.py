@@ -50,7 +50,7 @@ def Plot():
 
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
-        c1 = ROOT.TCanvas("","",1000,800)
+        c1 = ROOT.TCanvas("","",1000,1000)
 
         if branch[branch_name].__contains__("bin_array"):
             MC_err = ROOT.TH1D("","",len(branch[plot_branch]["bin_array"])-1,array('d', branch[plot_branch]["bin_array"]))
@@ -93,8 +93,8 @@ def Plot():
         MC_err.Add(filelist_MC['WZG']["hist"][plot_branch])
 
 
-        legend = ROOT.TLegend(0.20, 0.45, 0.90, 0.85)
-        legend.SetNColumns(3)
+        legend = ROOT.TLegend(0.20, 0.45, 0.85, 0.85)
+        legend.SetNColumns(2)
         legend.SetBorderSize(0)
         legend.SetFillColor(0)
         legend.SetTextSize(0.035)
@@ -110,13 +110,11 @@ def Plot():
         legend.AddEntry(filelist_MC["WZG"]["hist"][plot_branch], f'{filelist_MC["WZG"]["name"]}: {format(filelist_MC[file]["hist"][plot_branch].GetSumOfWeights(), ".2f")}','F')
         legend.AddEntry(ggZZ_sum,f'ggZZ: {format(ggZZ_sum.GetSumOfWeights(), ".2f")}', 'F')
         print(ggZZ_sum.GetSumOfWeights())
-        legend.AddEntry(hist_FakeLep[plot_branch],f'Nonprompt Lepton: {format(hist_FakeLep[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
+        legend.AddEntry(hist_FakeLep[plot_branch],f'Nonprompt l: {format(hist_FakeLep[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
         if not (channel in [0,1,2,3,4]):
             legend.AddEntry(hist_data[plot_branch], f'data: {format(hist_data[plot_branch].GetSumOfWeights(), ".2f")}')
-        else:
-            legend.AddEntry(hist_FakePho[plot_branch],f'Nonprompt Photon: {format(hist_FakePho[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
-        if channel in [30,31,32,20,21,22,23,24]:
-            legend.AddEntry(hist_FakePho[plot_branch],f'Nonprompt Photon: {format(hist_FakePho[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
+        if channel in [0,1,2,3,4,30,31,32,20,21,22,23,24]:
+            legend.AddEntry(hist_FakePho[plot_branch],f'Nonprompt #gamma: {format(hist_FakePho[plot_branch].GetSumOfWeights(), ".2f")}', 'F')
         Stat_Unc_Total = sum([MC_err.GetBinError(Bin) for Bin in range(1, MC_err.GetNbinsX()+1)])
         legend.AddEntry(MC_err, f'Stat Unc.: {format(Stat_Unc_Total, ".2f")}', 'F')
 
@@ -124,14 +122,14 @@ def Plot():
         c1.Draw()
         pad1 = ROOT.TPad("pad1", "pad1", 0, 0.30, 1, 1.00)
         pad1.SetTopMargin(0.1)  # joins upper and lower plot
-        pad1.SetBottomMargin(0.018)  # joins upper and lower plot
+        pad1.SetBottomMargin(0.035)  # joins upper and lower plot
         # pad1.SetGridx()
         pad1.Draw()
         # Lower ratio plot is pad2
         c1.cd()  # returns to main canvas before defining pad2
-        pad2 = ROOT.TPad("pad2", "pad2", 0, 0.01, 1, 0.29)
-        pad2.SetTopMargin(0)  # joins upper and lower plot
-        pad2.SetBottomMargin(0.30)  # joins upper and lower plot
+        pad2 = ROOT.TPad("pad2", "pad2", 0, 0.00, 1, 0.30)
+        pad2.SetTopMargin(0.040)  # joins upper and lower plot
+        pad2.SetBottomMargin(0.40)  # joins upper and lower plot
         pad2.SetGridy()
         pad2.Draw()
 
@@ -142,14 +140,14 @@ def Plot():
             SetHistStyle(hist_data[plot_branch], 1)
             hist_data[plot_branch].Draw("E0X0p")
             # hist_data.SetMinimum(10)
-            hist_data[plot_branch].SetMaximum(2.5*hist_data[plot_branch].GetMaximum())
+            hist_data[plot_branch].SetMaximum(3.5*hist_data[plot_branch].GetMaximum())
             stack_mc.Draw("HIST SAME")
             MC_err.Draw("e2 SAME")
             hist_data[plot_branch].Draw("E0X0p SAME")
             hist_data[plot_branch].GetXaxis().SetLabelSize(0)
         else:
             MC_err.Draw("e2")
-            MC_err.SetMaximum(3.0 * MC_err.GetMaximum())
+            MC_err.SetMaximum(3.5 * MC_err.GetMaximum())
             stack_mc.Draw("HIST SAME")
             MC_err.Draw("e2 SAME")
         legend.Draw("SAME")
@@ -169,6 +167,7 @@ def Plot():
         else:
             h4.Draw("e2")
         ROOT.gPad.RedrawAxis()
+        ROOT.gStyle.SetPadLeftMargin(0.15)
 
         CMS_lumi(pad1, 0, 0)
         c1.Update()

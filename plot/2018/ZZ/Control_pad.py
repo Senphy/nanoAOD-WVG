@@ -60,10 +60,7 @@ branch = {
     "ZZ_trileptonmass":{
         "name":"ZZ_trileptonmass",
         "axis_name":"m_{lll} [GeV]",
-        "bin_array":[100,200,300,500],
-        "xbins":5,
-        "xleft":100,
-        "xright":500,
+        "bin_array":[100,150,200,250,300,500],
     },
     "ZZ_lepton1_pt":{
         "name":"ZZ_lepton1_pt",
@@ -97,8 +94,8 @@ branch = {
         "name":"MET",
         "axis_name":"MET [GeV]",
         "xbins":10,
-        "xleft":30,
-        "xright":120,
+        "xleft":0,
+        "xright":30,
     },
     "nJets":{
         "name":"nJets",
@@ -144,26 +141,51 @@ filelist_MC = {
             "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000.root", 
             "xsec":3.697,
             "color":3},
-    "TTZ":
+    "TTZLLNuNu":
             {"name":"TTZToLLNuNu", 
             "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root", 
             "xsec":0.2529,
             "color":4},
+    "TTZLL":
+            {"name":"TTZToLL", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root", 
+            "xsec":0.05324,
+            "color":44},
     "TTW":
             {"name":"TTWJetsToLNu", 
             "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000.root", 
             "xsec":0.2043,
             "color":5},
+    "TTTT":
+            {"name":"TTTT", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/TTTT_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root", 
+            "xsec":0.008213,
+            "color":45},
     "tZq":
             {"name":"tZq_ll", 
             "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root", 
             "xsec":0.07358,
             "color":6},
+    "sT":
+            {"name":"sT top", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/ST_tW_top_5f_DS_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_2018_0000.root", 
+            "xsec":33.67,
+            "color":46},
+    "sT_anti":
+            {"name":"sT antitop", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/ST_tW_antitop_5f_DS_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_2018_0000.root", 
+            "xsec":35.13,
+            "color":46},
     "WWW":
             {"name":"WWW", 
             "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root", 
             "xsec":0.2086,
             "color":7},
+    "WWZ":
+            {"name":"WWZ", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root", 
+            "xsec":0.1707,
+            "color":47},
     #    "WZ":
     #         {"name":"WZ", 
     #         "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/WZ_TuneCP5_13TeV-pythia8_2018_0000.root", 
@@ -174,10 +196,15 @@ filelist_MC = {
             "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000.root", 
             "xsec":55.48,
             "color":9},
+    "WG":
+            {"name":"WGToLNuG",
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/WGToLNuG_01J_5f_PDFWeights_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000.root", 
+            "xsec":190.8,
+            "color":39},
         "qqZZ":
             {"name":"qqZZ",
-            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/ZZ_TuneCP5_13TeV-pythia8_2018_0000.root",
-            "xsec":16.523,
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/ZZTo4L_TuneCP5_13TeV_powheg_pythia8_2018_0000.root",
+            "xsec":1.325,
             "color":12},
         "ggZZ_2e2mu":
             {"name":"ggZZ_2e2mu",
@@ -221,7 +248,7 @@ filelist_MC = {
             "color":13},
         "WZG":
             {"name":"WZG",
-            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/wza_UL18_sum_Skim.root",
+            "path":"/eos/user/s/sdeng/WZG_analysis/final_skim/2018/LLWA_WToLNu_4FS_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000.root",
             "xsec":0.0384,
             "color":38}
     }
@@ -254,26 +281,51 @@ filelist_MC_FakeLep = {
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000_Skim.root", 
         "xsec":3.697,
         "color":3},
-   "TTZ":
-        {"name":"TTZToLLNuNu", 
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
-        "xsec":0.2529,
-        "color":4},
+    "TTZLLNuNu":
+            {"name":"TTZToLLNuNu", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.2529,
+            "color":4},
+    "TTZLL":
+            {"name":"TTZToLL", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.05324,
+            "color":44},
    "TTW":
         {"name":"TTWJetsToLNu", 
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000_Skim.root", 
         "xsec":0.2043,
         "color":5},
+    "TTTT":
+            {"name":"TTTT", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/TTTT_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.008213,
+            "color":45},
    "tZq":
         {"name":"tZq_ll", 
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
         "xsec":0.0758,
         "color":6},
-   "WWW":
-        {"name":"WWW", 
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
-        "xsec":0.2086,
-        "color":7},
+    "sT":
+            {"name":"sT top", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/ST_tW_top_5f_DS_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_2018_0000_Skim.root", 
+            "xsec":33.67,
+            "color":46},
+    "sT_anti":
+            {"name":"sT antitop", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/ST_tW_antitop_5f_DS_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_2018_0000_Skim.root", 
+            "xsec":35.13,
+            "color":46},
+    "WWW":
+            {"name":"WWW", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.2086,
+            "color":7},
+    "WWZ":
+            {"name":"WWZ", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.1707,
+            "color":47},
 #    "WZ":
 #         {"name":"WZ", 
 #         "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/WZ_TuneCP5_13TeV-pythia8_2018_0000_Skim.root", 
@@ -284,10 +336,15 @@ filelist_MC_FakeLep = {
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000_Skim.root", 
         "xsec":55.48,
         "color":9},
+    "WG":
+            {"name":"WGToLNuG",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/WGToLNuG_01J_5f_PDFWeights_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000_Skim.root", 
+            "xsec":190.8,
+            "color":39},
     "qqZZ":
         {"name":"qqZZ",
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/ZZ_TuneCP5_13TeV-pythia8_2018_0000_Skim.root", 
-        "xsec":16.523,
+        "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/ZZTo4L_TuneCP5_13TeV_powheg_pythia8_2018_0000_Skim.root", 
+        "xsec":1.325,
         "color":12},
     "ggZZ_2e2mu":
         {"name":"ggZZ_2e2mu",
@@ -331,7 +388,7 @@ filelist_MC_FakeLep = {
         "color":13},
     "WZG":
         {"name":"signal",
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/wza_UL18_sum_Skim_Skim.root", 
+        "path":"/eos/user/s/sdeng/WZG_analysis/fake_lepton_template/AR/2018/final/LLWA_WToLNu_4FS_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
         "xsec":0.0384,
         "color":21}
 }
@@ -364,26 +421,51 @@ filelist_MC_FakePho = {
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000_Skim.root", 
         "xsec":3.697,
         "color":3},
-"TTZ":
-        {"name":"TTZToLLNuNu", 
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
-        "xsec":0.2529,
-        "color":4},
-"TTW":
-        {"name":"TTWJetsToLNu", 
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000_Skim.root", 
-        "xsec":0.2043,
-        "color":5},
+    "TTZLLNuNu":
+            {"name":"TTZToLLNuNu", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.2529,
+            "color":4},
+    "TTZLL":
+            {"name":"TTZToLL", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.05324,
+            "color":44},
+    "TTW":
+            {"name":"TTWJetsToLNu", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_2018_0000_Skim.root", 
+            "xsec":0.2043,
+            "color":5},
+    "TTTT":
+            {"name":"TTTT", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/TTTT_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.008213,
+            "color":45},
 "tZq":
         {"name":"tZq_ll", 
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
         "xsec":0.0758,
         "color":6},
-"WWW":
-        {"name":"WWW", 
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
-        "xsec":0.2086,
-        "color":7},
+    "sT":
+            {"name":"sT top", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/ST_tW_top_5f_DS_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_2018_0000_Skim.root", 
+            "xsec":33.67,
+            "color":46},
+    "sT_anti":
+            {"name":"sT antitop", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/ST_tW_antitop_5f_DS_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_2018_0000_Skim.root", 
+            "xsec":35.13,
+            "color":46},
+    "WWW":
+            {"name":"WWW", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.2086,
+            "color":7},
+    "WWZ":
+            {"name":"WWZ", 
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
+            "xsec":0.1707,
+            "color":47},
 #    "WZ":
 #         {"name":"WZ", 
 #         "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/WZ_TuneCP5_13TeV-pythia8_2018_0000_Skim.root", 
@@ -394,14 +476,59 @@ filelist_MC_FakePho = {
         "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000_Skim.root", 
         "xsec":55.48,
         "color":9},
-    "qqZZ":
-        {"name":"qqZZ",
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/ZZ_TuneCP5_13TeV-pythia8_2018_0000_Skim.root", 
-        "xsec":16.523,
-        "color":12},
+    "WG":
+            {"name":"WGToLNuG",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/WGToLNuG_01J_5f_PDFWeights_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000_Skim.root", 
+            "xsec":190.8,
+            "color":39},
+        "qqZZ":
+            {"name":"qqZZ",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/ZZTo4L_TuneCP5_13TeV_powheg_pythia8_2018_0000_Skim.root",
+            "xsec":1.325,
+            "color":12},
+        "ggZZ_2e2mu":
+            {"name":"ggZZ_2e2mu",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00319,
+            "color":13},
+        "ggZZ_2e2nu":
+            {"name":"ggZZ_2e2nu",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00319,
+            "color":13},
+        "ggZZ_2e2tau":
+            {"name":"ggZZ_2e2tau",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00319,
+            "color":13},
+        "ggZZ_2mu2nu":
+            {"name":"ggZZ_2mu2nu",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00319,
+            "color":13},
+        "ggZZ_2mu2tau":
+            {"name":"ggZZ_2mu2tau",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00319,
+            "color":13},
+        "ggZZ_4e":
+            {"name":"ggZZ_4e",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00159,
+            "color":13},
+        "ggZZ_4mu":
+            {"name":"ggZZ_4mu",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00159,
+            "color":13},
+        "ggZZ_4tau":
+            {"name":"ggZZ_4tau",
+            "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8_2018_0000_Skim.root",
+            "xsec":0.00159,
+            "color":13},
     "WZG":
         {"name":"signal",
-        "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/wza_UL18_sum_Skim_Skim.root", 
+        "path":"/eos/user/s/sdeng/WZG_analysis/fake_photon_template/AR/2018/final/LLWA_WToLNu_4FS_TuneCP5_13TeV-amcatnlo-pythia8_2018_0000_Skim.root", 
         "xsec":0.0384,
         "color":21}
 }

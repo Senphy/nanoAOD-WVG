@@ -70,6 +70,10 @@ def Prepare_hist():
             hist_MC[plot_branch+f"_ElectronIDdown"] = deepcopy(hist_MC_temp)
             hist_MC[plot_branch+f"_ElectronRECOup"] = deepcopy(hist_MC_temp)
             hist_MC[plot_branch+f"_ElectronRECOdown"] = deepcopy(hist_MC_temp)
+            hist_MC[plot_branch+f"_l1up"] = deepcopy(hist_MC_temp)
+            hist_MC[plot_branch+f"_l1down"] = deepcopy(hist_MC_temp)
+            hist_MC[plot_branch+f"_puup"] = deepcopy(hist_MC_temp)
+            hist_MC[plot_branch+f"_pudown"] = deepcopy(hist_MC_temp)
             
         AddHist(filelist_MC[file]["path"], hist_MC, 0, filelist_MC[file]["xsec"], lumi, channel, branch)
         filelist_MC[file]["hist"] = hist_MC
@@ -127,7 +131,7 @@ def Prepare_hist():
             for UpDown in range(0,5):
                 filelist_MC[file]["hist"][plot_branch+f"_{UpDown_map[UpDown]}"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{str(UpDown_map[UpDown])}')
                 filelist_MC[file]["hist"][plot_branch+f"_{UpDown_map[UpDown]}"].Write()
-            #lep ID RECO updown
+            #updown
                 filelist_MC[file]["hist"][plot_branch+f"_MuonIDup"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_MuonIDup')
                 filelist_MC[file]["hist"][plot_branch+f"_MuonIDup"].Write()
                 filelist_MC[file]["hist"][plot_branch+f"_MuonIDdown"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_MuonIDdown')
@@ -140,6 +144,14 @@ def Prepare_hist():
                 filelist_MC[file]["hist"][plot_branch+f"_ElectronRECOup"].Write()
                 filelist_MC[file]["hist"][plot_branch+f"_ElectronRECOdown"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_ElectronRECOdown')
                 filelist_MC[file]["hist"][plot_branch+f"_ElectronRECOdown"].Write()
+                filelist_MC[file]["hist"][plot_branch+f"_l1up"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_l1up')
+                filelist_MC[file]["hist"][plot_branch+f"_l1up"].Write()
+                filelist_MC[file]["hist"][plot_branch+f"_l1down"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_l1down')
+                filelist_MC[file]["hist"][plot_branch+f"_l1down"].Write()
+                filelist_MC[file]["hist"][plot_branch+f"_puup"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_puup')
+                filelist_MC[file]["hist"][plot_branch+f"_puup"].Write()
+                filelist_MC[file]["hist"][plot_branch+f"_pudown"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_pudown')
+                filelist_MC[file]["hist"][plot_branch+f"_pudown"].Write()
     file_hist.Close()
 
     print (time.time()-time_total_init)

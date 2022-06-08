@@ -41,16 +41,16 @@ if __name__ == '__main__':
                 hist_temp = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{index}')
                 # print(type(hist_temp))
 
-                if filelist_MC[file]["name"] in Top_list:
+                if filelist_MC[file]["name"].lower() in Top_list:
                     hist_Top_list.append(hist_temp)
 
-                elif filelist_MC[file]["name"] in VVV_list:
+                elif filelist_MC[file]["name"].lower() in VVV_list:
                     hist_VVV_list.append(hist_temp)
 
-                elif filelist_MC[file]["name"] in VV_list or 'ggZZ' in filelist_MC[file]["name"] or 'qqZZ' in filelist_MC[file]["name"]:
+                elif filelist_MC[file]["name"].lower() in VV_list or 'ggZZ' in filelist_MC[file]["name"] or 'qqZZ' in filelist_MC[file]["name"]:
                     hist_VV_list.append(hist_temp)
                 
-                elif 'WZG' in filelist_MC[file]["name"]:
+                elif 'LLWA' in filelist_MC[file]["name"]:
                     hist_WZG_list.append(hist_temp)
 
             if len(hist_Top_list) > 0:

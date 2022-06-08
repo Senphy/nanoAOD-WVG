@@ -7,10 +7,10 @@ writeExtraText = True
 extraText   = "Preliminary"
 extraTextFont = 52 
 
-lumiTextSize     = 0.65
+lumiTextSize     = 0.70
 lumiTextOffset   = 0.2
 
-cmsTextSize      = 0.75
+cmsTextSize      = 0.85
 cmsTextOffset    = 0.1
 
 relPosX    = 0.045
@@ -148,7 +148,7 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
         latex.SetTextFont(extraTextFont)
         latex.SetTextSize(extraTextSize*t)
         latex.SetTextAlign(align_)
-        latex.DrawLatex(posX_*1.40, posY_, extraText)      
+        latex.DrawLatex(posX_+0.1, posY_, extraText)      
 
     pad.Update()
     return pad
