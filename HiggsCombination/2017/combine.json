@@ -1,33 +1,51 @@
 {
     "utils":{
-        "imax":1
+        "imax":1,
+        "nrateParam":0
     },
 
     "regions":{
         "CR_1":{
             "final_name":"CR1",
             "file_name":"ttZ",
-            "bins":5,
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
             "variable":"ttZ_trileptonmass",
-            "variable_plotname":"mWZ",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
             "csv":"combine_CR.csv",
             "tag":2017
         },
         "CR_2":{
             "final_name":"CR2",
+            "file_name":"ZGJ",
+            "bin_array":[100,200,300,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"ZGJ_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR.csv",
+            "tag":2017
+        },
+        "CR_3":{
+            "final_name":"CR3",
             "file_name":"ZZ",
-            "bins":5,
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
             "variable":"ZZ_trileptonmass",
-            "variable_plotname":"mWZ",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
             "csv":"combine_CR.csv",
             "tag":2017
         },
         "SR_1":{
             "final_name":"SR",
             "file_name":"WZG",
-            "bins":5,
+            "bin_array":[100, 200, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"WZG_trileptonmass",
-            "variable_plotname":"mWZ",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
             "csv":"combine_SR.csv",
             "tag":2017
         }
