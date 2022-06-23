@@ -1,0 +1,2 @@
+#pt, eta, phi, and mass are all used in in the p4 function in https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/framework/datamodel.py, so if you do not keep all of them and you use p4, it will cause runtime dependent behavior
+keep *

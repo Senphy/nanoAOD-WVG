@@ -1,2 +1,50 @@
 # this is a comment
-keep *
+drop *
+keep run
+keep luminosityBlock
+keep event
+keep Generator_weight
+keep *Weight*
+keep *weight*
+keep Flag*
+
+keep MET*
+keep Electron*
+keep Photon*
+keep Jet*
+keep Muon*
+
+keep HLT_Ele23*
+keep HLT_Ele32*
+keep HLT_Ele27*
+keep HLT_Mu8*
+keep HLT_Mu17*
+keep HLT_Mu23*
+keep HLT_IsoMu*
+keep HLT_IsoTkMu*
+keep HLT_PFMET*
+
+keep *GenPart*
+keep *GenJet*
+keep Pileup*
+keep *Corr*
+keep fixedGridRhoFastjetAll
+
+keep nTight*
+keep nFake*
+keep nVeto*
+keep nJets
+keep nbJets
+
+keep Tight*
+keep Fake*
+keep Veto*
+
+keep *mark
+keep dr*
+keep mwa
+keep ZGJ*
+keep ZZ*
+keep ttG*
+keep ttZ*
+keep WZG*
