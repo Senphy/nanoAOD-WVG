@@ -1,6 +1,7 @@
 import os,sys
 import ROOT
 
+sys.path.append(os.getcwd())
 from Control_pad import channel_map
 from Control_pad import channel
 from Control_pad import UpDown_map
@@ -10,10 +11,11 @@ from Control_pad import year
 
 if __name__ == '__main__':
 
-    Top_list = ["TTGJets", "TTZToLLNuNu", "TTWJetsToLNu", "tZq_ll"]
-    VVV_list = ["WWW","WWZ","ZZZ","WZZ"]
-    VV_list = ["qqZZ","ggZZ","WZ","ZGToLLG"]
-    index_list = ["None", "jesTotalUp", "jesTotalDown", "jerUp", "jerDown", "MuonIDup", "MuonIDdown", "ElectronIDup", "ElectronIDdown", "ElectronRECOup", "ElectronRECOdown"]
+    Top_list = ["ttgjets", "ttztollnunu", "ttztoll", "ttwjetstolnu", "tttt", "tZq_ll", "st antitop", "st top"]
+    VVV_list = ["www","wwz","zzz","wzz"]
+    VV_list = ["qqzz","ggzz","wz"]
+    VG_list = ["zgtollg","wgtolnug"]
+    index_list = ["None", "jesTotalUp", "jesTotalDown", "jerUp", "jerDown", "MuonIDup", "MuonIDdown", "ElectronIDup", "ElectronIDdown", "ElectronRECOup", "ElectronRECOdown", "puup", "pudown", "l1up", "l1down"]
 
     
     try:
@@ -33,6 +35,7 @@ if __name__ == '__main__':
             hist_Top_list = []
             hist_VVV_list = []
             hist_VV_list = []
+            hist_VG_list = []
             hist_WZG_list = []
             plot_branch = branch[branch_name]["name"]
 
@@ -50,7 +53,10 @@ if __name__ == '__main__':
                 elif filelist_MC[file]["name"].lower() in VV_list or 'ggZZ' in filelist_MC[file]["name"] or 'qqZZ' in filelist_MC[file]["name"]:
                     hist_VV_list.append(hist_temp)
                 
-                elif 'LLWA' in filelist_MC[file]["name"]:
+                elif filelist_MC[file]["name"].lower() in VG_list:
+                    hist_VG_list.append(hist_temp)
+
+                elif 'WZG' in filelist_MC[file]["name"]:
                     hist_WZG_list.append(hist_temp)
 
             if len(hist_Top_list) > 0:
@@ -73,6 +79,13 @@ if __name__ == '__main__':
                     hist_VV.Add(hist_VV_list[i])
                 hist_VV.SetName(f'{channel_map[channel]}_{plot_branch}_VV_{index}')
                 hist_VV.Write()
+
+            if len(hist_VG_list) > 0:
+                hist_VG = hist_VG_list[0].Clone()
+                for i in range(1, len(hist_VG_list)):
+                    hist_VG.Add(hist_VG_list[i])
+                hist_VG.SetName(f'{channel_map[channel]}_{plot_branch}_VG_{index}')
+                hist_VG.Write()
 
             if len(hist_WZG_list) == 0:
                 print('!!!Warning: No signal input!!!')

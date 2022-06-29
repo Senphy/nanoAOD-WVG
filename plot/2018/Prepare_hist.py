@@ -26,11 +26,7 @@ from Control_pad import channel_map
 from Control_pad import channel
 from Control_pad import UpDown_map
 from Control_pad import filelist_data
-from Control_pad import filelist_data_FakeLep
-from Control_pad import filelist_data_FakePho
 from Control_pad import filelist_MC
-from Control_pad import filelist_MC_FakePho
-from Control_pad import filelist_MC_FakeLep
 from Control_pad import branch
 from Control_pad import lumi
         
@@ -89,10 +85,10 @@ def Prepare_hist():
         hist_FakeLep_temp.SetYTitle(f'events / bin')
         SetHistStyle(hist_FakeLep_temp,23)
         hist_FakeLep[plot_branch] = deepcopy(hist_FakeLep_temp)
-    for file in filelist_data_FakeLep:
+    for file in filelist_data:
         AddHist_FakeLepton(file, hist_FakeLep, 1, 0, 0, channel, branch)
-    for file in filelist_MC_FakeLep:
-        AddHist_FakeLepton(filelist_MC_FakeLep[file]["path"], hist_FakeLep, 0, filelist_MC_FakeLep[file]["xsec"], lumi, channel, branch)
+    for file in filelist_MC:
+        AddHist_FakeLepton(filelist_MC[file]["path"], hist_FakeLep, 0, filelist_MC[file]["xsec"], lumi, channel, branch)
 
     hist_FakePho= {}
     for branch_name in branch:
@@ -107,10 +103,10 @@ def Prepare_hist():
         hist_FakePho[plot_branch] = deepcopy(hist_FakePho_temp)
 
     if channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
-        for file in filelist_data_FakePho:
+        for file in filelist_data:
             AddHist_FakePhoton(file, hist_FakePho, 1, 0, 0, channel, branch)
-        for file in filelist_MC_FakePho:
-            AddHist_FakePhoton(filelist_MC_FakePho[file]["path"], hist_FakePho, 0, filelist_MC_FakePho[file]["xsec"], lumi, channel, branch)
+        for file in filelist_MC:
+            AddHist_FakePhoton(filelist_MC[file]["path"], hist_FakePho, 0, filelist_MC[file]["xsec"], lumi, channel, branch)
     else:
         pass
 

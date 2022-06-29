@@ -147,6 +147,7 @@ def Plot():
             hist_data[plot_branch].GetXaxis().SetLabelSize(0)
         else:
             MC_err.Draw("e2")
+            MC_err.GetXaxis().SetLabelSize(0)
             MC_err.SetMaximum(3.5 * MC_err.GetMaximum())
             stack_mc.Draw("HIST SAME")
             MC_err.Draw("e2 SAME")

@@ -47,6 +47,10 @@ def channel_cut(channel, arrays):
         cut = arrays.loc[:,'channel_mark'] == channel
         arrays = arrays.loc[cut, :]
     
+    if channel in [10,11,12,1314]:
+        sel = 'ttZ_trileptonmass>100 & (ttZ_dileptonmass<76.188|ttZ_dileptonmass>106.188)'
+        arrays = arrays.query(sel)
+
     if channel in [5,6,7,8,9]:
         sel = 'ZZ_mllz2>75 & ZZ_mllz2<105'
         arrays = arrays.query(sel)
@@ -55,7 +59,7 @@ def channel_cut(channel, arrays):
         # sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
         # sel = '(ZGJ_mlla<75 | ZGJ_mlla>105) & (ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105)'
         sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182)'
-        # arrays = arrays.query(sel)
+        arrays = arrays.query(sel)
 
     return arrays
 
@@ -146,6 +150,7 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
 
     init_time = time.time()
     init_branches = ['channel_mark',\
+                    'region_mark',\
                     'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',\
                     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',\
                     'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',\
@@ -187,6 +192,8 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
     branches = uproot.open(file+':Events').arrays(init_branches, library='pd')
     arrays = HLT_cut(file, branches)
     arrays = channel_cut(channel, arrays)
+    region_cut = arrays.loc[:,'region_mark'] == 1
+    arrays = arrays.loc[region_cut,:]
     
     if isData:
         if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
@@ -289,6 +296,7 @@ def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch):
     init_time = time.time()
     init_branches = ['fake_lepton_weight',\
                     'channel_mark',\
+                    'region_mark',\
                     'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',\
                     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',\
                     'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',\
@@ -315,6 +323,8 @@ def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch):
     branches = uproot.open(file+':Events').arrays(init_branches, library='pd')
     arrays = HLT_cut(file, branches)
     arrays = channel_cut(channel, arrays)
+    region_cut = arrays.loc[:,'region_mark'] == 2
+    arrays = arrays.loc[region_cut,:]
     
     if isData:
         if channel in [0,1,2,3,4, 10,11,12,13,14, 20,21,22,23,24, 30,31,32]:
@@ -352,6 +362,7 @@ def AddHist_FakePhoton(file, hist, isData, xsec, lumi, channel, branch):
     
     init_time = time.time()
     init_branches = ['fake_photon_weight','channel_mark',\
+                    'region_mark',\
                     'WZG_photon_genPartFlav','WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
                     'ttG_photon_genPartFlav','ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
                     'ZGJ_photon_genPartFlav','ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
@@ -381,6 +392,8 @@ def AddHist_FakePhoton(file, hist, isData, xsec, lumi, channel, branch):
     branches = uproot.open(file+':Events').arrays(init_branches, library='pd')
     arrays = HLT_cut(file, branches)
     arrays = channel_cut(channel, arrays)
+    region_cut = arrays.loc[:,'region_mark'] == 3
+    arrays = arrays.loc[region_cut,:]
     
     
     if ((channel >= 0) and (channel <=4)):
