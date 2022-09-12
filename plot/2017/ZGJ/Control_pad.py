@@ -1,4 +1,4 @@
-channel = 0
+channel = 30
 channel_map = {
     0: "WZG",
     1: "WZG_emm",
@@ -17,6 +17,10 @@ channel_map = {
     22: "ttG_mee",
     23: "ttG_eee",
     24: "ttG_mmm",
+
+    30: "ZGJ",
+    31: "ZGJ_ee",
+    32: "ZGJ_mm",
 
     9: "ZZ",
     5: "ZZ_eemm",
@@ -43,85 +47,62 @@ UpDown_map={
 # 4: JERdown
 
 branch = {
-    "channel_mark":{
-        "name":"channel_mark",
-        "axis_name":"channel",
-        "bin_array":[1,2,3,4,5],
-    },
-    "mwa":{
-        "name":"mwa",
-        "axis_name":"m_{l_{W}#gamma} [GeV]",
-        "bin_strategy":"average",
-        "xbins":10,
-        "xleft":0,
-        "xright":200,
-    },
-    "WZG_dileptonmass":{
-        "name":"WZG_dileptonmass",
-        "axis_name":"m_{Z} [GeV]",
-        "bin_strategy":"average",
-        "xbins":5,
+    "ZGJ_dileptonmass":{
+        "name":"ZGJ_dileptonmass",
+        "axis_name":"m_{ll} [GeV]",
+        "xbins":6,
         "xleft":75,
         "xright":105,
     },
-    "WZG_trileptonmass":{
-        "name":"WZG_trileptonmass",
-        "axis_name":"m_{lll} [GeV]",
-        "bin_array":[100,200,300,500],
-    },
-    "WZG_mlla":{
-        "name":"WZG_mlla",
+    "ZGJ_mlla":{
+        "name":"ZGJ_mlla",
         "axis_name":"m_{ll#gamma} [GeV]",
-        "bin_array":[80,150,500],
+        "bin_array":[100,150,200,300,500],
+        # "xbins":10,
+        # "xleft":80,
+        # "xright":500,
     },
-    "WZG_lepton1_pt":{
-        "name":"WZG_lepton1_pt",
-        "axis_name":"P_{T, W} [GeV]",
+    "ZGJ_lepton1_pt":{
+        "name":"ZGJ_lepton1_pt",
+        "axis_name":"P_{T, l1} [GeV]",
         "xbins":10,
         "xleft":0,
         "xright":200,
     },
-    "WZG_lepton1_eta":{
-        "name":"WZG_lepton1_eta",
-        "axis_name":"|#eta_{W}|",
+    "ZGJ_lepton1_eta":{
+        "name":"ZGJ_lepton1_eta",
+        "axis_name":"#eta_{l1}",
         "xbins":6,
         "xleft":-2.5,
         "xright":2.5,
     },
-    "WZG_lepton2_pt":{
-        "name":"WZG_lepton2_pt",
-        "axis_name":"P_{T, Z1} [GeV]",
+    "ZGJ_lepton2_pt":{
+        "name":"ZGJ_lepton2_pt",
+        "axis_name":"P_{T, l2} [GeV]",
         "xbins":10,
         "xleft":0,
         "xright":200,
     },
-    "WZG_lepton2_eta":{
-        "name":"WZG_lepton2_eta",
-        "axis_name":"|#eta_{Z1}|",
+    "ZGJ_lepton2_eta":{
+        "name":"ZGJ_lepton2_eta",
+        "axis_name":"#eta_{l2}",
         "xbins":6,
         "xleft":-2.5,
         "xright":2.5,
     },
-    "WZG_photon_pt":{
-        "name":"WZG_photon_pt",
-        "axis_name":"P_{T, #gamma} [GeV]",
+    "ZGJ_photon_pt":{
+        "name":"ZGJ_photon_pt",
+        "axis_name":"P_{T,#gamma}",
         "xbins":10,
         "xleft":0,
         "xright":200,
-    },
-    "WZG_photon_eta":{
-        "name":"WZG_photon_eta",
-        "axis_name":"|#eta_{#gamma}|",
-        "xbins":6,
-        "xleft":-2.5,
-        "xright":2.5,
     },
     "MET":{
         "name":"MET",
         "axis_name":"MET [GeV]",
-        "xbins":5,
-        "xleft":30,
-        "xright":120,
+        "xbins":10,
+        "xleft":0,
+        "xright":30,
     },
     "nJets":{
         "name":"nJets",

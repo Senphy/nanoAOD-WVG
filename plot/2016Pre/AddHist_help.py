@@ -14,23 +14,24 @@ from array import array
 import time
 
 def HLT_cut(file, branches):
-    HLT_SingleMuon = branches.loc[:,'HLT_IsoMu24'] == True
-    HLT_DoubleMuon = branches.loc[:,'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8'] == True
-    HLT_EGamma = branches.loc[:,'HLT_Ele32_WPTight_Gsf'] == True
-    HLT_DoubleEG = branches.loc[:,'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL'] == True
-    HLT_MuonEG1 = branches.loc[:,'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ'] == True
+    HLT_SingleMuon = branches.loc[:,'HLT_IsoTkMu24'] == True
+    HLT_DoubleMuon = branches.loc[:,'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL']
+    HLT_SingleElectron = branches.loc[:,'HLT_Ele27_WPTight_Gsf'] == True
+    HLT_DoubleEG = branches.loc[:,'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ'] == True
+    HLT_MuonEG1 = branches.loc[:,'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL'] == True
     HLT_MuonEG2 = branches.loc[:,'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL'] == True
     if 'SingleMuon' in file:
         arrays = branches.loc[HLT_SingleMuon, :].copy()
     elif 'DoubleMuon' in file:
         arrays = branches.loc[~HLT_SingleMuon & HLT_DoubleMuon, :].copy()
-#         2018 is special
-    elif 'EGamma' in file:
-        arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon &   (HLT_EGamma | HLT_DoubleEG) ,:].copy()
+    elif 'SingleElectron' in file:
+        arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon & HLT_SingleElectron, :].copy()
+    elif 'DoubleEG' in file:
+        arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon & ~HLT_SingleElectron & HLT_DoubleEG, :].copy()
     elif 'MuonEG' in file:
-        arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon &  ~(HLT_EGamma | HLT_DoubleEG) & (HLT_MuonEG1 | HLT_MuonEG2),:].copy()
+        arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon & ~HLT_SingleElectron & ~HLT_DoubleEG & (HLT_MuonEG1 | HLT_MuonEG2),:].copy()
     else:
-        arrays = branches.loc[HLT_SingleMuon | HLT_DoubleMuon |  HLT_EGamma | HLT_DoubleEG | HLT_MuonEG1 | HLT_MuonEG2,:].copy() 
+        arrays = branches.loc[HLT_SingleMuon | HLT_DoubleMuon |  HLT_SingleElectron | HLT_DoubleEG | HLT_MuonEG1 | HLT_MuonEG2,:].copy()
     return arrays
 
 def channel_cut(channel, arrays):
@@ -63,7 +64,6 @@ def channel_cut(channel, arrays):
         # sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105 & nbJets>0'
         # sel = '(ZGJ_mlla<75 | ZGJ_mlla>105) & (ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105)'
         sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182) & ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
-        # sel = 'ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105'
         arrays = arrays.query(sel)
         pass
 
@@ -157,12 +157,12 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
     init_time = time.time()
     init_branches = ['channel_mark',\
                     'region_mark',\
-                    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',\
+                    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',\
                     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',\
-                    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',\
-                    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',\
-                    'HLT_Ele32_WPTight_Gsf',\
-                    'HLT_IsoMu24']
+                    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL',\
+                    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL',\
+                    'HLT_Ele27_WPTight_Gsf',\
+                    'HLT_IsoTkMu24']
     
     if isData:
         print('is Data')
@@ -298,18 +298,19 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch):
     print ('Time cost: %.2f\n' %(end_time-init_time))
     return True
 
+
 def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch):
     
     init_time = time.time()
     init_branches = ['fake_lepton_weight',\
                     'channel_mark',\
                     'region_mark',\
-                    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',\
+                    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',\
                     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',\
-                    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',\
-                    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',\
-                    'HLT_Ele32_WPTight_Gsf',\
-                    'HLT_IsoMu24']
+                    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL',\
+                    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL',\
+                    'HLT_Ele27_WPTight_Gsf',\
+                    'HLT_IsoTkMu24']
     
     if isData:
         print('is Data')
@@ -373,12 +374,12 @@ def AddHist_FakePhoton(file, hist, isData, xsec, lumi, channel, branch):
                     'WZG_photon_genPartFlav','WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
                     'ttG_photon_genPartFlav','ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
                     'ZGJ_photon_genPartFlav','ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
-                    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',\
+                    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',\
                     'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',\
-                    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',\
-                    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',\
-                    'HLT_Ele32_WPTight_Gsf',\
-                    'HLT_IsoMu24']
+                    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL',\
+                    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL',\
+                    'HLT_Ele27_WPTight_Gsf',\
+                    'HLT_IsoTkMu24']
     
     if isData:
         print('is Data')
