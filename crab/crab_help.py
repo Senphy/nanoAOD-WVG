@@ -40,6 +40,8 @@ def prepare_crab(name,sample_type,year,period):
         f.write('config.JobType.sendPythonFolder  = True\n')
         f.write('config.JobType.allowUndistributedCMSSW = True \n')
         f.write('config.JobType.maxJobRuntimeMin = 4320 \n\n')
+        if sample_type == 'MC':
+            f.write('config.JobType.maxMemoryMB = 4096 \n\n')
 
         f.write('config.section_("Data")\n')
         f.write('config.Data.inputDataset = "' + name + '" \n')
@@ -64,6 +66,8 @@ def prepare_crab(name,sample_type,year,period):
                 f.write('config.Data.lumiMask = "" \n\n')
         elif year == '2017':
             f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt" \n\n')
+        elif year in ['2016Pre','2016Post']:
+            f.write('config.Data.lumiMask = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt" \n\n')
 
         f.write('config.Data.outLFNDirBase ="/store/user/sdeng/WZG_analysis/final_skim/' + sample_type + '/' + year + '"\n')
         f.write('config.Data.publication = False\n')
@@ -74,6 +78,7 @@ def prepare_crab(name,sample_type,year,period):
         f.write('config.section_("Site")\n')
         f.write('config.Site.storageSite = "T3_CH_CERNBOX"\n')
         f.write('config.Site.whitelist = ["T2_US_MIT","T2_US_Wisconsin","T2_US_Purdue","T2_US_UCSD","T2_US_Caltech"] \n')
+        f.write('config.Site.blacklist = ["T2_US_Vanderbilt"] \n')
         f.close()
 
 def submit(name,sample_type,year):
