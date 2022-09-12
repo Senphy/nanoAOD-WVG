@@ -50,16 +50,17 @@ branch = {
     "ZGJ_dileptonmass":{
         "name":"ZGJ_dileptonmass",
         "axis_name":"m_{ll} [GeV]",
-        "xbins":30,
+        "xbins":20,
         "xleft":0,
-        "xright":300,
+        "xright":200,
     },
     "ZGJ_mlla":{
         "name":"ZGJ_mlla",
         "axis_name":"m_{ll#gamma} [GeV]",
-        "xbins":30,
-        "xleft":0,
-        "xright":300,
+        "bin_array":[100,150,200,300,500],
+        # "xbins":10,
+        # "xleft":0,
+        # "xright":500,
     },
     "ZGJ_lepton1_pt":{
         "name":"ZGJ_lepton1_pt",
@@ -71,9 +72,9 @@ branch = {
     "ZGJ_lepton1_eta":{
         "name":"ZGJ_lepton1_eta",
         "axis_name":"#eta_{l1}",
-        "xbins":6,
-        "xleft":-2.5,
-        "xright":2.5,
+        "xbins":20,
+        "xleft":-3.0,
+        "xright":3.0,
     },
     "ZGJ_lepton2_pt":{
         "name":"ZGJ_lepton2_pt",
@@ -101,7 +102,7 @@ branch = {
         "axis_name":"MET [GeV]",
         "xbins":10,
         "xleft":0,
-        "xright":100,
+        "xright":30,
     },
     "nJets":{
         "name":"nJets",

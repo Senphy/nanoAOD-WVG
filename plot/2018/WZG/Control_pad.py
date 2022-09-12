@@ -43,6 +43,19 @@ UpDown_map={
 # 4: JERdown
 
 branch = {
+    "channel_mark":{
+        "name":"channel_mark",
+        "axis_name":"channel",
+        "bin_array":[1,2,3,4,5],
+    },
+    "mwa":{
+        "name":"mwa",
+        "axis_name":"m_{l_{W}#gamma} [GeV]",
+        "bin_strategy":"average",
+        "xbins":10,
+        "xleft":0,
+        "xright":200,
+    },
     "WZG_dileptonmass":{
         "name":"WZG_dileptonmass",
         "axis_name":"m_{Z} [GeV]",
@@ -59,9 +72,7 @@ branch = {
     "WZG_mlla":{
         "name":"WZG_mlla",
         "axis_name":"m_{ll#gamma} [GeV]",
-        "xbins":10,
-        "xleft":0,
-        "xright":500,
+        "bin_array":[80,150,500],
     },
     "WZG_lepton1_pt":{
         "name":"WZG_lepton1_pt",
