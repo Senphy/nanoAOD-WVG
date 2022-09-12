@@ -15,10 +15,15 @@ import optparse
 
 parser = argparse.ArgumentParser(description='create attachment NanoAOD-like fake photon result')
 parser.add_argument('-f', dest='file', default='', help='File input')
+parser.add_argument('-y', dest='year', default='2018', help='year')
 args = parser.parse_args()
 
 
-Modules = [ApplyWeightFakePhotonModule()]
+if str(args.year) == '2018':
+    Modules = [ApplyWeightFakePhotonModule18()]
+elif str(args.year) == '2017':
+    Modules = [ApplyWeightFakePhotonModule17()]
+
 infilelist = [args.file]
 jsoninput = None
 fwkjobreport = False

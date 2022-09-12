@@ -1,0 +1,8 @@
+{
+    "lepton":{
+        "nlepton":"(nMuon+nElectron)>=2"
+    },
+    "photon":{
+        "nphoton":"nPhoton>0"
+    }
+}
