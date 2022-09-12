@@ -399,12 +399,18 @@ class ApplyRegionFakeLeptonProducer(Module):
             tight_jets.append(i)
 
             if event.Jet_pt_nom[i] >= 30:
-                if self.year == '2017':
+                if self.year == '2016Pre':
+                    if jets[i].btagDeepB > 0.8819:
+                        tight_bjets.append(i)
+                elif self.year == '2016Post':
+                    if jets[i].btagDeepB > 0.8767:
+                        tight_bjets.append(i)
+                elif self.year == '2017':
                     if jets[i].btagDeepB > 0.7738:
-                            tight_bjets.append(i)
+                        tight_bjets.append(i)
                 elif self.year == '2018':
                     if jets[i].btagDeepB > 0.7665:
-                            tight_bjets.append(i)
+                        tight_bjets.append(i)
 
         self.out.fillBranch("nJets", len(tight_jets))
         self.out.fillBranch("nbJets", len(tight_bjets))
@@ -1127,7 +1133,8 @@ class FakeLep_first_Template_Producer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 ApplyRegionFakeLeptonModule = lambda : ApplyRegionFakeLeptonProducer()
-ApplyRegionFakeLeptonModule_16 = lambda : ApplyRegionFakeLeptonProducer("2016")
+ApplyRegionFakeLeptonModule_16Pre = lambda : ApplyRegionFakeLeptonProducer("2016Pre")
+ApplyRegionFakeLeptonModule_16Post = lambda : ApplyRegionFakeLeptonProducer("2016Post")
 ApplyRegionFakeLeptonModule_17 = lambda : ApplyRegionFakeLeptonProducer("2017")
 ApplyRegionFakeLeptonModule_18 = lambda : ApplyRegionFakeLeptonProducer("2018")
 FakeLep_first_Template_Module = lambda : FakeLep_first_Template_Producer()

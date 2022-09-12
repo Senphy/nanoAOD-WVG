@@ -419,7 +419,7 @@ class WZG_Producer(Module):
 
         # ZGJets Control Region
         # Zjets + photon region is designed to validate nonprompt photon.
-        # |mll-mz| <= 15
+        # |mll-mz| > 15
         # min mll > 4
         # >=0 tight photon
         # >0 b jets

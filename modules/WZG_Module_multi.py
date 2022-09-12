@@ -216,6 +216,7 @@ class WZG_multi_Producer(Module):
 
         ntightandfakeleptons = len(tight_electrons) + len(tight_muons) + len(fake_muons) + len(fake_electrons)
         ntightleptons = len(tight_electrons) + len(tight_muons)
+        nfakeleptons = len(fake_electrons) + len(fake_muons)
 
         # region mark
         # 1: nominal
@@ -259,8 +260,8 @@ class WZG_multi_Producer(Module):
         # MET < 40
 
         # two leptons situation, denote fake lepton as f, tight as t
-        # (ff + tf + ft + tt) or (tt plus nf)
-        if (ntightandfakeleptons == 2) or (ntightleptons == 2):
+        # (ff + tf + ft + tt)
+        if (ntightandfakeleptons == 2):
 
             # OSSF selection has been added in pre-selection module
             if len(tight_photons) + len(fake_photons) == 0:
@@ -389,8 +390,8 @@ class WZG_multi_Producer(Module):
         # Bjets veto
 
         # 3 leptons situation
-        # (fff + fft + ftt + ttt) or (ttt plus nf)
-        if ntightandfakeleptons == 3 or ntightleptons == 3:
+        # (fff + fft + ftt + ttt)
+        if ntightandfakeleptons == 3:
             
             # ttt plus nf, if n=0 region 1 else veto
             if ntightleptons == 3:
@@ -741,8 +742,8 @@ class WZG_multi_Producer(Module):
         # Bjets veto
 
         # 4 leptons situation
-        # (ffff + ffft + fftt + fttt + tttt) or (tttt plus nf)
-        if ntightandfakeleptons == 4 or ntightleptons == 4:
+        # (ffff + ffft + fftt + fttt + tttt)
+        if ntightandfakeleptons == 4:
             
             # tttt plus nf, if n=0 region 1 else veto
             if ntightleptons == 4:

@@ -20,30 +20,43 @@ class ApplyWeightFakePhotonProducer(Module):
         pass
         self.year = year
 
+        self.endcap_pt_map_16 = {
+            "20-50": 0.300,
+            "50-Inf": 0.220
+        }
+
+        self.barrel_pt_map_16 = {
+            "20-30": 0.390,
+            "30-50": 0.280,
+            "50-80": 0.200,
+            "80-120": 0.140,
+            "120-Inf": 0.120
+        }
+
         self.endcap_pt_map_17 = {
-            "20-50": 0.407,
-            "50-Inf": 0.092
+            "20-50": 0.460,
+            "50-Inf": 0.072
         }
 
         self.barrel_pt_map_17 = {
-            "20-30": 0.485,
-            "30-50": 0.289,
-            "50-80": 0.152,
-            "80-120": 0.094,
-            "120-Inf": 0.040
+            "20-30": 0.740,
+            "30-50": 0.348,
+            "50-80": 0.141,
+            "80-120": 0.066,
+            "120-Inf": 0.020
         }
 
         self.endcap_pt_map_18 = {
-            "20-50": 0.416,
-            "50-Inf": 0.110
+            "20-50": 0.204,
+            "50-Inf": 0.122
         }
 
         self.barrel_pt_map_18 = {
-            "20-30": 0.505,
-            "30-50": 0.270,
-            "50-80": 0.154,
-            "80-120": 0.101,
-            "120-Inf": 0.042
+            "20-30": 0.297,
+            "30-50": 0.205,
+            "50-80": 0.145,
+            "80-120": 0.123,
+            "120-Inf": 0.085
         }
 
         if str(self.year) == '2018':
@@ -52,6 +65,9 @@ class ApplyWeightFakePhotonProducer(Module):
         elif str(self.year) == '2017':
             self.endcap_pt_map = self.endcap_pt_map_17
             self.barrel_pt_map = self.barrel_pt_map_17
+        elif str(self.year) == '2016':
+            self.endcap_pt_map = self.endcap_pt_map_16
+            self.barrel_pt_map = self.barrel_pt_map_16
         
 
     def beginJob(self):
@@ -108,3 +124,4 @@ class ApplyWeightFakePhotonProducer(Module):
 ApplyWeightFakePhotonModule = lambda : ApplyWeightFakePhotonProducer()
 ApplyWeightFakePhotonModule18 = lambda : ApplyWeightFakePhotonProducer('2018')
 ApplyWeightFakePhotonModule17 = lambda : ApplyWeightFakePhotonProducer('2017')
+ApplyWeightFakePhotonModule16 = lambda : ApplyWeightFakePhotonProducer('2016')
