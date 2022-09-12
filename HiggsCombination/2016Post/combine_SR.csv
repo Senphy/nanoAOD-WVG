@@ -1,0 +1,15 @@
+uncertainty,type,WZG,FakeLep,FakePho,Top,VV,VVV
+lumi_16Post,lnN,1.017,1.017,1.017,1.017,1.017,1.017
+JES_16Post,lnN,auto_cal,,,auto_cal,auto_cal,auto_cal
+JER_16Post,lnN,auto_cal,,,auto_cal,auto_cal,auto_cal
+FakeLep_16Post,lnN,,1.030,,,,
+FakePho_16Post,lnN,,,1.030,,,
+HLT_method_16Post,lnN,1.005,,,1.005,1.005,1.005
+HLT_sta_16Post,lnN,1.007,,,1.007,1.007,1.007
+id_eff_16Post,lnN,1.001,,,1.001,1.001,1.001
+WZG_stat_16Post,lnN,auto_cal,,,,,
+FakeLep_stat_16Post,lnN,,auto_cal,,,,
+FakePho_stat_16Post,lnN,,,auto_cal,,,
+Top_stat_16Post,lnN,,,,auto_cal,,
+VV_stat_16Post,lnN,,,,,auto_cal,
+VVV_stat_16Post,lnN,,,,,,auto_cal

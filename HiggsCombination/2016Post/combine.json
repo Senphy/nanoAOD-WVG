@@ -1,0 +1,35 @@
+{
+    "utils":{
+        "imax":1
+    },
+
+    "regions":{
+        "CR_1":{
+            "final_name":"CR1",
+            "file_name":"ttZ",
+            "bins":5,
+            "variable":"ttZ_trileptonmass",
+            "variable_plotname":"mWZ",
+            "csv":"combine_CR.csv",
+            "tag":"2016Post"
+        },
+        "CR_2":{
+            "final_name":"CR2",
+            "file_name":"ZZ",
+            "bins":5,
+            "variable":"ZZ_trileptonmass",
+            "variable_plotname":"mWZ",
+            "csv":"combine_CR.csv",
+            "tag":"2016Post"
+        },
+        "SR_1":{
+            "final_name":"SR",
+            "file_name":"WZG",
+            "bins":5,
+            "variable":"WZG_trileptonmass",
+            "variable_plotname":"mWZ",
+            "csv":"combine_SR.csv",
+            "tag":"2016Post"
+        }
+    }
+}

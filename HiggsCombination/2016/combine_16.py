@@ -5,9 +5,9 @@ import json
 def prepare_cards(name):
     cards = ''
     logging.basicConfig(level=logging.DEBUG)
-    if not os.path.isfile('cards_map_2017.json'):
+    if not os.path.isfile('cards_map_2016.json'):
         logging.warning('cards_map not exist, please check')
-    with open('cards_map_2017.json', 'r') as f:
+    with open('cards_map_2016.json', 'r') as f:
         jsons = json.load(f)
         f.close()
     
@@ -24,7 +24,7 @@ def prepare_cards(name):
     pass
 
 if __name__ == '__main__':
-    name = 'test17'
+    name = 'test16'
     prepare_cards(name)
     
     codes = '''

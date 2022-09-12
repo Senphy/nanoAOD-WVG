@@ -1,7 +1,7 @@
 {
     "utils":{
         "imax":1,
-        "nrateParam":0
+        "nrateParam":1
     },
 
     "regions":{
@@ -19,7 +19,7 @@
         "CR_2":{
             "final_name":"CR2",
             "file_name":"ZGJ",
-            "bin_array":[100,200,300,500],
+            "bin_array":[100,150,200,300,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"ZGJ_mlla",
             "variable_storename":"mlla",
@@ -41,11 +41,11 @@
         "SR_1":{
             "final_name":"SR",
             "file_name":"WZG",
-            "bin_array":[100, 200, 300, 500],
+            "bin_array":[80,150,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
-            "variable":"WZG_trileptonmass",
-            "variable_storename":"mWZ",
-            "variable_plotname":"m_{lll} [GeV]",
+            "variable":"WZG_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
             "csv":"combine_SR.csv",
             "tag":2017
         }

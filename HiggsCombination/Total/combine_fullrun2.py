@@ -2,15 +2,7 @@ import os,sys
 import logging
 import json
 
-def prepare_cards(name):
-    cards = ''
-    logging.basicConfig(level=logging.DEBUG)
-    if not os.path.isfile('cards_map_2017.json'):
-        logging.warning('cards_map not exist, please check')
-    with open('cards_map_2017.json', 'r') as f:
-        jsons = json.load(f)
-        f.close()
-    
+def loop_json(cards, jsons):
     for region in jsons:
         logging.info('Preparing cards for region {region}'.format(region=region))
         region = jsons[region]
@@ -18,13 +10,38 @@ def prepare_cards(name):
             bin = region[bin]
             logging.info('Preparing cards for {tag}'.format(tag=bin['tag']))
             cards = cards + '{tag}={file} '.format(tag=bin['tag'], file=bin['file'])
+    return cards
+
+def prepare_cards(name):
+    cards = ''
+    logging.basicConfig(level=logging.DEBUG)
+    if not os.path.isfile('cards_map_2016.json'):
+        logging.warning('cards_map not exist, please check')
+    with open('cards_map_2016.json', 'r') as f:
+        jsons = json.load(f)
+        f.close()
+    cards = loop_json(cards, jsons)
+
+    if not os.path.isfile('cards_map_2017.json'):
+        logging.warning('cards_map not exist, please check')
+    with open('cards_map_2017.json', 'r') as f:
+        jsons = json.load(f)
+        f.close()
+    cards = loop_json(cards, jsons)
+    
+    if not os.path.isfile('cards_map_2018.json'):
+        logging.warning('cards_map not exist, please check')
+    with open('cards_map_2018.json', 'r') as f:
+        jsons = json.load(f)
+        f.close()
+    cards = loop_json(cards, jsons)
     
     os.system('combineCards.py {cards} >& {name}.txt'.format(cards=cards, name=name))
     os.system('combineCards.py -S {cards} >& {name}_shape.txt'.format(cards=cards, name=name))
     pass
 
 if __name__ == '__main__':
-    name = 'test17'
+    name = 'fullrun2'
     prepare_cards(name)
     
     codes = '''

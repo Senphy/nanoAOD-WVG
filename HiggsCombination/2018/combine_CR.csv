@@ -4,7 +4,7 @@ lumi_fullrun2,lnN,1.02,,1.02,1.02,1.02,1.02
 lumi_1718,lnN,1.002,,1.002,1.002,1.002,1.002
 JES_18,lnN,auto_cal,,auto_cal,auto_cal,auto_cal,auto_cal
 JER_18,lnN,auto_cal,,auto_cal,auto_cal,auto_cal,auto_cal
-FakeLep_18,lnN,,1.30,,,,
+FakeLep,lnN,,1.30,,,,
 HLT_method_sys,lnN,1.01,,1.01,1.01,1.01,1.01
 HLT_sta_18,lnN,1.002,,1.002,1.002,1.002,1.002
 muon_id,lnN,auto_cal,,auto_cal,auto_cal,auto_cal,auto_cal
@@ -19,3 +19,4 @@ Top_stat_18,lnN,,,auto_cal,,,
 VV_stat_18,lnN,,,,auto_cal,,
 VVV_stat_18,lnN,,,,,auto_cal,
 VG_stat_18,lnN,,,,,,auto_cal
+VV_scale,rateParam,*,VV,1.0,"[0,5]",,

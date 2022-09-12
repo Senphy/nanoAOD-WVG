@@ -1,0 +1,13 @@
+uncertainty,type,WZG,FakeLep,Top,VV,VVV
+lumi_16Pre,lnN,1.017,1.017,1.017,1.017,1.017
+JES_16Pre,lnN,auto_cal,,auto_cal,auto_cal,auto_cal
+JER_16Pre,lnN,auto_cal,,auto_cal,auto_cal,auto_cal
+FakeLep_16Pre,lnN,,1.030,,,
+HLT_method_16Pre,lnN,1.005,,1.005,1.005,1.005
+HLT_sta_16Pre,lnN,1.007,,1.007,1.007,1.007
+id_eff_16Pre,lnN,1.001,1.001,1.001,1.001,1.001
+WZG_stat_16Pre,lnN,auto_cal,,,,
+FakeLep_stat_16Pre,lnN,,auto_cal,,,
+Top_stat_16Pre,lnN,,,auto_cal,,
+VV_stat_16Pre,lnN,,,,auto_cal,
+VVV_stat_16Pre,lnN,,,,,auto_cal

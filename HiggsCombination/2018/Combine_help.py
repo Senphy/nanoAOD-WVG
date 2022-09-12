@@ -44,7 +44,7 @@ def auto_cal(region, file, variable, process, uncertainty, bin):
             cal_unc = 1
         else:
             cal_unc = 1 + abs(stat_unc/nominal)
-            if cal_unc >= 2: cal_unc = 2.0
+            # if cal_unc >= 2: cal_unc = 2.0
         return Decimal(valid_unc(cal_unc)).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
 
     elif 'jes' in uncertainty.lower():
