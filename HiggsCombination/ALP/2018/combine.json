@@ -1,0 +1,20 @@
+{
+    "utils":{
+        "imax":1,
+        "nrateParam":0
+    },
+
+    "regions":{
+        "SR_1":{
+            "final_name":"SR",
+            "file_name":"WZG",
+            "processes":["ALP","WZG","VG","VV","VVV","Top","FakeLep","FakePho"],
+            "bin_array":[0,100,110,120,130,140,160,200,300,500],
+            "variable":"WZG_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_Zgamma",
+            "csv":"combine_SR.csv",
+            "tag":2018
+        }
+    }
+}
