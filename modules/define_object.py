@@ -188,12 +188,13 @@ class define_object_Producer(Module):
                 continue
 
             # MinPtCut,PhoSCEtaMultiRangeCut,PhoSingleTowerHadOverEmCut,PhoFull5x5SigmaIEtaIEtaCut,PhoAnyPFIsoWithEACut,PhoAnyPFIsoWithEAAndQuadScalingCut,PhoAnyPFIsoWithEACut
-            mask_iso_sigmaietaieta = (1<<1) | (1<<3) | (1<<5) | (1<<11) | (1<<13) # remove charge iso and sigmaietaieta cut in medium id
+            mask_iso_sigmaietaieta = (1<<1) | (1<<3) | (1<<5)  # remove iso and sigmaietaieta cut in medium id
 
             bitmap = photons[i].vidNestedWPBitmap & mask_iso_sigmaietaieta
             if (bitmap == mask_iso_sigmaietaieta):
                 fake_photons.append(i)
-
+        
+        selected_photons = tight_photons + fake_photons
 
         Photon_ID_Weight = 1
         Photon_ID_Weight_UP = 1
@@ -217,8 +218,8 @@ class define_object_Producer(Module):
 
             pass_lepton_dr_cut = True
 
-            for j in range(0,len(tight_photons)):
-                if deltaR(jets[i].eta,jets[i].phi,photons[tight_photons[j]].eta,photons[tight_photons[j]].phi) < 0.5:
+            for j in range(0,len(selected_photons)):
+                if deltaR(jets[i].eta,jets[i].phi,photons[selected_photons[j]].eta,photons[selected_photons[j]].phi) < 0.5:
                     pass_lepton_dr_cut = False
 
             for j in range(0,len(selected_electrons)):
