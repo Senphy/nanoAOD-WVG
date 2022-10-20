@@ -35,11 +35,11 @@ if args.isdata:
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2017", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2017(),FRFakeLep_first_Template_Module(),jetmetCorrector(),FRFakeLeptonModule()]
-    if args.year == '2016':
+    if args.year == '2016Post':
         jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2016b(),jetmetCorrector(),FRFakeLeptonModule()]
-    if args.year == '2016_PreVFP':
-        jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016_PreVFP", runPeriod=args.period, metBranchName="MET")
+    if args.year == '2016Pre':
+        jetmetCorrector = createJMECorrector(isMC=False, dataYear="UL2016_preVFP", runPeriod=args.period, metBranchName="MET")
         Modules = [muonScaleRes2016a(),jetmetCorrector(),FRFakeLeptonModule()]
 else:
     if args.year == '2018':
@@ -48,11 +48,11 @@ else:
     if args.year == '2017':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2017", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),muonScaleRes2017(),FRFakeLep_first_Template_Module(),puAutoWeight_2017(),PrefCorrUL17(),muonIDISOSF2017(),eleRECOSF2017(),eleIDSF2017(),jetmetCorrector(),FRFakeLeptonModule()]
-    if args.year == '2016':
+    if args.year == '2016Post':
         jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_postVFP(),muonIDISOSF2016(),muonScaleRes2016b(),eleRECOSF2016(),eleIDSF2016(),jetmetCorrector(),FRFakeLeptonModule()]
-    if args.year == '2016_PreVFP':
-        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016_PreVFP", jesUncert="Total", metBranchName="MET", splitJER=False)
+    if args.year == '2016Pre':
+        jetmetCorrector = createJMECorrector(isMC=True, dataYear="UL2016_preVFP", jesUncert="Total", metBranchName="MET", splitJER=False)
         Modules = [countHistogramsProducer(),puAutoWeight_2016(),PrefCorrUL16_preVFP(),muonIDISOSF2016(),muonScaleRes2016a(),eleRECOSF2016(),eleIDSF2016(),jetmetCorrector(),FRFakeLeptonModule()]
 
 if args.file:
