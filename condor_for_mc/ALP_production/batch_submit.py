@@ -4,17 +4,18 @@ import subprocess
 
 def ALP_batch_condor():
     MassesALP = [50, 90, 100, 110, 160, 200, 300, 400]
-    year = 2017
+    year = '2016Post'
     eospath = '/eos/user/s/sdeng/WZG_analysis/ALP/fa_200G/'
     initial_path = os.getcwd()
 
     for mass in MassesALP:
         Sample_Name = "ALP_lvlla_4f_LO_m%s_%s" %(str(mass), str(year))
+        storedir_Name = "ALP_lvlla_4f_LO_m%s" %(str(mass))
         if os.path.isdir(Sample_Name):
             shutil.rmtree(Sample_Name)
         os.makedirs(Sample_Name+'/log')
-        if not os.path.isdir(eospath + str(year) + '/' + Sample_Name):
-            os.makedirs(eospath + str(year) + '/' + Sample_Name)
+        if not os.path.isdir(eospath + str(year) + '/' + storedir_Name):
+            os.makedirs(eospath + str(year) + '/' + storedir_Name)
 
 
         shutil.copyfile('cmssw-cc7.sh', Sample_Name+'/cmssw-cc7.sh')
