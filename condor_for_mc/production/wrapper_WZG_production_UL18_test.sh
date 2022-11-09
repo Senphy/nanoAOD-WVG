@@ -3,9 +3,10 @@
 # set up cmssw
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
-export X509_USER_PROXY=$1
+Proxy_path='/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738'
+export X509_USER_PROXY=${Proxy_path}
 voms-proxy-info -all
-voms-proxy-info -all -file $1
+voms-proxy-info -all -file ${Proxy_path}
 EVENTS=1000
 
 # lhe-gen level production
