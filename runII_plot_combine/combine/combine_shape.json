@@ -1,0 +1,66 @@
+{
+    "utils":{
+        "imax":1,
+        "autoMCStats_threshold":10000000,
+        "tag":2018
+    },
+
+    "regions":{
+        "CR_1":{
+            "final_name":"CR1",
+            "region_name":"ttZ",
+            "file_name":"ttZ_2018.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ttZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,5]",""]
+            }
+        },
+        "CR_2":{
+            "final_name":"CR2",
+            "region_name":"ZGJ",
+            "file_name":"ZGJ_2018.root",
+            "bin_array":[100,150,200,300,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"ZGJ_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_CR_shape.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,5]",""]
+            }
+        },
+        "CR_3":{
+            "final_name":"CR3",
+            "region_name":"ZZ",
+            "file_name":"ZZ_2018.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ZZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,5]",""]
+            }
+        },
+        "SR_1":{
+            "final_name":"SR",
+            "region_name":"WZG",
+            "file_name":"WZG_2018.root",
+            "bin_array":[80,150,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"WZG_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,5]",""]
+            }
+        }
+    }
+}

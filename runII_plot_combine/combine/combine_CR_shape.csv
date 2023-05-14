@@ -1,0 +1,15 @@
+uncertainty,type,WZG,FakeLep,Top,VV,VVV,VG
+lumi_18,lnN,1.015,,1.015,1.015,1.015,1.015
+lumi_fullrun2,lnN,1.02,,1.02,1.02,1.02,1.02
+lumi_1718,lnN,1.002,,1.002,1.002,1.002,1.002
+FakeLep,lnN,,1.30,,,,
+HLT_method_sys,lnN,1.01,,1.01,1.01,1.01,1.01
+HLT_stat_18,lnN,1.002,,1.002,1.002,1.002,1.002
+
+jesTotal,shape,1.000,,1.000,1.000,1.000,1.000
+jer,shape,1.000,,1.000,1.000,1.000,1.000
+Muon_ID_Weight,shape,1.000,,1.000,1.000,1.000,1.000
+Electron_ID_Weight,shape,1.000,,1.000,1.000,1.000,1.000
+Electron_RECO_Weight,shape,1.000,,1.000,1.000,1.000,1.000
+puWeight,shape,1.000,,1.000,1.000,1.000,1.000
+l1pref,shape,1.000,,1.000,1.000,1.000,1.000
