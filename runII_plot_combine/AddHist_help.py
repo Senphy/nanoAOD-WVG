@@ -18,42 +18,63 @@ unc_map = {
         "Nom":"Muon_ID_Weight",
         "Up":"Muon_ID_Weight_UP",
         "Down":"Muon_ID_Weight_DOWN",
-        "corr":None
+        "overlap":0,
+        "corr":1
     },
     "Electron_ID_Weight":{
         "Nom":"Electron_ID_Weight",
         "Up":"Electron_ID_Weight_UP",
         "Down":"Electron_ID_Weight_DOWN",
-        "corr":None
+        "overlap":0,
+        "corr":1
     },
     "Electron_RECO_Weight":{
         "Nom":"Electron_RECO_Weight",
         "Up":"Electron_RECO_Weight_UP",
         "Down":"Electron_RECO_Weight_DOWN",
-        "corr":None
+        "overlap":0,
+        "corr":1
     },
     "puWeight":{
         "Nom":"puWeight",
         "Up":"puWeightUp",
         "Down":"puWeightDown",
-        "corr":None
+        "overlap":0,
+        "corr":1
     },
     "l1pref":{
         "Nom":"L1PreFiringWeight_Nom",
         "Up":"L1PreFiringWeight_Up",
         "Down":"L1PreFiringWeight_Dn",
+        "overlap":0,
+        "corr":1
+    },
+    "btagWeight_bc_corr":{
+        "Nom":"btagWeight",
+        "Up":"btagWeight_bc_up_corr",
+        "Down":"btagWeight_bc_down_corr",
+        "overlap":0,
+        "corr":1
+    },
+    "btagWeight_l_corr":{
+        "Nom":"btagWeight",
+        "Up":"btagWeight_l_up_corr",
+        "Down":"btagWeight_l_down_corr",
+        "overlap":1,
+        "corr":1
+    },
+    "btagWeight_bc_uncorr":{
+        "Nom":"btagWeight",
+        "Up":"btagWeight_bc_up_uncorr",
+        "Down":"btagWeight_bc_down_uncorr",
+        "overlap":1,
         "corr":None
     },
-    "btagWeight_bc":{
+    "btagWeight_l_uncorr":{
         "Nom":"btagWeight",
-        "Up":"btagWeight_bc_up",
-        "Down":"btagWeight_bc_down",
-        "corr":None
-    },
-    "btagWeight_l":{
-        "Nom":"btagWeight",
-        "Up":"btagWeight_l_up",
-        "Down":"btagWeight_l_down",
+        "Up":"btagWeight_l_up_uncorr",
+        "Down":"btagWeight_l_down_uncorr",
+        "overlap":1,
         "corr":None
     }
 }
@@ -132,7 +153,7 @@ def channel_cut(channel, arrays):
         arrays = arrays.loc[cut, :]
     
     if channel in [0,1,2,3,4]:
-        sel = '(channel_mark==2|channel_mark==4) | ((channel_mark==1|channel_mark==3)&(mwa<75|mwa>105)) & WZG_trileptonmass>100 & (WZG_dileptonmass>75&WZG_dileptonmass<105)'
+        sel = '((channel_mark==2|channel_mark==4) | ((channel_mark==1|channel_mark==3)&(mwa<75|mwa>105))) & WZG_trileptonmass>100 & (WZG_dileptonmass>75&WZG_dileptonmass<105) & WZG_photon_pt>20'
         arrays = arrays.query(sel)
 
     if channel in [10,11,12,13,14]:
@@ -341,7 +362,8 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch, year='2018', **kwar
 
         arrays['unc_product'] = 1.0
         for unc in unc_map:
-            arrays['unc_product'] *= arrays[f'{unc_map[unc]["Nom"]}']
+            if unc_map[unc]['overlap'] == 0:
+                arrays['unc_product'] *= arrays[f'{unc_map[unc]["Nom"]}']
         arrays['true_weight'] = arrays['unc_product'] * lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
 
         if channel in [0,1,2,3,4, 10,11,12,13,14]:
@@ -402,7 +424,7 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch, year='2018', **kwar
 def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch, year='2018', **kwargs):
     
     init_time = time.time()
-    init_branches = ['fake_lepton_weight']
+    init_branches = ['fake_lepton_weight','fake_lepton_weight_up','fake_lepton_weight_down']
     init_branches = init_branch(year, init_branches)
     
     if isData:
@@ -454,6 +476,8 @@ def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch, year='20
         for branch_name in branch:
             for i in trange(0, len(arrays[branch[branch_name]["name"]]), desc=f'fill {branch[branch_name]["name"]} for {file}'):
                 hist[branch_name].Fill(float(arrays[branch[branch_name]["name"]].values[i]), -1 * float(arrays['fake_lepton_weight'].values[i]) * float(arrays['true_weight'].values[i]))
+                hist[f'{branch_name}_fakerateUp'].Fill(float(arrays[branch[branch_name]["name"]].values[i]), -1 * float(arrays['fake_lepton_weight_up'].values[i]) * float(arrays['true_weight'].values[i]))
+                hist[f'{branch_name}_fakerateDown'].Fill(float(arrays[branch[branch_name]["name"]].values[i]), -1 * float(arrays['fake_lepton_weight_down'].values[i]) * float(arrays['true_weight'].values[i]))
             print (f"SumOfWeights for {branch_name}: ", hist[branch_name].GetSumOfWeights())
     
     end_time = time.time()
@@ -503,6 +527,7 @@ def AddHist_FakePhoton(file, hist, isData, xsec, lumi, channel, branch, year='20
         chg_cut = ((arrays.loc[:,"ZGJ_photon_pfRelIso03_chg"]*arrays.loc[:,"ZGJ_photon_pt"]) > 4) & ((arrays.loc[:,"ZGJ_photon_pfRelIso03_chg"]*arrays.loc[:,"ZGJ_photon_pt"]) < 10)
         sieie_sel = '(ZGJ_photon_sieie>0.01015 & ZGJ_photon_sieie<0.05030 & ZGJ_photon_eta<1.4442) | (ZGJ_photon_sieie>0.0272 & ZGJ_photon_sieie<0.1360 & ZGJ_photon_eta>1.566)'
     arrays = arrays.query(sieie_sel)
+    arrays = arrays.loc[chg_cut,:]
 
     if isData:
         arrays = arrays.loc[chg_cut,:]

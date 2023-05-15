@@ -16,9 +16,15 @@ parser = argparse.ArgumentParser(description='plot input')
 parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2017','2018'])
 parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG'], default='ttZ')
 parser.add_argument('-m', dest='mode', choices=['local','condor'], default='local')
+parser.add_argument('-o', dest='overflow', action='store_true', default=False)
 args = parser.parse_args()
 
-def Plot(year='2018', region='WZG', **kwargs):
+def AddOverflow(hist):
+    nx_over = hist.GetNbinsX() + 1
+    hist.Fill(hist.GetBinCenter(nx_over-1), hist.GetBinContent(nx_over))
+    return hist
+
+def Plot(year='2018', region='WZG', overflow=False, **kwargs):
 
     sys.path.append(f'./{year}/{region}')
     from Control_pad import channel_map
@@ -34,12 +40,16 @@ def Plot(year='2018', region='WZG', **kwargs):
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
         hist_data[plot_branch] = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_data_{str(UpDown_map[0])}')
+        if overflow:
+            hist_data[plot_branch] = AddOverflow(hist_data[plot_branch])
 
     for file in filelist_MC:
         hist_MC = {}
         for branch_name in branch:
             plot_branch = branch[branch_name]["name"]
             hist_MC[plot_branch] = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{str(UpDown_map[UpDown])}')
+            if overflow:
+                hist_MC[plot_branch] = AddOverflow(hist_MC[plot_branch])
             
         filelist_MC[file]["hist"] = hist_MC
     
@@ -47,11 +57,15 @@ def Plot(year='2018', region='WZG', **kwargs):
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
         hist_FakeLep[plot_branch] = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakeLep_{str(UpDown_map[0])}')
+        if overflow:
+            hist_FakeLep[plot_branch] = AddOverflow(hist_FakeLep[plot_branch])
 
     hist_FakePho= {}
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
         hist_FakePho[plot_branch] = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakePho_{str(UpDown_map[0])}')
+        if overflow:
+            hist_FakePho[plot_branch] = AddOverflow(hist_FakePho[plot_branch])
 
     tdrStyle.setTDRStyle()
     tdrStyle.gtdr()
@@ -203,4 +217,4 @@ def Plot(year='2018', region='WZG', **kwargs):
         print (time.time()-time_total_init)
 
 if __name__ == "__main__":
-    sys.exit(Plot(year=args.year, region=args.region))
+    sys.exit(Plot(year=args.year, region=args.region, overflow=args.overflow))

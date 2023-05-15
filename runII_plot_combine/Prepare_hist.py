@@ -88,10 +88,12 @@ def Prepare_hist(year='2018', region='WZG', **kwargs):
         hist_FakeLep_temp.SetYTitle(f'events / bin')
         SetHistStyle(hist_FakeLep_temp,23)
         hist_FakeLep[plot_branch] = deepcopy(hist_FakeLep_temp)
+        hist_FakeLep[f'{plot_branch}_fakerateUp'] = deepcopy(hist_FakeLep_temp)
+        hist_FakeLep[f'{plot_branch}_fakerateDown'] = deepcopy(hist_FakeLep_temp)
     for file in filelist_data:
         AddHist_FakeLepton(file, hist_FakeLep, 1, 0, 0, channel, branch, year=year)
     for file in filelist_MC:
-        AddHist_FakeLepton(filelist_MC[file]["path"], hist_FakeLep, 0, filelist_MC[file]["xsec"], lumi, channel, branch, year)
+        AddHist_FakeLepton(filelist_MC[file]["path"], hist_FakeLep, 0, filelist_MC[file]["xsec"], lumi, channel, branch, year=year)
 
     hist_FakePho= {}
     for branch_name in branch:
@@ -120,9 +122,13 @@ def Prepare_hist(year='2018', region='WZG', **kwargs):
 
         hist_data[plot_branch].SetName(f"{channel_map[channel]}_{plot_branch}_data_{str(UpDown_map[0])}")
         hist_FakeLep[plot_branch].SetName(f"{channel_map[channel]}_{plot_branch}_FakeLep_{str(UpDown_map[0])}")
+        hist_FakeLep[f'{plot_branch}_fakerateUp'].SetName(f"{channel_map[channel]}_{plot_branch}_FakeLep_fakerateUp")
+        hist_FakeLep[f'{plot_branch}_fakerateDown'].SetName(f"{channel_map[channel]}_{plot_branch}_FakeLep_fakerateDown")
         hist_FakePho[plot_branch].SetName(f"{channel_map[channel]}_{plot_branch}_FakePho_{str(UpDown_map[0])}")
         hist_data[plot_branch].Write()
         hist_FakeLep[plot_branch].Write()
+        hist_FakeLep[f'{plot_branch}_fakerateUp'].Write()
+        hist_FakeLep[f'{plot_branch}_fakerateDown'].Write()
         hist_FakePho[plot_branch].Write()
 
         for file in filelist_MC:

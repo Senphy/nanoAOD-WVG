@@ -1,6 +1,7 @@
 import os,sys
 import ROOT
 import argparse
+from copy import deepcopy
 
 sys.path.append(os.getcwd())
 from AddHist_help import unc_map 
@@ -19,6 +20,8 @@ def corr_suffix(year):
     elif year == '2016Pre' or '2016Post':
         return 16
 
+def GetUnc():
+    pass
 if __name__ == '__main__':
 
     year = args.year
@@ -31,21 +34,30 @@ if __name__ == '__main__':
     from Control_pad import branch
     from Control_pad import year
 
-    Top_list = ["ttgjets", "ttztollnunu", "ttztoll", "ttwjetstolnu", "tttt", "tZq_ll", "st antitop", "st top"]
-    VVV_list = ["www","wwz","zzz","wzz"]
-    VV_list = ["qqzz","ggzz","wz"]
-    VG_list = ["zgtollg","wgtolnug"]
-    index_list = ["None"]
-    for unc in unc_map:
-        if unc_map[unc]['corr'] != None:
-            index_list.append(f'{unc}Up_{corr_suffix(year)}')
-            index_list.append(f'{unc}Down_{corr_suffix(year)}')
-        else:
-            index_list.append(f'{unc}Up')
-            index_list.append(f'{unc}Down')
-    index_list.extend(["jesTotalUp", "jesTotalDown", "jerUp", "jerDown"])
-    print(index_list)
+    index_list = deepcopy(unc_map)
+    index_list['jesTotal'] = {}
+    index_list['jer'] = {}
+    index_list['jesTotal']['corr'] = None
+    index_list['jer']['corr'] = None
+    print(unc_map)
 
+    hist_list_sample = {
+        "VV":{
+            "name":["qqzz","ggzz","wz"],
+        },
+        "VG":{  
+            "name":["zgtollg","wgtolnug"],
+        },
+        "VVV":{
+            "name":["www","wwz","zzz","wzz"],
+        },
+        "Top":{
+            "name":["ttgjets", "ttztollnunu", "ttztoll", "ttwjetstolnu", "tttt", "tZq_ll", "st antitop", "st top"],
+        },
+        "WZG":{
+            "name":["WZG"],
+        },
+    }
     
     try:
         file_hist = ROOT.TFile(f'./{year}/{channel_map[channel]}_{year}.root',"OPEN")
@@ -60,72 +72,64 @@ if __name__ == '__main__':
     for index in index_list:
 
         for branch_name in branch:
+            hist_list = deepcopy(hist_list_sample)
 
-            hist_Top_list = []
-            hist_VVV_list = []
-            hist_VV_list = []
-            hist_VG_list = []
-            hist_WZG_list = []
             plot_branch = branch[branch_name]["name"]
 
+            for cate in hist_list:
+                hist_list[cate]["hists_up"] = []
+                hist_list[cate]["hists_down"] = []
             for file in filelist_MC:
                 # print(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{index}')
-                hist_temp = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{index}')
+                hist_temp_up = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{index}Up')
+                hist_temp_down = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{index}Down')
                 # print(type(hist_temp))
 
-                if filelist_MC[file]["name"].lower() in Top_list:
-                    hist_Top_list.append(hist_temp)
+                for cate in hist_list:
+                    if filelist_MC[file]["name"].lower() in hist_list[cate]["name"]:
+                        hist_list[cate]["hists_up"].append(hist_temp_up)
+                        hist_list[cate]["hists_down"].append(hist_temp_down)
 
-                elif filelist_MC[file]["name"].lower() in VVV_list:
-                    hist_VVV_list.append(hist_temp)
+            # hist_list[cate]['final_hist']
+            # for cate in hist_list:
+            #     if len(hist_list[cate]["hists"]) > 0:
+            #         for i in range(0, len(hist_list[cate]["hists"])):
+            #             hist_temp_up.Add(hist_list[cate]["hists_up"][i])
+            #             hist_temp_down.Add(hist_list[cate]["hists_up"][i])
+            #         hist_temp
+            for cate in hist_list:
+                del hist_temp_up
+                del hist_temp_down
+                if len(hist_list[cate]["hists_up"]) == 0:
+                    hist_temp_up = ROOT.TH1D()
+                    hist_temp_down= ROOT.TH1D()
+                else:
+                    hist_temp_up = hist_list[cate]["hists_up"][0].Clone()
+                    hist_temp_down = hist_list[cate]["hists_down"][0].Clone()
+                    for i in range(1,len(hist_list[cate]["hists_up"])):
+                        hist_temp_up.Add(hist_list[cate]["hists_up"][i])
+                        hist_temp_down.Add(hist_list[cate]["hists_down"][i])
 
-                elif filelist_MC[file]["name"].lower() in VV_list or 'ggZZ' in filelist_MC[file]["name"] or 'qqZZ' in filelist_MC[file]["name"]:
-                    hist_VV_list.append(hist_temp)
-                
-                elif filelist_MC[file]["name"].lower() in VG_list:
-                    hist_VG_list.append(hist_temp)
+                if index_list[index]['corr'] != None:
+                    hist_temp_up.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Up')
+                    hist_temp_up.Write()
+                    hist_temp_down.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Down')
+                    hist_temp_down.Write()
+                else:
+                    hist_temp_up.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Up_{corr_suffix(year)}')
+                    hist_temp_up.Write()
+                    hist_temp_down.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Down_{corr_suffix(year)}')
+                    hist_temp_down.Write()
 
-                elif 'WZG' in filelist_MC[file]["name"]:
-                    hist_WZG_list.append(hist_temp)
 
-            if len(hist_Top_list) > 0:
-                hist_Top = hist_Top_list[0].Clone()
-                for i in range(1, len(hist_Top_list)):
-                    hist_Top.Add(hist_Top_list[i])
-                hist_Top.SetName(f'{channel_map[channel]}_{plot_branch}_Top_{index}')
-                hist_Top.Write()
+            # if len(hist_VG_list) > 0:
+            #     hist_VG = hist_VG_list[0].Clone()
+            #     for i in range(1, len(hist_VG_list)):
+            #         hist_VG.Add(hist_VG_list[i])
+            #     hist_VG.SetName(f'{channel_map[channel]}_{plot_branch}_VG_{index}')
+            #     hist_VG.Write()
 
-            if len(hist_VVV_list) > 0:
-                hist_VVV = hist_VVV_list[0].Clone()
-                for i in range(1, len(hist_VVV_list)):
-                    hist_VVV.Add(hist_VVV_list[i])
-                hist_VVV.SetName(f'{channel_map[channel]}_{plot_branch}_VVV_{index}')
-                hist_VVV.Write()
-
-            if len(hist_VV_list) > 0:
-                hist_VV = hist_VV_list[0].Clone()
-                for i in range(1, len(hist_VV_list)):
-                    hist_VV.Add(hist_VV_list[i])
-                hist_VV.SetName(f'{channel_map[channel]}_{plot_branch}_VV_{index}')
-                hist_VV.Write()
-
-            if len(hist_VG_list) > 0:
-                hist_VG = hist_VG_list[0].Clone()
-                for i in range(1, len(hist_VG_list)):
-                    hist_VG.Add(hist_VG_list[i])
-                hist_VG.SetName(f'{channel_map[channel]}_{plot_branch}_VG_{index}')
-                hist_VG.Write()
-
-            if len(hist_WZG_list) == 0:
-                print('!!!Warning: No signal input!!!')
-            else:
-                hist_WZG = hist_WZG_list[0].Clone()
-                if len(hist_WZG_list) > 1:
-                    print('!!!Warning: More than 1 signal input!!!')
-                    for i in range(1, len(hist_WZG_list)):
-                        hist_WZG.Add(hist_WZG_list[i])
-                hist_WZG.SetName(f'{channel_map[channel]}_{plot_branch}_WZG_{index}')
-                hist_WZG.Write()
+            del hist_list
 
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
@@ -136,6 +140,10 @@ if __name__ == '__main__':
         hist_FakeLep = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakeLep_None')
         hist_FakeLep.SetName(f'{channel_map[channel]}_{plot_branch}_FakeLep_None')
         hist_FakeLep.Write()
+        for suffix in ['Up','Down']:
+            hist_FakeLep = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakeLep_fakerate{suffix}')
+            hist_FakeLep.SetName(f'{channel_map[channel]}_{plot_branch}_FakeLep_fakerate{suffix}')
+            hist_FakeLep.Write()
 
         hist_FakePho = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakePho_None')
         hist_FakePho.SetName(f'{channel_map[channel]}_{plot_branch}_FakePho_None')

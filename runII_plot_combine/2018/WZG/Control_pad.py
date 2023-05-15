@@ -73,6 +73,10 @@ branch = {
         "name":"WZG_mlla",
         "axis_name":"m_{ll#gamma} [GeV]",
         "bin_array":[80,150,500],
+        # "bin_array":[80,120,140,160,180,200,300],
+        # "xbins":5,
+        # "xleft":80,
+        # "xright":480,
     },
     "WZG_lepton1_pt":{
         "name":"WZG_lepton1_pt",
