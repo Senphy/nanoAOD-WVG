@@ -55,7 +55,7 @@ if __name__ == '__main__':
             "name":["ttgjets", "ttztollnunu", "ttztoll", "ttwjetstolnu", "tttt", "tZq_ll", "st antitop", "st top"],
         },
         "WZG":{
-            "name":["WZG"],
+            "name":["wzg"],
         },
     }
     
@@ -98,8 +98,6 @@ if __name__ == '__main__':
             #             hist_temp_down.Add(hist_list[cate]["hists_up"][i])
             #         hist_temp
             for cate in hist_list:
-                del hist_temp_up
-                del hist_temp_down
                 if len(hist_list[cate]["hists_up"]) == 0:
                     hist_temp_up = ROOT.TH1D()
                     hist_temp_down= ROOT.TH1D()
@@ -116,9 +114,9 @@ if __name__ == '__main__':
                     hist_temp_down.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Down')
                     hist_temp_down.Write()
                 else:
-                    hist_temp_up.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Up_{corr_suffix(year)}')
+                    hist_temp_up.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}_{corr_suffix(year)}Up')
                     hist_temp_up.Write()
-                    hist_temp_down.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}Down_{corr_suffix(year)}')
+                    hist_temp_down.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}_{corr_suffix(year)}Down')
                     hist_temp_down.Write()
 
 
@@ -132,7 +130,27 @@ if __name__ == '__main__':
             del hist_list
 
     for branch_name in branch:
+        hist_list = deepcopy(hist_list_sample)
         plot_branch = branch[branch_name]["name"]
+        for cate in hist_list:
+            hist_list[cate]["hists_None"] = []
+        for file in filelist_MC:
+            hist_temp = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_None')
+            for cate in hist_list:
+                if filelist_MC[file]["name"].lower() in hist_list[cate]["name"]:
+                    hist_list[cate]["hists_None"].append(hist_temp)
+        for cate in hist_list:
+            del hist_temp
+            if len(hist_list[cate]["hists_None"]) == 0:
+                hist_temp = ROOT.TH1D()
+            else:
+                hist_temp = hist_list[cate]["hists_None"][0].Clone()
+                for i in range(1,len(hist_list[cate]["hists_None"])):
+                    hist_temp.Add(hist_list[cate]["hists_None"][i])
+            hist_temp.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_None')
+            hist_temp.Write()
+        del hist_list
+            
         hist_data = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_data_None')
         hist_data.SetName(f'{channel_map[channel]}_{plot_branch}_data_obs_None')
         hist_data.Write()
@@ -142,7 +160,7 @@ if __name__ == '__main__':
         hist_FakeLep.Write()
         for suffix in ['Up','Down']:
             hist_FakeLep = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakeLep_fakerate{suffix}')
-            hist_FakeLep.SetName(f'{channel_map[channel]}_{plot_branch}_FakeLep_fakerate{suffix}')
+            hist_FakeLep.SetName(f'{channel_map[channel]}_{plot_branch}_FakeLep_fakerate_{corr_suffix(year)}{suffix}')
             hist_FakeLep.Write()
 
         hist_FakePho = file_hist.Get(f'{channel_map[channel]}_{plot_branch}_FakePho_None')

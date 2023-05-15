@@ -62,10 +62,10 @@ branch = {
     "ZGJ_mlla":{
         "name":"ZGJ_mlla",
         "axis_name":"m_{ll#gamma} [GeV]",
-        # "bin_array":[100,150,200,300,500],
-        "xbins":100,
-        "xleft":0,
-        "xright":500,
+        "bin_array":[100,150,200,300,500],
+        # "xbins":100,
+        # "xleft":0,
+        # "xright":500,
     },
     "ZGJ_lepton1_pt":{
         "name":"ZGJ_lepton1_pt",

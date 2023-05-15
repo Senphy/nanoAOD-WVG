@@ -6,11 +6,13 @@ FakeLep,lnN,,1.3,,,,,
 FakePho,lnN,,,1.3,,,,
 HLT_method_sys,lnN,1.01,,,1.01,1.01,1.01,1.01
 HLT_stat_18,lnN,1.002,,,1.002,1.002,1.002,1.002
-
-jesTotal,shape,1.000,,,1.000,1.000,1.000,1.000
-jer,shape,1.000,,,1.000,1.000,1.000,1.000
+jesTotal_18,shape,1.000,,,1.000,1.000,1.000,1.000
+jer_18,shape,1.000,,,1.000,1.000,1.000,1.000
 Muon_ID_Weight,shape,1.000,,,1.000,1.000,1.000,1.000
 Electron_ID_Weight,shape,1.000,,,1.000,1.000,1.000,1.000
 Electron_RECO_Weight,shape,1.000,,,1.000,1.000,1.000,1.000
 puWeight,shape,1.000,,,1.000,1.000,1.000,1.000
-l1pref,shape,1.000,,,1.000,1.000,1.000,1.000
+btagWeight_bc_corr,shape,1.000,,,1.000,1.000,1.000,1.000
+btagWeight_l_corr,shape,1.000,,,1.000,1.000,1.000,1.000
+btagWeight_bc_uncorr_18,shape,1.000,,,1.000,1.000,1.000,1.000
+btagWeight_l_uncorr_18,shape,1.000,,,1.000,1.000,1.000,1.000

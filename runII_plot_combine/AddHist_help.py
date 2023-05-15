@@ -168,7 +168,7 @@ def channel_cut(channel, arrays):
         # sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105 & nbJets>0'
         # sel = '(ZGJ_mlla<75 | ZGJ_mlla>105) & (ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105)'
         # sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182) & ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
-        sel = '(ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105) & ZGJ_photon_pt>20'
+        sel = '(ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105) & ZGJ_photon_pt>20 & nbJets>0'
         arrays = arrays.query(sel)
         pass
 
@@ -460,6 +460,8 @@ def AddHist_FakeLepton(file, hist, isData, xsec, lumi, channel, branch, year='20
         for branch_name in branch:
             for i in trange(0, len(arrays[branch[branch_name]["name"]]), desc=f'fill {branch[branch_name]["name"]} for {file}'):
                 hist[branch_name].Fill(float(arrays[branch[branch_name]["name"]].values[i]), float(arrays['fake_lepton_weight'].values[i]))
+                hist[f'{branch_name}_fakerateUp'].Fill(float(arrays[branch[branch_name]["name"]].values[i]), float(arrays['fake_lepton_weight_up'].values[i]))
+                hist[f'{branch_name}_fakerateDown'].Fill(float(arrays[branch[branch_name]["name"]].values[i]), float(arrays['fake_lepton_weight_down'].values[i]))
             print (f"SumOfWeights for {branch_name}: ", hist[branch_name].GetSumOfWeights())
     else:
         arrays = lep_gen_cut(channel, arrays)

@@ -40,7 +40,7 @@ class region_combine():
             self.processes.append(f'{self.region_name}_{self.variable}_{process}_None')
             self.processes_abrev.append(f'{process}')
             self.printlength = max(self.printlength, len(process))
-        self.df_nominal = uproot.open(f'{self.file_name}')
+        self.df_nominal = uproot.open(f'store/{self.file_name}')
 
     def cal_ijk(self, f):
         self.jmax = len(self.processes)-1
@@ -53,7 +53,7 @@ class region_combine():
     def cal_shape_input(self, f):
         #*FIXME* Only support one shape source currently#
         # shapes [process] [channel] [file] [histogram] [histogram_with_systematics]
-        shape_string = f'shapes * {self.region_plotname} {self.region_name}_{self.tag}.root {self.region_name}_{self.variable}_$PROCESS_None {self.region_name}_{self.variable}_$PROCESS_$SYSTEMATIC'
+        shape_string = f'shapes * {self.region_plotname} store/{self.file_name} {self.region_name}_{self.variable}_$PROCESS_None {self.region_name}_{self.variable}_$PROCESS_$SYSTEMATIC'
         f.write(f'{shape_string}\n')
         f.write('----------\n')
 
@@ -99,7 +99,7 @@ class region_combine():
             row_string += f'{self.df_unc.iloc[row, 1].ljust(self.printlength)}'
             if str(self.df_unc.iloc[row, 1]).lower() in ['lnn','shape']:
                 for i in range(len(self.df_unc.iloc[row, 2:])):
-                    para = str(self.df_unc.iloc[row, i+2])
+                    para = str(self.df_unc.iloc[row, i+2])[0:5]
                     if para == 'nan':
                         row_string += '-'.ljust(self.printlength)
                     else:
@@ -114,6 +114,7 @@ class region_combine():
             f.write(f'{temp_rate.ljust(self.printlength)}{"rateParam".ljust(self.printlength)}')
             for temp_para in self.jsons['rateParam'][temp_rate]:
                 f.write(f'{temp_para.ljust(self.printlength)}')
+            f.write('\n')
         f.write('\n')
 
 
@@ -158,7 +159,7 @@ if __name__ == '__main__':
         json.dump(cards_map, f)
 
     cards = ''
-    with open('cards_map_2018.json', 'r') as f:
+    with open(f'cards_map_{jsons["utils"]["tag"]}.json', 'r') as f:
         jsons_map = json.load(f)
     for region in jsons_map:
         logging.info('Preparing cards for region {region}'.format(region=region))
