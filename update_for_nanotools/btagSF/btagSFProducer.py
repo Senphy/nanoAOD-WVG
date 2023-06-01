@@ -229,7 +229,11 @@ class btagSFProducer(Module):
         # define systematic uncertainties
         self.systs = []
         self.systs.append("up")
+        self.systs.append("up_correlated")
+        self.systs.append("up_uncorrelated")
         self.systs.append("down")
+        self.systs.append("down_correlated")
+        self.systs.append("down_uncorrelated")
         self.central_and_systs = ["central"]
         self.central_and_systs.extend(self.systs)
 
