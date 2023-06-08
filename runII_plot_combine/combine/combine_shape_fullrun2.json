@@ -1,0 +1,178 @@
+{
+    "utils":{
+        "imax":1,
+        "autoMCStats_threshold":10000000,
+        "tag":"fullrun2"
+    },
+
+    "regions":{
+        "CR_1_2016":{
+            "final_name":"CR1_2016",
+            "region_name":"ttZ",
+            "file_name":"ttZ_2016.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ttZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape_16.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_2_2016":{
+            "final_name":"CR2_2016",
+            "region_name":"ZGJ",
+            "file_name":"ZGJ_2016.root",
+            "bin_array":[100,150,200,300,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"ZGJ_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape_16.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_3_2016":{
+            "final_name":"CR3_2016",
+            "region_name":"ZZ",
+            "file_name":"ZZ_2016.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ZZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape_16.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "SR_1_2016":{
+            "final_name":"SR_2016",
+            "region_name":"WZG",
+            "file_name":"WZG_2016.root",
+            "bin_array":[80,150,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"WZG_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape_16.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_1_2017":{
+            "final_name":"CR1_2017",
+            "region_name":"ttZ",
+            "file_name":"ttZ_2017.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ttZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape_17.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_2_2017":{
+            "final_name":"CR2_2017",
+            "region_name":"ZGJ",
+            "file_name":"ZGJ_2017.root",
+            "bin_array":[100,150,200,300,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"ZGJ_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape_17.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_3_2017":{
+            "final_name":"CR3_2017",
+            "region_name":"ZZ",
+            "file_name":"ZZ_2017.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ZZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape_17.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "SR_1_2017":{
+            "final_name":"SR_2017",
+            "region_name":"WZG",
+            "file_name":"WZG_2017.root",
+            "bin_array":[80,150,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"WZG_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape_17.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_1_2018":{
+            "final_name":"CR1_2018",
+            "region_name":"ttZ",
+            "file_name":"ttZ_2018.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ttZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape_18.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_2_2018":{
+            "final_name":"CR2_2018",
+            "region_name":"ZGJ",
+            "file_name":"ZGJ_2018.root",
+            "bin_array":[100,150,200,300,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"ZGJ_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape_18.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "CR_3_2018":{
+            "final_name":"CR3_2018",
+            "region_name":"ZZ",
+            "file_name":"ZZ_2018.root",
+            "bin_array":[100, 150, 200, 250, 300, 500],
+            "processes":["WZG","VV","VVV","Top","FakeLep"],
+            "variable":"ZZ_trileptonmass",
+            "variable_storename":"mWZ",
+            "variable_plotname":"m_{lll} [GeV]",
+            "csv":"combine_CR_shape_18.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        },
+        "SR_1_2018":{
+            "final_name":"SR_2018",
+            "region_name":"WZG",
+            "file_name":"WZG_2018.root",
+            "bin_array":[80,150,500],
+            "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
+            "variable":"WZG_mlla",
+            "variable_storename":"mlla",
+            "variable_plotname":"m_{ll#gamma} [GeV]",
+            "csv":"combine_SR_shape_18.csv",
+            "rateParam":{
+                "VV_Norm":["*","VV","1.0","[0,2]",""]
+            }
+        }
+    }
+}

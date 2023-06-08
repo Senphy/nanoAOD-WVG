@@ -4,6 +4,7 @@ import os,sys
 import argparse
 from array import array
 import time
+from math import sqrt
 
 sys.path.append(os.getcwd())
 sys.path.append('..')
@@ -13,7 +14,7 @@ from AddHist_help import SetHistStyle
 from ratio import createRatio
         
 parser = argparse.ArgumentParser(description='plot input')
-parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2017','2018'])
+parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018'])
 parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG'], default='ttZ')
 parser.add_argument('-m', dest='mode', choices=['local','condor'], default='local')
 parser.add_argument('-o', dest='overflow', action='store_true', default=False)
@@ -21,7 +22,8 @@ args = parser.parse_args()
 
 def AddOverflow(hist):
     nx_over = hist.GetNbinsX() + 1
-    hist.Fill(hist.GetBinCenter(nx_over-1), hist.GetBinContent(nx_over))
+    hist.SetBinContent(nx_over-1, hist.GetBinContent(nx_over-1)+hist.GetBinContent(nx_over))
+    hist.SetBinError(nx_over-1, sqrt(hist.GetBinContent(nx_over-1)*hist.GetBinContent(nx_over-1)+hist.GetBinContent(nx_over)*hist.GetBinContent(nx_over)))
     return hist
 
 def Plot(year='2018', region='WZG', overflow=False, **kwargs):

@@ -529,15 +529,23 @@ class WZG_plot():
             for branch_name in self.branch:
                 if self.branch[branch_name].__contains__('bin_array'):
                     h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_lepton_weight'],histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_lepton_weight_up'],histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_lepton_weight_down'],histogram=bh.Histogram, storage=bh.storage.Weight())
                 else:
                     xbins = self.branch[branch_name]['xbins']
                     xleft = self.branch[branch_name]['xleft']
                     xright = self.branch[branch_name]['xright']
                     h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_lepton_weight'],histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_lepton_weight_up'],histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_lepton_weight_down'],histogram=bh.Histogram, storage=bh.storage.Weight())
                 if f'{branch_name}' in hists.keys():
                     hists[branch_name] += h_temp
+                    hists[f'{branch_name}_fakerateUp'] += h_temp_up
+                    hists[f'{branch_name}_fakerateDown'] += h_temp_down
                 else:
                     hists[branch_name] = deepcopy(h_temp)
+                    hists[f'{branch_name}_fakerateUp'] = deepcopy(h_temp_up)
+                    hists[f'{branch_name}_fakerateDown'] = deepcopy(h_temp_down)
                 del h_temp
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
@@ -551,20 +559,28 @@ class WZG_plot():
             unc_nom_list = set([self.unc_map[x]['Nom'] for x in self.unc_map])
             for unc in unc_nom_list:
                 df['unc_product'] *= df[f'{unc}']
-            df['true_weight'] = df['unc_product'] * self.lumi * xsec * 1000 * df['Generator_weight_sgn'] * df['fake_lepton_weight']/ true_events
+            df['true_weight'] = df['unc_product'] * self.lumi * xsec * 1000 * df['Generator_weight_sgn'] / true_events
 
             for branch_name in self.branch:
                 if self.branch[branch_name].__contains__('bin_array'):
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight'] * df['fake_lepton_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight'] * df['fake_lepton_weight_up'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight'] * df['fake_lepton_weight_down'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 else:
                     xbins = self.branch[branch_name]['xbins']
                     xleft = self.branch[branch_name]['xleft']
                     xright = self.branch[branch_name]['xright']
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_lepton_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_lepton_weight_up'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_lepton_weight_down'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 if f'{branch_name}' in hists.keys():
                     hists[branch_name] += h_temp
+                    hists[f'{branch_name}_fakerateUp'] += h_temp_up
+                    hists[f'{branch_name}_fakerateDown'] += h_temp_down
                 else:
                     hists[branch_name] = deepcopy(h_temp)
+                    hists[f'{branch_name}_fakerateUp'] = deepcopy(h_temp_up)
+                    hists[f'{branch_name}_fakerateDown'] = deepcopy(h_temp_down)
                 del h_temp
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
@@ -712,11 +728,13 @@ class WZG_plot():
                         output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Up'] = self.branch[branch_name]['hists'][group][f'{unc}Up']
                         output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Down'] = self.branch[branch_name]['hists'][group][f'{unc}Down']
                     else:
-                        output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Up_{year_suffix}'] = self.branch[branch_name]['hists'][group][f'{unc}Up']
-                        output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Down_{year_suffix}'] = self.branch[branch_name]['hists'][group][f'{unc}Down']
+                        output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}_{year_suffix}Up'] = self.branch[branch_name]['hists'][group][f'{unc}Up']
+                        output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}_{year_suffix}Down'] = self.branch[branch_name]['hists'][group][f'{unc}Down']
 
             # store fakelep
             output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_None'] = hists_flep[branch_name]
+            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_fakerate_{year_suffix}Up'] = hists_flep[f'{branch_name}_fakerateUp']
+            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_fakerate_{year_suffix}Down'] = hists_flep[f'{branch_name}_fakerateDown']
 
             if self.channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
                 # store fakepho
@@ -884,9 +902,9 @@ class WZG_plot():
                 hists_flep = self.AddHist_FakeLep(self.filelist_MC[file]['path'], hists=hists_flep, isData=False, xsec=self.filelist_MC[file]['xsec'])
             if self.channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
                 for file in self.filelist_data:
-                    hists_fpho = self.AddHist_FakeLep(file, hists=hists_fpho, isData=True)
+                    hists_fpho = self.AddHist_FakePho(file, hists=hists_fpho, isData=True)
                 for file in self.filelist_MC:
-                    hists_fpho = self.AddHist_FakeLep(self.filelist_MC[file]['path'], hists=hists_fpho, isData=False, xsec=self.filelist_MC[file]['xsec'])
+                    hists_fpho = self.AddHist_FakePho(self.filelist_MC[file]['path'], hists=hists_fpho, isData=False, xsec=self.filelist_MC[file]['xsec'])
             self.hist_store(hists_data=hists_data, hists_mc=hists_mc, hists_flep=hists_flep, hists_fpho=hists_fpho)
         else:
             file = uproot.open(f'{self.year}/{self.region}_{self.year}.root')
@@ -901,7 +919,7 @@ class WZG_plot():
                 for group in self.plot_groups:
                     hists_mcgroup[f'{group}'][f'{branch_name}'] = file[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_None'].to_boost()
 
-            self.plot(hists_data=hists_data, hists_mcgroup=hists_mcgroup, hists_flep=hists_flep, hists_fpho=hists_fpho)
+            self.plot(hists_data=hists_data, hists_mcgroup=hists_mcgroup, hists_flep=hists_flep, hists_fpho=hists_fpho, flow='none')
 
 
 if __name__ == '__main__':

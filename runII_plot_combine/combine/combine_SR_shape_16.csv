@@ -13,7 +13,3 @@ Electron_ID_Weight,shape,1.000,,,1.000,1.000,1.000,1.000
 Electron_RECO_Weight,shape,1.000,,,1.000,1.000,1.000,1.000
 puWeight,shape,1.000,,,1.000,1.000,1.000,1.000
 l1pref,shape,1.000,,,1.000,1.000,1.000,1.000
-btagWeight_bc_corr,shape,1.000,,,1.000,1.000,1.000,1.000
-btagWeight_l_corr,shape,1.000,,,1.000,1.000,1.000,1.000
-btagWeight_bc_uncorr_16,shape,1.000,,,1.000,1.000,1.000,1.000
-btagWeight_l_uncorr_16,shape,1.000,,,1.000,1.000,1.000,1.000

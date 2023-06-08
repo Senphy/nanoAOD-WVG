@@ -55,6 +55,9 @@ class region_combine():
         # shapes [process] [channel] [file] [histogram] [histogram_with_systematics]
         shape_string = f'shapes * {self.region_plotname} store/{self.file_name} {self.region_name}_{self.variable}_$PROCESS_None {self.region_name}_{self.variable}_$PROCESS_$SYSTEMATIC'
         f.write(f'{shape_string}\n')
+        # f.write('----------\n')
+        data_shape_string = f'shapes data_obs {self.region_plotname} store/{self.file_name} {self.region_name}_{self.variable}_data_None'
+        f.write(f'{data_shape_string}\n')
         f.write('----------\n')
 
     def cal_observation(self, f):
@@ -64,11 +67,11 @@ class region_combine():
         for process in self.processes:
             temp_sum = self.df_nominal[f'{process}'].to_hist().sum()
             if type(temp_sum) == float:
-                self.rate.append(temp_sum)
-                self.obs += temp_sum
+                self.rate.append(max(temp_sum,0))
+                self.obs += max(temp_sum,0)
             else:
-                self.rate.append(temp_sum.value)
-                self.obs += temp_sum.value
+                self.rate.append(max(temp_sum.value,0))
+                self.obs += max(temp_sum.value,0)
         # obs_string = f'observation \t {str(Decimal(str(self.obs)).quantize(Decimal("0.001")))}'
         obs_string = f'observation \t -1'
         f.write(f'{bin_string}\n')
@@ -174,12 +177,12 @@ if __name__ == '__main__':
 combine -M Significance --expectSignal=1 -t -1 {name}_shape.txt > result_{name}.txt
 combine -M Significance --expectSignal=1 -t -1 {name}_shape.txt --freezeParameters all > result_freezeAll{name}.txt
 
-combine -M FitDiagnostics -t -1 --expectSignal=1 -d {name}_shape.txt -m 125 --saveShapes --saveWithUncertainties
-text2workspace.py {name}_shape.txt -m 125
-combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --doInitialFit --robustFit 1
-combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --robustFit 1 --doFits --parallel 4
-combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 -o impacts_{name}.json
-plotImpacts.py -i impacts_{name}.json -o impacts_{name}
+# combine -M FitDiagnostics -t -1 --expectSignal=1 -d {name}_shape.txt -m 125 --saveShapes --saveWithUncertainties
+# text2workspace.py {name}_shape.txt -m 125
+# combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --doInitialFit --robustFit 1
+# combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --robustFit 1 --doFits --parallel 4
+# combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 -o impacts_{name}.json
+# plotImpacts.py -i impacts_{name}.json -o impacts_{name}
     '''
 
     os.system(codes.format(name=args.output_card))
