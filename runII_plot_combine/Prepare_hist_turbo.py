@@ -373,7 +373,9 @@ class WZG_plot():
         for branch_name in self.branch:
             if self.branch[branch_name]['name'] not in init_branches:
                 init_branches.append(self.branch[branch_name]['name'])
+        time_IO = time.time()
         df = uproot.open(f'{file}:Events').arrays(init_branches, library='pd')
+        print(f'IO: {"{:2f}".format(str(time.time-time_IO))}s')
         df = self.HLT_cut(file, df)
         df = self.channel_cut(df)
         region_cut = df.loc[:,'region_mark'] == 1
@@ -422,34 +424,16 @@ class WZG_plot():
                 df['unc_product'] *= df[f'{unc}']
             df['true_weight'] = df['unc_product'] * self.lumi * xsec * 1000 * df['Generator_weight_sgn'] / true_events
 
-            for unc in self.unc_map:
-                unc_else = unc_nom_list - set([self.unc_map[unc]['Nom']])
-                df['temp_unc_product'] = 1.0
-                for unc_temp in unc_else:
-                    df['temp_unc_product'] *= df[f'{unc_temp}']
-                df[f'{unc}Up'] = df['temp_unc_product'] * df[self.unc_map[unc]['Up']] * df['Generator_weight_sgn'] * self.lumi * xsec * 1000 / true_events
-                df[f'{unc}Down'] = df['temp_unc_product'] * df[self.unc_map[unc]['Down']] * df['Generator_weight_sgn'] * self.lumi * xsec * 1000 / true_events
-            
-            df_special = deepcopy(df)
-            if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] > 30)
-                df = df.loc[MET_cut,:].copy()
-            elif self.channel in [5,6,7,8,9,30,31,32]:
-                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] <= 30)
-                df = df.loc[MET_cut,:].copy()
-            else:
-                df = df.copy()
-
             # special treatment for jes/jer (MET cut related)
             for unc in self.unc_special_map:
                 for suffix in ['Up', 'Down']:
                     if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                        MET_special_cut = (df_special.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] > 30)
+                        MET_special_cut = (df.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] > 30)
                     elif self.channel in [5,6,7,8,9,30,31,32]:
-                        MET_special_cut = (df_special.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] <= 30)
+                        MET_special_cut = (df.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] <= 30)
                     else:
                         MET_special_cut = None
-                    df_special = df_special.loc[MET_special_cut,:].copy()
+                    df_special = df.loc[MET_special_cut,:].copy()
                     for branch_name in self.branch:
                         if self.branch[branch_name].__contains__('bin_array'):
                             h_temp = bh.numpy.histogram(df_special[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df_special['true_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
@@ -460,7 +444,24 @@ class WZG_plot():
                             h_temp = bh.numpy.histogram(df_special[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df_special['true_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
                         hists[f'{branch_name}_{unc}{suffix}'] = deepcopy(h_temp)
                         del h_temp
+                    del df_special
 
+            if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
+                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] > 30)
+                df = df.loc[MET_cut,:].copy()
+            elif self.channel in [5,6,7,8,9,30,31,32]:
+                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] <= 30)
+                df = df.loc[MET_cut,:].copy()
+            else:
+                df = df.copy()
+
+            for unc in self.unc_map:
+                unc_else = unc_nom_list - set([self.unc_map[unc]['Nom']])
+                df['temp_unc_product'] = 1.0
+                for unc_temp in unc_else:
+                    df['temp_unc_product'] *= df[f'{unc_temp}']
+                df[f'{unc}Up'] = df['temp_unc_product'] * df[self.unc_map[unc]['Up']] * df['Generator_weight_sgn'] * self.lumi * xsec * 1000 / true_events
+                df[f'{unc}Down'] = df['temp_unc_product'] * df[self.unc_map[unc]['Down']] * df['Generator_weight_sgn'] * self.lumi * xsec * 1000 / true_events
 
             # Fill hist
             for branch_name in self.branch:
@@ -587,10 +588,10 @@ class WZG_plot():
 
     def AddHist_FakePho(self, file, hists={}, isData=True, xsec=0, **kwargs):
         time_init = time.time()
-        init_branches = ['fake_photon_weight',
-                        'WZG_photon_genPartFlav','WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
-                        'ttG_photon_genPartFlav','ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
-                        'ZGJ_photon_genPartFlav','ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
+        init_branches = ['fake_photon_weight', \
+                        'WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
+                        'ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
+                        'ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
                         ]
         init_branches = self.init_branch(init_branches)
 
@@ -720,7 +721,6 @@ class WZG_plot():
                 '2018':'18',
             }
             year_suffix = year_suffix_map[self.year]
-            suffix_list = ['Nom']
             for group in self.plot_groups:
                 output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_None'] = self.branch[branch_name]['hists'][group]['Nom']
                 for unc in unc_total:
