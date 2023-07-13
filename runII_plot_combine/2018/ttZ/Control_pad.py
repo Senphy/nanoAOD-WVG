@@ -57,7 +57,7 @@ branch = {
     },
     "ttZ_trileptonmass":{
         "name":"ttZ_trileptonmass",
-        "axis_name":"m_{lll} [GeV]",
+        "axis_name":"$m_{lll}$ [GeV]",
         "bin_array":[100,150,200,250,300,500],
     },
     "ttZ_lepton1_pt":{

@@ -8,6 +8,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.countHistogramsModu
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.FakeLep_Apply_weight_Template_Module import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.FakePho_Apply_weight_Template_Module import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.btagWeightProducer_1a import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.theory_unc_Producer import *
 
 import argparse
 import re
@@ -17,13 +19,20 @@ import optparse
 parser = argparse.ArgumentParser(description='create attachment NanoAOD-like fake lepton result')
 parser.add_argument('-f', dest='file', default='', help='File input')
 parser.add_argument('-y', dest='year', default='2018', help='year')
+parser.add_argument('-d', dest='isdata', action='store_true', default=False, help='isdata')
 args = parser.parse_args()
 
 if args.year == '2018':
     Modules = [ApplyWeightFakeLeptonModule_18(),ApplyWeightFakePhotonModule18()]
 elif args.year == '2017':
     Modules = [ApplyWeightFakeLeptonModule_17(),ApplyWeightFakePhotonModule17()]
+elif args.year == '2016Pre' or args.year == '2016Post':
+    Modules = [ApplyWeightFakeLeptonModule_16(),ApplyWeightFakePhotonModule16()]
     
+if not args.isdata:
+    Modules.append(btagWeight_1a_Module())
+    Modules.append(theory_unc_Module())
+
 infilelist = [args.file]
 jsoninput = None
 fwkjobreport = False
