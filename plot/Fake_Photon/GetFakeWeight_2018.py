@@ -215,18 +215,6 @@ def AddHist_data(file, hist, ptrange, isbarrel):
     HLT_MuonEG1 = branches.loc[:,'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ'] == True
     HLT_MuonEG2 = branches.loc[:,'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL'] == True
     
-#     if 'SingleMuon' in file:
-#         arrays = branches.loc[HLT_SingleMuon, :].copy()
-#     elif 'DoubleMuon' in file:
-#         arrays = branches.loc[~HLT_SingleMuon & HLT_DoubleMuon, :].copy()
-# #         2018 is special
-#     elif 'EGamma' in file:
-#         arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon &   (HLT_EGamma | HLT_DoubleEG) ,:].copy()
-#     elif 'MuonEG' in file:
-#         arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon &  ~(HLT_EGamma | HLT_DoubleEG) & (HLT_MuonEG1 | HLT_MuonEG2),:].copy()
-#     else:
-#         arrays = branches.loc[HLT_SingleMuon | HLT_DoubleMuon |  HLT_EGamma | HLT_DoubleEG | HLT_MuonEG1 | HLT_MuonEG2,:].copy()
-        
     if 'DoubleMuon' in file:
         arrays = branches.loc[HLT_DoubleMuon, :].copy()
 #         2018 is special
@@ -240,15 +228,15 @@ def AddHist_data(file, hist, ptrange, isbarrel):
         eta_cut = abs((arrays.loc[:,'photon_eta']) > 1.566) & abs((arrays.loc[:,'photon_eta']) < 2.5)
 #         chg_cut = (arrays.loc[:,'photon_pfRelIso03_chg']*arrays.loc[:,'photon_pt']) < 1.051
         
-    mask_mediumID_withoutsieie = (1<<1) | (1<<3) | (1<<5) | (1<<9) | (1<<11) | (1<<13)
-    arrays['mediumID'] = arrays['photon_vidNestedWPBitmap'] & mask_mediumID_withoutsieie
-    arrays = arrays.loc[arrays.loc[:,'mediumID'] == mask_mediumID_withoutsieie, :]
+    mask_mediumID = (1<<1) | (1<<3) | (1<<5) | (1<<7) |(1<<9) | (1<<11) | (1<<13)
+    arrays['mediumID'] = arrays['photon_vidNestedWPBitmap'] & mask_mediumID
+    arrays = arrays.loc[arrays.loc[:,'mediumID'] == mask_mediumID, :]
     
     pt_cut = (arrays.loc[:,'photon_pt'] >= ptrange[0]) & (arrays.loc[:,'photon_pt'] < ptrange[1]) 
     arrays = arrays.loc[pt_cut & eta_cut,:]
     
-    for i in trange(0, len(arrays['photon_sieie']), desc=f'fill sigma ieta ieta for {file}'):
-        hist.Fill(float(arrays['photon_sieie'].values[i]))
+    for i in trange(0, len(arrays['photon_pt']), desc=f'fill pt for {file}'):
+        hist.Fill(float(arrays['photon_pt'].values[i]))
     
     
 def AddHist_mcTruth(file, hist, ptrange, isbarrel, xsec, lumi):
@@ -265,25 +253,32 @@ def AddHist_mcTruth(file, hist, ptrange, isbarrel, xsec, lumi):
     # arrays = branches.loc[HLT_SingleMuon | HLT_DoubleMuon |  HLT_EGamma | HLT_DoubleEG | HLT_MuonEG1 | HLT_MuonEG2,:].copy()
     arrays = branches.loc[HLT_DoubleMuon |  HLT_EGamma | HLT_DoubleEG ,:].copy()
     
+    mask_mediumID = (1<<1) | (1<<3) | (1<<5) | (1<<7) | (1<<9) | (1<<11) | (1<<13)
+    mask_invert_IsoChg = (1<<1) | (1<<3) | (1<<5) | (1<<7) | (1<<11) | (1<<13)
+    mask_invert_sieie  = (1<<1) | (1<<3) | (1<<5) | (1<<9)  | (1<<11) | (1<<13)
+
+    arrays['mediumID'] = arrays['photon_vidNestedWPBitmap'] & mask_mediumID
+
+    # case I cut fail sieie or IsoChg in medium cut
+    cut_fail_IsoChg = (arrays.loc[:,'mediumID'] == mask_invert_IsoChg)
+    cut_fail_Sieie  = (arrays.loc[:,'mediumID'] == mask_invert_sieie)
+    cut_fail_medium = cut_fail_IsoChg | cut_fail_Sieie
+    
+    arrays = arrays.loc[cut_fail_medium, :]
+    
     if isbarrel == 1:
         eta_cut = abs(arrays.loc[:,'photon_eta']) < 1.4442
     elif isbarrel == 0:
         eta_cut = abs((arrays.loc[:,'photon_eta']) > 1.566) & abs((arrays.loc[:,'photon_eta']) < 2.5)
-        
-    mask_mediumID_withoutsieie = (1<<1) | (1<<3) | (1<<5) | (1<<9) | (1<<11) | (1<<13)
-    arrays['mediumID'] = arrays['photon_vidNestedWPBitmap'] & mask_mediumID_withoutsieie
-    arrays = arrays.loc[arrays.loc[:,'mediumID'] == mask_mediumID_withoutsieie, :]
-    
     pt_cut = (arrays.loc[:,'photon_pt'] >= ptrange[0]) & (arrays.loc[:,'photon_pt'] < ptrange[1]) 
     gen_cut = arrays.loc[:,'photon_genPartFlav'] != 0
     arrays = arrays.loc[pt_cut & eta_cut & gen_cut,:]
     
     arrays['Generator_weight_sgn'] = arrays['Generator_weight'].apply(lambda x: 1 if x >= 0 else -1)
-    arrays['true_weight'] = lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
+    arrays['true_weight'] = -1 * lumi * xsec * 1000 * arrays['Generator_weight_sgn'] / true_events
     
-    for i in trange(0, len(arrays['photon_sieie']), desc=f'fill sigma ieta ieta for {file}'):
-        hist.Fill(float(arrays['photon_sieie'].values[i]), float(arrays['true_weight'].values[i]))
-        
+    for i in trange(0, len(arrays['photon_pt']), desc=f'fill pt for {file}'):
+        hist.Fill(float(arrays['photon_pt'].values[i]), float(arrays['true_weight'].values[i]))
     
 def AddHist_dataFake(file, hist, ptrange, isbarrel):
     branches = uproot.open(file+':Events').arrays(['HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL','HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL','HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8','HLT_Ele32_WPTight_Gsf','HLT_IsoMu24','photon_sieie','photon_vidNestedWPBitmap','photon_eta','photon_pt','photon_pfRelIso03_chg'], library='pd')
@@ -295,35 +290,38 @@ def AddHist_dataFake(file, hist, ptrange, isbarrel):
     HLT_MuonEG1 = branches.loc[:,'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ'] == True
     HLT_MuonEG2 = branches.loc[:,'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL'] == True
     
-#     if 'SingleMuon' in file:
-#         arrays = branches.loc[HLT_SingleMuon, :].copy()
-#     elif 'DoubleMuon' in file:
-#         arrays = branches.loc[~HLT_SingleMuon & HLT_DoubleMuon, :].copy()
-# #         2018 is special
-#     elif 'EGamma' in file:
-#         arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon &   (HLT_EGamma | HLT_DoubleEG) ,:].copy()
-#     elif 'MuonEG' in file:
-#         arrays = branches.loc[~HLT_SingleMuon & ~HLT_DoubleMuon &  ~(HLT_EGamma | HLT_DoubleEG) & (HLT_MuonEG1 | HLT_MuonEG2),:].copy()
-#     else:
-#         arrays = branches.loc[HLT_SingleMuon | HLT_DoubleMuon |  HLT_EGamma | HLT_DoubleEG | HLT_MuonEG1 | HLT_MuonEG2,:].copy()
-        
     if 'DoubleMuon' in file:
         arrays = branches.loc[HLT_DoubleMuon, :].copy()
 #         2018 is special
     elif 'EGamma' in file:
         arrays = branches.loc[~HLT_DoubleMuon & (HLT_EGamma | HLT_DoubleEG) ,:].copy()
 
+    mask_mediumID = (1<<1) | (1<<3) | (1<<5) | (1<<7) | (1<<9) | (1<<11) | (1<<13)
+    mask_invert_IsoChg = (1<<1) | (1<<3) | (1<<5) | (1<<7) | (1<<11) | (1<<13)
+    mask_invert_sieie  = (1<<1) | (1<<3) | (1<<5) | (1<<9)  | (1<<11) | (1<<13)
+
+    arrays['mediumID'] = arrays['photon_vidNestedWPBitmap'] & mask_mediumID
+
+    # case I cut fail sieie or IsoChg in medium cut
+    cut_fail_IsoChg = (arrays.loc[:,'mediumID'] == mask_invert_IsoChg)
+    cut_fail_Sieie  = (arrays.loc[:,'mediumID'] == mask_invert_sieie)
+    cut_fail_medium = cut_fail_IsoChg | cut_fail_Sieie
+
+    # case II cut fail one of medium cut
+    #cut_fail_medium = (arrays.loc[:,'mediumID'] != mask_mediumID)
+
+    arrays = arrays.loc[cut_fail_medium, :]
     if isbarrel == 1:
         eta_cut = abs(arrays.loc[:,'photon_eta']) < 1.4442
     elif isbarrel == 0:
         eta_cut = abs((arrays.loc[:,'photon_eta']) > 1.566) & abs((arrays.loc[:,'photon_eta']) < 2.5)
         
-    chg_cut = ((arrays.loc[:,"photon_pfRelIso03_chg"]*arrays.loc[:,"photon_pt"]) > 4) & ((arrays.loc[:,"photon_pfRelIso03_chg"]*arrays.loc[:,"photon_pt"]) < 10)
+#     chg_cut = ((arrays.loc[:,"photon_pfRelIso03_chg"]*arrays.loc[:,"photon_pt"]) > 4) & ((arrays.loc[:,"photon_pfRelIso03_chg"]*arrays.loc[:,"photon_pt"]) < 10)
     pt_cut = (arrays.loc[:,'photon_pt'] >= ptrange[0]) & (arrays.loc[:,'photon_pt'] < ptrange[1]) 
-    arrays = arrays.loc[pt_cut & eta_cut & chg_cut ,:]
+    arrays = arrays.loc[pt_cut & eta_cut,:]
     
-    for i in trange(0, len(arrays['photon_sieie']), desc=f'fill sigma ieta ieta for {file}'):
-        hist.Fill(float(arrays['photon_sieie'].values[i]))
+    for i in trange(0, len(arrays['photon_pt']), desc=f'fill pt for {file}'):
+        hist.Fill(float(arrays['photon_pt'].values[i]))
         
 @numba.njit
 def sgn(num):
@@ -476,182 +474,52 @@ if __name__ == '__main__':
 
     tdrStyle.cd()
 
+    filelist_data = [
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018A_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018B_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018C_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018D_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018A_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018B_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018C_0000.root",
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018D_0000.root"
+    ]
+
+    filelist_mc = [
+        "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000.root",
+    ]
+
     # 1: barrel
     # 0: endcap
-    isbarrel = 0
+    isbarrel = 1
 
-    if isbarrel:
-        xbins = 28
-        xleft = 0.00615
-        xright = 0.02015
-        ptlist = [15, 20, 30, 50, 80, 120, 5000]
+    if isbarrel == 1:
+        xbins = [15, 20, 30, 50, 80, 120, 5000]
+        ff = [0.399, 0.268, 0.151, 0.091, 0.069, 0.102]
+        ff_unc = [0.004, 0.004, 0.003, 0.004, 0.005, 0.167]
     else:
-        xbins = 40
-        xleft = 0.0172
-        xright = 0.0572
-        ptlist = [15, 50, 5000]
+        xbins = [15, 50, 5000]
+        ff = [0.356, 0.105]
+        ff_unc = [0.007, 0.010]
 
-    for i, ptlow in enumerate(ptlist[:len(ptlist)-1]):
-        pthigh = ptlist[i+1]
-        ptrange = [ptlow,pthigh]
-        print(f'preparing for {ptrange}')
-        hist_data = ROOT.TH1F("","",xbins,xleft,xright)
-        hist_mctruth = ROOT.TH1F("","",xbins,xleft,xright)
-        hist_datafake = ROOT.TH1F("","",xbins,xleft,xright)
-        hist_data.Sumw2()
-        hist_mctruth.Sumw2()
-        hist_datafake.Sumw2()
+    from array import array
+    hist_data_plj = ROOT.TH1F("","",len(xbins)-1,array('d', xbins))
+    hist_datafake_plj = ROOT.TH1F("","",len(xbins)-1,array('d', xbins))
+    hist_data_plj.Sumw2()
+    hist_datafake_plj.Sumw2()
 
-        filelist_data = [
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018A_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018B_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018C_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/DoubleMuon_Run2018D_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018A_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018B_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018C_0000.root",
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/EGamma_Run2018D_0000.root"
-        ]
+    for file in filelist_data:
+        AddHist_data(file, hist_data_plj, [15,5000], isbarrel)
 
-        filelist_mc = [
-            "/eos/user/s/sdeng/WZG_analysis/fake_photon_template/CR/2018/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_2018_0000.root",
-        ]
+    for file in filelist_data:
+        AddHist_dataFake(file, hist_datafake_plj, [15,5000], isbarrel)
 
-        for file in filelist_data:
-            AddHist_data(file, hist_data, ptrange, isbarrel)
-        for file in filelist_mc:
-            AddHist_mcTruth(file, hist_mctruth, ptrange, isbarrel,  55.48, 59.7)
-        for file in filelist_data:
-            AddHist_dataFake(file, hist_datafake, ptrange, isbarrel)
-
-        # Observable
-        sieie = ROOT.RooRealVar("sieie","sieie",xleft,xright)
-
-        # Import hist
-        data_hist = ROOT.RooDataHist("data_hist", "data with x(sieie)", ROOT.RooArgList(sieie), ROOT.RooFit.Import(hist_data))
-        TruePhotons_hist = ROOT.RooDataHist("TruePhotons_hist", "true photons MC with x(sieie)", ROOT.RooArgList(sieie), ROOT.RooFit.Import(hist_mctruth))
-        FakePhotons_hist = ROOT.RooDataHist("FakePhotons_hist", "fake photons data with x(sieie)", ROOT.RooArgList(sieie), ROOT.RooFit.Import(hist_datafake))
-
-        ndata = hist_data.GetSumOfWeights()
-
-        # Parameters
-        # TrueFraction = ROOT.RooRealVar("TrueFraction","fraction of true photons", 0, 1)
-        # FakeFraction = ROOT.RooRealVar("FakeFraction","fraction of fake photons", 0, 1)
-
-        ntrue = ROOT.RooRealVar("true number", "true number", 0.5*ndata, 0, ndata)
-        nfake = ROOT.RooRealVar("fake number", "fake number", 0.5*ndata, 0, ndata)
-
-        # PDF
-        true_pdf = ROOT.RooHistPdf("true_pdf", "truepdf", sieie, TruePhotons_hist)
-        fake_pdf = ROOT.RooHistPdf("fake_pdf", "fakepdf", sieie, FakePhotons_hist)
-
-        etrue_pdf = ROOT.RooExtendPdf("ntrue", "ntrue", true_pdf, ntrue)
-        efake_pdf = ROOT.RooExtendPdf("nfake", "nfake", fake_pdf, nfake)
-
-        fullpdf = ROOT.RooAddPdf("fullpdf", "true plus fake", ROOT.RooArgList(etrue_pdf, efake_pdf))
-
-        # Fit
-        fullpdf.fitTo(data_hist, ROOT.RooFit.SumW2Error(True), ROOT.RooFit.Extended(True))
-
-        chi2 = ROOT.RooChi2Var("chi2", "chi2", fullpdf, data_hist)
-        chi2ToNDF = chi2.getVal() / xbins
-
-        # Plot
-        if isbarrel == 1:
-            region_mark = "Barrel"
-        else:
-            region_mark = "Endcap"
-            
-        xframe = sieie.frame(ROOT.RooFit.Title(f"{region_mark} region, {ptrange[0]} GeV < photon PT < {ptrange[1]}"), ROOT.RooFit.Bins(xbins))
-        xframe.GetXaxis().SetTitle("#sigma_{i#etai#eta}")
-        xframe.GetYaxis().SetTitle("events / bin")
-        xframe.GetYaxis().SetTitleSize(48)
-        xframe.GetYaxis().SetTitleFont(43)
-        xframe.GetYaxis().SetTitleOffset(1.50)
-        xframe.GetYaxis().SetLabelFont(43)
-        xframe.GetYaxis().SetLabelSize(28)
-        xframe.GetYaxis().SetLabelOffset(0.020)
-
-        xframe.GetXaxis().SetTitleSize(48)
-        xframe.GetXaxis().SetTitleFont(43)
-        xframe.GetXaxis().SetTitleOffset(1.3)
-        xframe.GetXaxis().SetLabelFont(43)
-        xframe.GetXaxis().SetLabelSize(28)
-        xframe.GetXaxis().SetLabelOffset(0.035)
-        xframe.GetXaxis().SetTitle("#sigma_{i#etai#eta}")
-        xframe.GetYaxis().SetTitle("events / bin")
-
-        data_hist.plotOn(xframe)
-        fullpdf.plotOn(xframe, ROOT.RooFit.Name("sum"), ROOT.RooFit.FillStyle(4100), ROOT.RooFit.FillColor(20), ROOT.RooFit.DrawOption("F"))
-        fullpdf.plotOn(xframe, ROOT.RooFit.Components("ntrue"), ROOT.RooFit.Name("true"), ROOT.RooFit.LineColor(4), ROOT.RooFit.LineStyle(9))
-        fullpdf.plotOn(xframe, ROOT.RooFit.Components("nfake"), ROOT.RooFit.Name("fake"), ROOT.RooFit.LineColor(2), ROOT.RooFit.LineStyle(9))
-        data_hist.plotOn(xframe)
-
-        c1 = ROOT.TCanvas("","",1000,1000)
-        c1.Draw()
-        xframe.Draw()
-
-        legend = ROOT.TLegend(0.55, 0.60, 0.70, 0.85)
-        legend.SetBorderSize(0)
-        legend.SetFillColor(0)
-        legend.SetTextSize(0.025)
-        legend.SetLineWidth(1)
-        legend.SetLineStyle(0)
-        legend.AddEntry(hist_data,'data template')
-        hist_fit_NaN = hist_data.Clone() # Just for plot
-        hist_fit_NaN.SetLineColor(20)
-        hist_fit_NaN.SetLineWidth(0)
-        hist_fit_NaN.SetFillColor(20)
-        hist_fit_NaN.SetMarkerStyle(0)
-        legend.AddEntry(hist_fit_NaN,'Fit result', "F")
-        legend.AddEntry(hist_mctruth,'True photons (from MC)')
-        legend.AddEntry(hist_datafake,'Fake photons (from data)')
-        legend.Draw("SAME")
-
-        hist_mctruth.SetMarkerStyle(0)
-        hist_mctruth.SetLineColor(4)
-        hist_mctruth.SetLineWidth(3)
-
-        hist_datafake.SetMarkerStyle(0)
-        hist_datafake.SetLineColor(2)
-        hist_datafake.SetLineWidth(3)
-
-        textChi2 = ROOT.TLatex()
-        textChi2.SetNDC()
-        textChi2.SetTextSize(0.025)
-        textChi2.DrawLatex(0.55, 0.55, "#chi^{2}/n="+str("%.2f" % chi2ToNDF))
-        textChi2.DrawLatex(0.55, 0.50, str(ptrange[0])+" GeV < P_{T,#gamma} < "+str(ptrange[1])+" GeV")
-
-        # Calculate fake fraction within original sieie cut
-        result_nfake = nfake.getVal()
-        result_nfake_err = nfake.getAsymErrorHi()
-        result_ntrue = ntrue.getVal()
-        result_ntrue_err = ntrue.getAsymErrorHi()
-        if isbarrel == 1:
-            sieie.setRange('window', 0.00515, 0.01015)
-        else:
-            sieie.setRange('window', 0.0172, 0.0272)
-        fakeratio = efake_pdf.createIntegral(sieie, sieie, 'window')
-        nfake_window = result_nfake*fakeratio.getVal()
-        nfake_window_err = numpy.sqrt(result_nfake_err*result_nfake_err*fakeratio.getVal()*fakeratio.getVal())
-
-        trueratio = etrue_pdf.createIntegral(sieie, sieie, 'window')
-        ntrue_window = result_ntrue*trueratio.getVal()
-        ntrue_window_err = numpy.sqrt(result_ntrue_err*result_ntrue_err*trueratio.getVal()*trueratio.getVal())
-
-        fake_fraction = nfake_window / (nfake_window + ntrue_window)
-        fake_fraction_err = numpy.sqrt(pow(nfake_window/pow(ntrue_window+nfake_window,2),2)*pow(ntrue_window_err,2) + pow(ntrue_window/pow(nfake_window+ntrue_window,2),2)*pow(nfake_window_err,2))
-        textChi2.DrawLatex(0.55, 0.45, "Fake Fraction: "+ str("%.3f" % fake_fraction) + "#pm " + str("%.3f" % fake_fraction_err)) 
-
-
-        c1.SetBottomMargin(0.15)
-        c1.SetTopMargin(0.10)
-        c1.SetRightMargin(0.05)
-        c1.SetLeftMargin(0.15)
-        CMS_lumi(c1, 0, 0)
-
-        c1.SaveAs(f'2018/{region_mark}_pt{str(ptrange[0])}_{str(ptrange[1])}_v9.pdf')
-        c1.SaveAs(f'2018/{region_mark}_pt{str(ptrange[0])}_{str(ptrange[1])}_v9.png')
-        # print (ntrue.getVal())
-        # print (ntrue.getAsymErrorHi())
-        # print (ntrue.getAsymErrorLo())
+    for file in filelist_mc:
+        AddHist_mcTruth(file, hist_datafake_plj, [15,5000], isbarrel,  55.48, 59.7)
+        
+    for i in range(1, len(xbins)):
+        deno = hist_datafake_plj.GetBinContent(i)
+        nume = hist_data_plj.GetBinContent(i)
+        fraction = ff[i-1]
+        fraction_unc = ff_unc[i-1]
+        print(f'{xbins[i-1]}-{xbins[i]}: {nume}/{deno}*{fraction}+-{fraction_unc} = {nume/deno*fraction}+-{nume/deno*fraction_unc}')
