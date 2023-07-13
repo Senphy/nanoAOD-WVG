@@ -6,7 +6,7 @@
     },
 
     "regions":{
-        "CR_1_2016":{
+        "CR1_2016":{
             "final_name":"CR1_2016",
             "region_name":"ttZ",
             "file_name":"ttZ_2016.root",
@@ -20,7 +20,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_2_2016":{
+        "CR2_2016":{
             "final_name":"CR2_2016",
             "region_name":"ZGJ",
             "file_name":"ZGJ_2016.root",
@@ -34,7 +34,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_3_2016":{
+        "CR3_2016":{
             "final_name":"CR3_2016",
             "region_name":"ZZ",
             "file_name":"ZZ_2016.root",
@@ -48,11 +48,11 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "SR_1_2016":{
+        "SR1_2016":{
             "final_name":"SR_2016",
             "region_name":"WZG",
             "file_name":"WZG_2016.root",
-            "bin_array":[80,150,500],
+            "bin_array":[80,130,180,250,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"WZG_mlla",
             "variable_storename":"mlla",
@@ -62,7 +62,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_1_2017":{
+        "CR1_2017":{
             "final_name":"CR1_2017",
             "region_name":"ttZ",
             "file_name":"ttZ_2017.root",
@@ -76,7 +76,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_2_2017":{
+        "CR2_2017":{
             "final_name":"CR2_2017",
             "region_name":"ZGJ",
             "file_name":"ZGJ_2017.root",
@@ -90,7 +90,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_3_2017":{
+        "CR3_2017":{
             "final_name":"CR3_2017",
             "region_name":"ZZ",
             "file_name":"ZZ_2017.root",
@@ -104,11 +104,11 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "SR_1_2017":{
+        "SR1_2017":{
             "final_name":"SR_2017",
             "region_name":"WZG",
             "file_name":"WZG_2017.root",
-            "bin_array":[80,150,500],
+            "bin_array":[80,130,180,250,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"WZG_mlla",
             "variable_storename":"mlla",
@@ -118,7 +118,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_1_2018":{
+        "CR1_2018":{
             "final_name":"CR1_2018",
             "region_name":"ttZ",
             "file_name":"ttZ_2018.root",
@@ -132,7 +132,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_2_2018":{
+        "CR2_2018":{
             "final_name":"CR2_2018",
             "region_name":"ZGJ",
             "file_name":"ZGJ_2018.root",
@@ -146,7 +146,7 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "CR_3_2018":{
+        "CR3_2018":{
             "final_name":"CR3_2018",
             "region_name":"ZZ",
             "file_name":"ZZ_2018.root",
@@ -160,11 +160,11 @@
                 "VV_Norm":["*","VV","1.0","[0,2]",""]
             }
         },
-        "SR_1_2018":{
+        "SR1_2018":{
             "final_name":"SR_2018",
             "region_name":"WZG",
             "file_name":"WZG_2018.root",
-            "bin_array":[80,150,500],
+            "bin_array":[80,130,180,250,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"WZG_mlla",
             "variable_storename":"mlla",

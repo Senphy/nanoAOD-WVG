@@ -14,15 +14,30 @@ import uproot
 import awkward
 import json
 import numba
+import threading
+import logging
+import ROOT
 
 parser = argparse.ArgumentParser(description='plot input')
-parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018'])
+parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018','RunII'])
 parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG','ALP'], default='ttZ')
 parser.add_argument('-m', dest='mode', default='prepare')
+parser.add_argument('-c', dest='iscondor', default=False, action='store_true')
 args = parser.parse_args()
 
 hep.style.use("CMS")
 
+class WZG_Thread(threading.Thread):
+    def __init__(self, thread_name, target=None, args=None, kwargs=None):
+        super(WZG_Thread, self).__init__(name=thread_name, target=target, args=args, kwargs=kwargs)
+    
+    def run(self):
+        if self._target is not None:
+            self._return = self._target(*self._args, **self._kwargs)
+
+    def join(self):
+        super().join()
+        return self._return
 class WZG_plot():
     def __init__(self, year='2018', region='WZG', **kwargs):
         self.year = year
@@ -52,7 +67,149 @@ class WZG_plot():
                 "corr":None
             },
         }
+        # overlap=1: avoid times the same weight multiple times
+        # corr=0: add year suffix
         self.unc_map = {
+            "VG_scale":{
+                "Nom":"scale_Weight",
+                "Up":"scale_WeightUp",
+                "Down":"scale_WeightDown",
+                "overlap":0,
+                "corr":1
+            },
+            "VV_scale":{
+                "Nom":"scale_Weight",
+                "Up":"scale_WeightUp",
+                "Down":"scale_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VVV_scale":{
+                "Nom":"scale_Weight",
+                "Up":"scale_WeightUp",
+                "Down":"scale_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "Top_scale":{
+                "Nom":"scale_Weight",
+                "Up":"scale_WeightUp",
+                "Down":"scale_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "WZG_scale":{
+                "Nom":"scale_Weight",
+                "Up":"scale_WeightUp",
+                "Down":"scale_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VG_pdf":{
+                "Nom":"pdf_Weight",
+                "Up":"pdf_WeightUp",
+                "Down":"pdf_WeightDown",
+                "overlap":0,
+                "corr":1
+            },
+            "VV_pdf":{
+                "Nom":"pdf_Weight",
+                "Up":"pdf_WeightUp",
+                "Down":"pdf_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VVV_pdf":{
+                "Nom":"pdf_Weight",
+                "Up":"pdf_WeightUp",
+                "Down":"pdf_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "Top_pdf":{
+                "Nom":"pdf_Weight",
+                "Up":"pdf_WeightUp",
+                "Down":"pdf_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "WZG_pdf":{
+                "Nom":"pdf_Weight",
+                "Up":"pdf_WeightUp",
+                "Down":"pdf_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VG_PSWeight_Isr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_isr_WeightUp",
+                "Down":"PS_isr_WeightDown",
+                "overlap":0,
+                "corr":1
+            },
+            "VV_PSWeight_Isr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_isr_WeightUp",
+                "Down":"PS_isr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VVV_PSWeight_Isr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_isr_WeightUp",
+                "Down":"PS_isr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "Top_PSWeight_Isr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_isr_WeightUp",
+                "Down":"PS_isr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "WZG_PSWeight_Isr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_isr_WeightUp",
+                "Down":"PS_isr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VG_PSWeight_Fsr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_fsr_WeightUp",
+                "Down":"PS_fsr_WeightDown",
+                "overlap":0,
+                "corr":1
+            },
+            "VV_PSWeight_Fsr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_fsr_WeightUp",
+                "Down":"PS_fsr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "VVV_PSWeight_Fsr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_fsr_WeightUp",
+                "Down":"PS_fsr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "Top_PSWeight_Fsr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_fsr_WeightUp",
+                "Down":"PS_fsr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
+            "WZG_PSWeight_Fsr":{
+                "Nom":"PS_Weight",
+                "Up":"PS_fsr_WeightUp",
+                "Down":"PS_fsr_WeightDown",
+                "overlap":1,
+                "corr":1
+            },
             "Muon_ID_Weight":{
                 "Nom":"Muon_ID_Weight",
                 "Up":"Muon_ID_Weight_UP",
@@ -218,20 +375,20 @@ class WZG_plot():
             arrays = arrays.loc[cut, :]
         
         if self.channel in [0,1,2,3,4]:
-            sel = '((channel_mark==2|channel_mark==4) | ((channel_mark==1|channel_mark==3)&(mwa<75|mwa>105))) & WZG_trileptonmass>100 & (WZG_dileptonmass>75&WZG_dileptonmass<105) & WZG_photon_pt>20'
+            sel = '((channel_mark==2|channel_mark==4) | ((channel_mark==1|channel_mark==3)&(mwa<75|mwa>105))) & WZG_trileptonmass>100 & (WZG_dileptonmass>75&WZG_dileptonmass<105) '
 
         if self.channel in [10,11,12,13,14]:
             sel = 'ttZ_trileptonmass>100 & (ttZ_dileptonmass<75|ttZ_dileptonmass>105)'
 
         if self.channel in [5,6,7,8,9]:
-            sel = 'ZZ_mllz2>75 & ZZ_mllz2<105 & nbJets==0'
+            sel = 'ZZ_mllz2>75 & ZZ_mllz2<105'
 
         if self.channel in [30,31,32]:
-            # sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105 & nbJets>0'
+            sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105 & nbJets>0'
             # sel = '(ZGJ_mlla<75 | ZGJ_mlla>105) & (ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105)'
             # sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182) & ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
             # sel = '(ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105) & ZGJ_photon_pt>20 & nbJets>0'
-            sel = 'ZGJ_photon_pt>20 & nbJets>0'
+            # sel = 'nbJets>0'
         arrays = arrays.query(sel)
 
         return arrays
@@ -351,7 +508,7 @@ class WZG_plot():
         return init_branches
 
     def AddBranches_MC(self, file, branches, **kwargs):
-        search_keys = ['MET_T1Smear*', '*_lepton*genPartFlav', '*_photon*genPartFlav','*ID_Weight*', '*RECO_Weight*', 'L1PreFiringWeight*', 'puWeight*', 'btagWeight*']
+        search_keys = ['MET_T1Smear*', '*_lepton*genPartFlav', '*_photon*genPartFlav','*ID_Weight*', '*RECO_Weight*', 'L1PreFiringWeight*', 'puWeight*', 'btagWeight*', 'scale_Weight*', 'pdf_Weight*', 'PS_*Weight*']
         for key in search_keys:
             branches.extend(uproot.open(f'{file}:Events').keys(filter_name=key))
         branches.append('Generator_weight')
@@ -363,19 +520,21 @@ class WZG_plot():
         init_branches = self.init_branch(init_branches)
 
         if isData:
-            print('is Data')
+            logging.info('is Data')
         else:
-            print('is MC')
+            # *FIXME* log doesn't work well for multithread
+            logging.info('is MC')
             init_branches = self.AddBranches_MC(file, init_branches)
             true_events = uproot.open(file)['nEventsGenWeighted'].values()[0]
 
-        print(f'Adding hist for {file}')
+        logging.info(f'Adding hist for {file}')
         for branch_name in self.branch:
             if self.branch[branch_name]['name'] not in init_branches:
                 init_branches.append(self.branch[branch_name]['name'])
         time_IO = time.time()
         df = uproot.open(f'{file}:Events').arrays(init_branches, library='pd')
-        print(f'IO: {"{:2f}".format(str(time.time-time_IO))}s')
+        time_IO = "{:.2f}".format(time.time()-time_IO)
+        logging.info(f'IO for {file}: {time_IO} s')
         df = self.HLT_cut(file, df)
         df = self.channel_cut(df)
         region_cut = df.loc[:,'region_mark'] == 1
@@ -402,7 +561,7 @@ class WZG_plot():
                 else:
                     hists[branch_name] = deepcopy(h_temp)
                 del h_temp
-            print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
+            logging.info(f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
         
         else:
@@ -589,6 +748,8 @@ class WZG_plot():
     def AddHist_FakePho(self, file, hists={}, isData=True, xsec=0, **kwargs):
         time_init = time.time()
         init_branches = ['fake_photon_weight', \
+                        'fake_photon_weight_statup', \
+                        'fake_photon_weight_statdown', \
                         'WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
                         'ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
                         'ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
@@ -635,16 +796,26 @@ class WZG_plot():
             for branch_name in self.branch:
                 if self.branch[branch_name].__contains__('bin_array'):
                     h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 else:
                     xbins = self.branch[branch_name]['xbins']
                     xleft = self.branch[branch_name]['xleft']
                     xright = self.branch[branch_name]['xright']
                     h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 if f'{branch_name}' in hists.keys():
                     hists[branch_name] += h_temp
+                    hists[f'{branch_name}_fractionUp'] += h_temp_up
+                    hists[f'{branch_name}_fractionDown'] += h_temp_down
                 else:
                     hists[branch_name] = deepcopy(h_temp)
+                    hists[f'{branch_name}_fractionUp'] = deepcopy(h_temp_up)
+                    hists[f'{branch_name}_fractionDown'] = deepcopy(h_temp_down)
                 del h_temp
+                del h_temp_up
+                del h_temp_down
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
         
@@ -657,21 +828,32 @@ class WZG_plot():
             unc_nom_list = set([self.unc_map[x]['Nom'] for x in self.unc_map])
             for unc in unc_nom_list:
                 df['unc_product'] *= df[f'{unc}']
-            df['true_weight'] = df['unc_product'] * self.lumi * xsec * 1000 * df['Generator_weight_sgn'] * df['fake_photon_weight'] / true_events
+            df['true_weight'] = df['unc_product'] * self.lumi * xsec * 1000 * df['Generator_weight_sgn'] / true_events
 
             for branch_name in self.branch:
                 if self.branch[branch_name].__contains__('bin_array'):
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
+
                 else:
                     xbins = self.branch[branch_name]['xbins']
                     xleft = self.branch[branch_name]['xleft']
                     xright = self.branch[branch_name]['xright']
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 if f'{branch_name}' in hists.keys():
                     hists[branch_name] += h_temp
+                    hists[f'{branch_name}_fractionUp'] += h_temp_up
+                    hists[f'{branch_name}_fractionDown'] += h_temp_down
                 else:
                     hists[branch_name] = deepcopy(h_temp)
+                    hists[f'{branch_name}_fractionUp'] = deepcopy(h_temp_up)
+                    hists[f'{branch_name}_fractionDown'] = deepcopy(h_temp_down)
                 del h_temp
+                del h_temp_up
+                del h_temp_down
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
 
@@ -739,6 +921,13 @@ class WZG_plot():
             if self.channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
                 # store fakepho
                 output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_None'] = hists_fpho[branch_name]
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_fakefraction_{year_suffix}Up'] = hists_fpho[f'{branch_name}_fractionUp']
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_fakefraction_{year_suffix}Down'] = hists_fpho[f'{branch_name}_fractionDown']
+    
+    # manually fold over/under flow bin for better workflow
+    def _fold_flow(self):
+        file = ROOT.OPEN(f'{self.year}/{self.region}_{self.year}.root')
+        pass
 
 
     def _make_error_boxes(self, hist=None, facecolor='none', edgecolor='grey', alpha=0.9, hatch='\\\\', linewidth=0.05, **kwargs):
@@ -796,6 +985,7 @@ class WZG_plot():
                 pass
 
             # manually add flow instead of using function from mpl for better setup
+            # *FIXME*
             if flow.lower() == 'sum':
                 pass
 
@@ -883,29 +1073,80 @@ class WZG_plot():
             del hist_pred
             del pred_err_box_proxy
 
-    def run(self, mode='prepare'):
+    def prepare_condor(self):
+        if not os.path.exists(f'condor_hist_{self.year}'):
+            os.mkdir(f'condor_hist_{self.year}')
+        if not os.path.exists(f'condor_hist_{self.year}/log'):
+            os.mkdir(f'condor_hist_{self.year}/log')
+        logging.info(f'-------> Preparing condor code for {self.year} {self.region} region')
+        for file in self.filelist_MC:
+            _name = self.filelist_MC[file]['name']
+            _xsec = self.filelist_MC[file]['xsec']
+            with open(f'condor_hist_{self.year}/submit_hist_{self.filelist_MC[file]["name"]}.jdl', 'w+') as f:
+                submit_string = \
+                f'''universe = vanilla
+executable = Prepare_hist_turbo.py
+requirements = (OpSysAndVer =?= "CentOS7")
+
+Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
+name={_name} 
+arguments = $(name) {self.year} {self.region} $(Cluster) $(Process)
+use_x509userproxy  = true
++JobFlavour = "testmatch"
+
+should_transfer_files = YES
+transfer_input_files = $(Proxy_path)
+
+RequestCpus = 4
+error = log/{self.region}_{_name}_{self.year}.err
+output = log/{self.region}_{_name}_{self.year}.out
+log = log/{self.region}_{_name}_{self.year}.log
+when_to_transfer_output = ON_EXIT
+queue 1'''
+                f.write(submit_string)
+            pass
+
+    def run(self, mode='prepare', iscondor=False, input=None, **kwargs):
+        # logging.basicConfig(filename=f'{self.region}_{self.year}.log', level=logging.INFO)
+        logging.basicConfig(level=logging.INFO)
         hists_data = {}
         hists_mc = {}
         hists_mcgroup = {}
         hists_flep = {}
         hists_fpho = {}
         if mode.lower() == 'prepare':
-            for file in self.filelist_data:
-                hists_data = self.AddHist(file, hists=hists_data, isData=True)
-            for file in self.filelist_MC:
-                hists_mc[file] = {}
-                hists_mc[file]['name'] = self.filelist_MC[file]['name']
-                hists_mc[file] = self.AddHist(self.filelist_MC[file]['path'], hists=hists_mc[file], isData=False, xsec=self.filelist_MC[file]['xsec'])
-            for file in self.filelist_data:
-                hists_flep = self.AddHist_FakeLep(file, hists=hists_flep, isData=True)
-            for file in self.filelist_MC:
-                hists_flep = self.AddHist_FakeLep(self.filelist_MC[file]['path'], hists=hists_flep, isData=False, xsec=self.filelist_MC[file]['xsec'])
-            if self.channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
+            if iscondor:
+                if input:
+                    pass
+                else:
+                    self.prepare_condor()
+                pass
+            
+            else:
                 for file in self.filelist_data:
-                    hists_fpho = self.AddHist_FakePho(file, hists=hists_fpho, isData=True)
+                    hists_data = self.AddHist(file, hists=hists_data, isData=True)
+                threads = {}
                 for file in self.filelist_MC:
-                    hists_fpho = self.AddHist_FakePho(self.filelist_MC[file]['path'], hists=hists_fpho, isData=False, xsec=self.filelist_MC[file]['xsec'])
-            self.hist_store(hists_data=hists_data, hists_mc=hists_mc, hists_flep=hists_flep, hists_fpho=hists_fpho)
+                    hists_mc[file] = {}
+                    hists_mc[file]['name'] = self.filelist_MC[file]['name']
+                    thread = WZG_Thread(hists_mc[file]['name'], target=self.AddHist, args=(self.filelist_MC[file]['path'], ), kwargs={"hists":hists_mc[file], "isData":False, "xsec":self.filelist_MC[file]['xsec']})
+                    thread.start()
+                    threads[file] = thread
+                    # hists_mc[file] = threads[file].join()
+                    # hists_mc[file] = self.AddHist(self.filelist_MC[file]['path'], hists=hists_mc[file], isData=False, xsec=self.filelist_MC[file]['xsec'])
+                for file in threads:
+                    hists_mc[file] = threads[file].join()
+
+                for file in self.filelist_data:
+                    hists_flep = self.AddHist_FakeLep(file, hists=hists_flep, isData=True)
+                for file in self.filelist_MC:
+                    hists_flep = self.AddHist_FakeLep(self.filelist_MC[file]['path'], hists=hists_flep, isData=False, xsec=self.filelist_MC[file]['xsec'])
+                if self.channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
+                    for file in self.filelist_data:
+                        hists_fpho = self.AddHist_FakePho(file, hists=hists_fpho, isData=True)
+                    for file in self.filelist_MC:
+                        hists_fpho = self.AddHist_FakePho(self.filelist_MC[file]['path'], hists=hists_fpho, isData=False, xsec=self.filelist_MC[file]['xsec'])
+                self.hist_store(hists_data=hists_data, hists_mc=hists_mc, hists_flep=hists_flep, hists_fpho=hists_fpho)
         else:
             file = uproot.open(f'{self.year}/{self.region}_{self.year}.root')
             for group in self.plot_groups:
@@ -925,5 +1166,5 @@ class WZG_plot():
 if __name__ == '__main__':
     time_total_init = time.time()
     p = WZG_plot(year=args.year, region=args.region)
-    p.run(args.mode)
+    p.run(mode=args.mode, iscondor=args.iscondor)
     print (f'Total Time Cost: {time.time()-time_total_init}s')

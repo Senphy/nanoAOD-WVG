@@ -9,7 +9,7 @@
         "CR_1":{
             "final_name":"CR1",
             "region_name":"ttZ",
-            "file_name":"ttZ_combine_2016.root",
+            "file_name":"ttZ_2016.root",
             "bin_array":[100, 150, 200, 250, 300, 500],
             "processes":["WZG","VV","VVV","Top","FakeLep"],
             "variable":"ttZ_trileptonmass",
@@ -23,7 +23,7 @@
         "CR_2":{
             "final_name":"CR2",
             "region_name":"ZGJ",
-            "file_name":"ZGJ_combine_2016.root",
+            "file_name":"ZGJ_2016.root",
             "bin_array":[100,150,200,300,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"ZGJ_mlla",
@@ -37,7 +37,7 @@
         "CR_3":{
             "final_name":"CR3",
             "region_name":"ZZ",
-            "file_name":"ZZ_combine_2016.root",
+            "file_name":"ZZ_2016.root",
             "bin_array":[100, 150, 200, 250, 300, 500],
             "processes":["WZG","VV","VVV","Top","FakeLep"],
             "variable":"ZZ_trileptonmass",
@@ -51,7 +51,7 @@
         "SR_1":{
             "final_name":"SR",
             "region_name":"WZG",
-            "file_name":"WZG_combine_2016.root",
+            "file_name":"WZG_2016.root",
             "bin_array":[80,150,500],
             "processes":["WZG","VV","VVV","Top","FakeLep","FakePho"],
             "variable":"WZG_mlla",

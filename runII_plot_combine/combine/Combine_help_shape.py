@@ -177,12 +177,12 @@ if __name__ == '__main__':
 combine -M Significance --expectSignal=1 -t -1 {name}_shape.txt > result_{name}.txt
 combine -M Significance --expectSignal=1 -t -1 {name}_shape.txt --freezeParameters all > result_freezeAll{name}.txt
 
-# combine -M FitDiagnostics -t -1 --expectSignal=1 -d {name}_shape.txt -m 125 --saveShapes --saveWithUncertainties
-# text2workspace.py {name}_shape.txt -m 125
-# combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --doInitialFit --robustFit 1
-# combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --robustFit 1 --doFits --parallel 4
-# combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 -o impacts_{name}.json
-# plotImpacts.py -i impacts_{name}.json -o impacts_{name}
+combine -M FitDiagnostics -t -1 --expectSignal=1 -d {name}_shape.txt -m 125 --saveShapes --saveWithUncertainties
+text2workspace.py {name}_shape.txt -m 125
+combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --doInitialFit --robustFit 1
+combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 --robustFit 1 --doFits --parallel 4
+combineTool.py -M Impacts -d {name}_shape.root -t -1 --expectSignal=1 -m 125 -o impacts_{name}.json
+plotImpacts.py -i impacts_{name}.json -o impacts_{name}
     '''
 
     os.system(codes.format(name=args.output_card))
