@@ -158,7 +158,7 @@ class define_object_Producer(Module):
         # selection on photons, but not requirement on photon number in this module
         for i in range(0,len(photons)):
 
-            if photons[i].pt < 20:
+            if photons[i].pt < 15:
                 continue
 
             if not (photons[i].isScEtaEE or photons[i].isScEtaEB):
@@ -207,8 +207,12 @@ class define_object_Producer(Module):
 
         for i in range(0,len(jets)): 
 
-            if event.Jet_pt_nom[i] < 30:
-                continue
+            if hasattr(event, 'Jet_pt_nom'):
+                if event.Jet_pt_nom[i] < 30:
+                    continue
+            else:
+                if jets[i].pt < 30:
+                    continue
 
             if abs(jets[i].eta) > 2.4:
                 continue
@@ -249,19 +253,18 @@ class define_object_Producer(Module):
 
             tight_jets.append(i)
 
-            if event.Jet_pt_nom[i] >= 30:
-                if self.year == '2016Pre':
-                    if jets[i].btagDeepB > 0.8819:
-                        tight_bjets.append(i)
-                elif self.year == '2016Post':
-                    if jets[i].btagDeepB > 0.8767:
-                        tight_bjets.append(i)
-                elif self.year == '2017':
-                    if jets[i].btagDeepB > 0.7738:
-                        tight_bjets.append(i)
-                elif self.year == '2018':
-                    if jets[i].btagDeepB > 0.7665:
-                        tight_bjets.append(i)
+            if self.year == '2016Pre':
+                if jets[i].btagDeepB > 0.8819:
+                    tight_bjets.append(i)
+            elif self.year == '2016Post':
+                if jets[i].btagDeepB > 0.8767:
+                    tight_bjets.append(i)
+            elif self.year == '2017':
+                if jets[i].btagDeepB > 0.7738:
+                    tight_bjets.append(i)
+            elif self.year == '2018':
+                if jets[i].btagDeepB > 0.7665:
+                    tight_bjets.append(i)
 
         self.out.fillBranch("nTightMuons", len(tight_muons))
         self.out.fillBranch("nTightElectrons", len(tight_electrons))

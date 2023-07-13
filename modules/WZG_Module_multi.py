@@ -340,7 +340,7 @@ class WZG_multi_Producer(Module):
                 m_lla = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4() + photons[tight_photons[0]].p4()).M()
                 dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
                 m_lla = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4() + photons[tight_photons[0]].p4()).M()
-                self.out.fillBranch("channel_mark", 31)
+                self.out.fillBranch("channel_mark", 32)
                 self.out.fillBranch("region_mark", region_mark)
                 self.out.fillBranch("ZGJ_lepton1_pt", muons[tight_muons[0]].pt)
                 self.out.fillBranch("ZGJ_lepton1_eta", muons[tight_muons[0]].eta)
