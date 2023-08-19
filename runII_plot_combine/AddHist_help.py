@@ -358,6 +358,10 @@ def AddHist(file, hist, isData, xsec, lumi, channel, branch, year='2018', **kwar
         arrays = lep_gen_cut(channel, arrays)
         arrays = pho_gen_cut(channel, arrays)
 
+        for unc in ['btagWeight_bc','btagWeight_l']:
+            for suffix1 in ['up','down']:
+                for suffix2 in ['corr','uncorr']:
+                    arrays[f'{unc}_{suffix1}_{suffix2}'] = arrays[f'{unc}_{suffix1}_{suffix2}'].apply(lambda x: 1 if x==0 else x)
         arrays['Generator_weight_sgn'] = arrays['Generator_weight'].apply(lambda x: 1 if x >= 0 else -1)
 
         arrays['unc_product'] = 1.0

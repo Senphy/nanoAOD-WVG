@@ -20,7 +20,7 @@ import ROOT
 
 parser = argparse.ArgumentParser(description='plot input')
 parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018','RunII'])
-parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG','ALP'], default='ttZ')
+parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG','ttG','ALP'], default='ttZ')
 parser.add_argument('-m', dest='mode', default='prepare')
 parser.add_argument('-c', dest='iscondor', default=False, action='store_true')
 args = parser.parse_args()
@@ -224,6 +224,13 @@ class WZG_plot():
                 "overlap":0,
                 "corr":1
             },
+            "Photon_ID_Weight":{
+                "Nom":"Photon_ID_Weight",
+                "Up":"Photon_ID_Weight_UP",
+                "Down":"Photon_ID_Weight_DOWN",
+                "overlap":0,
+                "corr":1
+            },
             "Electron_RECO_Weight":{
                 "Nom":"Electron_RECO_Weight",
                 "Up":"Electron_RECO_Weight_UP",
@@ -389,6 +396,10 @@ class WZG_plot():
             # sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182) & ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
             # sel = '(ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105) & ZGJ_photon_pt>20 & nbJets>0'
             # sel = 'nbJets>0'
+        
+        if self.channel in [20,21,22,23,24]:
+            sel = 'channel_mark>0'
+
         arrays = arrays.query(sel)
 
         return arrays
@@ -742,6 +753,8 @@ class WZG_plot():
                     hists[f'{branch_name}_fakerateUp'] = deepcopy(h_temp_up)
                     hists[f'{branch_name}_fakerateDown'] = deepcopy(h_temp_down)
                 del h_temp
+                del h_temp_up
+                del h_temp_down
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
 

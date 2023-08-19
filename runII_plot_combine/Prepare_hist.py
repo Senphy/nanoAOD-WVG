@@ -27,7 +27,7 @@ from ratio import createRatio
         
 parser = argparse.ArgumentParser(description='plot input')
 parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2017','2018'])
-parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG'], default='ttZ')
+parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG','ALP'], default='ttZ')
 parser.add_argument('-m', dest='mode', choices=['local','condor'], default='local')
 args = parser.parse_args()
 
@@ -77,6 +77,32 @@ def Prepare_hist(year='2018', region='WZG', **kwargs):
         AddHist(filelist_MC[file]["path"], hist_MC, 0, filelist_MC[file]["xsec"], lumi, channel, branch, year=year)
         filelist_MC[file]["hist"] = hist_MC
     
+    if region=='ALP':
+        from Control_pad import filelist_ALP
+        for file in filelist_ALP:
+            hist_ALP = {}
+            for branch_name in branch:
+                plot_branch = branch[branch_name]["name"]
+                if branch[branch_name].__contains__("bin_array"):
+                    hist_ALP_temp = ROOT.TH1F("", "", len(branch[branch_name]["bin_array"])-1, array('d', branch[branch_name]["bin_array"]))
+                else:
+                    hist_ALP_temp = ROOT.TH1F("", "", branch[branch_name]["xbins"], branch[branch_name]["xleft"], branch[branch_name]["xright"])
+                SetHistStyle(hist_ALP_temp, filelist_ALP[file]["color"])
+                hist_ALP_temp.SetXTitle(f'{branch[branch_name]["axis_name"]}')
+                hist_ALP_temp.SetLineColor(filelist_ALP[file]["color"])
+                hist_ALP_temp.SetLineWidth(2)
+                hist_ALP_temp.SetLineStyle(9)
+                hist_ALP_temp.SetFillColor(0)
+                hist_ALP_temp.SetFillStyle(0)
+                hist_ALP_temp.SetMarkerStyle(0)
+                for UpDown in range(0,5):
+                    hist_ALP[plot_branch+f"_{UpDown_map[UpDown]}"] = deepcopy(hist_ALP_temp)
+                for unc in unc_map:
+                    hist_ALP[f'{plot_branch}_{unc}Up'] = deepcopy(hist_MC_temp)
+                    hist_ALP[f'{plot_branch}_{unc}Down'] = deepcopy(hist_MC_temp)
+            AddHist(filelist_ALP[file]["path"], hist_ALP, 0, filelist_ALP[file]["xsec"]/6.25, lumi, channel, branch)
+            filelist_ALP[file]["hist"] = hist_ALP
+
     hist_FakeLep = {}
     for branch_name in branch:
         plot_branch = branch[branch_name]["name"]
@@ -142,6 +168,18 @@ def Prepare_hist(year='2018', region='WZG', **kwargs):
                 filelist_MC[file]['hist'][f'{plot_branch}_{unc}Up'].Write()
                 filelist_MC[file]['hist'][f'{plot_branch}_{unc}Down'].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_MC[file]["name"]}_{unc}Down')
                 filelist_MC[file]['hist'][f'{plot_branch}_{unc}Down'].Write()
+        
+        if region == 'ALP':
+            for file in filelist_ALP:
+                for UpDown in range(0,5):
+                    filelist_ALP[file]["hist"][plot_branch+f"_{UpDown_map[UpDown]}"].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_ALP[file]["name"]}_{str(UpDown_map[UpDown])}')
+                    filelist_ALP[file]["hist"][plot_branch+f"_{UpDown_map[UpDown]}"].Write()
+                #updown
+                for unc in unc_map:
+                    filelist_ALP[file]['hist'][f'{plot_branch}_{unc}Up'].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_ALP[file]["name"]}_{unc}Up')
+                    filelist_ALP[file]['hist'][f'{plot_branch}_{unc}Up'].Write()
+                    filelist_ALP[file]['hist'][f'{plot_branch}_{unc}Down'].SetName(f'{channel_map[channel]}_{plot_branch}_{filelist_ALP[file]["name"]}_{unc}Down')
+                    filelist_ALP[file]['hist'][f'{plot_branch}_{unc}Down'].Write()
     file_hist.Close()
 
     print (time.time()-time_total_init)

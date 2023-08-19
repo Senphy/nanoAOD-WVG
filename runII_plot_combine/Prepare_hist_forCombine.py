@@ -39,7 +39,7 @@ if __name__ == '__main__':
     index_list['jer'] = {}
     index_list['jesTotal']['corr'] = None
     index_list['jer']['corr'] = None
-    print(unc_map)
+    # print(unc_map)
 
     hist_list_sample = {
         "VV":{
@@ -89,6 +89,8 @@ if __name__ == '__main__':
                     if filelist_MC[file]["name"].lower() in hist_list[cate]["name"]:
                         hist_list[cate]["hists_up"].append(hist_temp_up)
                         hist_list[cate]["hists_down"].append(hist_temp_down)
+                del hist_temp_up
+                del hist_temp_down
 
             # hist_list[cate]['final_hist']
             # for cate in hist_list:
@@ -99,8 +101,8 @@ if __name__ == '__main__':
             #         hist_temp
             for cate in hist_list:
                 if len(hist_list[cate]["hists_up"]) == 0:
-                    hist_temp_up = ROOT.TH1D()
-                    hist_temp_down= ROOT.TH1D()
+                    hist_temp_up = ROOT.TH1F()
+                    hist_temp_down= ROOT.TH1F()
                 else:
                     hist_temp_up = hist_list[cate]["hists_up"][0].Clone()
                     hist_temp_down = hist_list[cate]["hists_down"][0].Clone()
@@ -118,6 +120,9 @@ if __name__ == '__main__':
                     hist_temp_up.Write()
                     hist_temp_down.SetName(f'{channel_map[channel]}_{plot_branch}_{cate}_{index}_{corr_suffix(year)}Down')
                     hist_temp_down.Write()
+                
+                del hist_temp_up
+                del hist_temp_down
 
 
             # if len(hist_VG_list) > 0:
@@ -140,9 +145,8 @@ if __name__ == '__main__':
                 if filelist_MC[file]["name"].lower() in hist_list[cate]["name"]:
                     hist_list[cate]["hists_None"].append(hist_temp)
         for cate in hist_list:
-            del hist_temp
             if len(hist_list[cate]["hists_None"]) == 0:
-                hist_temp = ROOT.TH1D()
+                hist_temp = ROOT.TH1F()
             else:
                 hist_temp = hist_list[cate]["hists_None"][0].Clone()
                 for i in range(1,len(hist_list[cate]["hists_None"])):

@@ -32,3 +32,7 @@ VG_scale,shape,,,,,,1.000
 VG_pdf,shape,,,,,,1.000
 VG_PSWeight_Isr,shape,,,,,,1.000
 VG_PSWeight_Fsr,shape,,,,,,1.000
+btagWeight_bc_corr,shape,1.000,,1.000,1.000,1.000,1.000
+btagWeight_l_corr,shape,1.000,,1.000,1.000,1.000,1.000
+btagWeight_bc_uncorr_18,shape,1.000,,1.000,1.000,1.000,1.000
+btagWeight_l_uncorr_18,shape,1.000,,1.000,1.000,1.000,1.000
