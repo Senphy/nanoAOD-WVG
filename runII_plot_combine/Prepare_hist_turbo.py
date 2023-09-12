@@ -17,6 +17,8 @@ import numba
 import threading
 import logging
 import ROOT
+import warnings
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 parser = argparse.ArgumentParser(description='plot input')
 parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018','RunII'])
@@ -51,6 +53,7 @@ class WZG_plot():
         self.filelist_MC = cp.filelist_MC
         self.branch = cp.branch
         self.lumi = cp.lumi
+        self._fakepho_unc_list = ['mc','closure','iso','stat']
         self.unc_special_map = {
             'jesTotal':{
                 "Nom":None,
@@ -382,7 +385,7 @@ class WZG_plot():
             arrays = arrays.loc[cut, :]
         
         if self.channel in [0,1,2,3,4]:
-            sel = '((channel_mark==2|channel_mark==4) | ((channel_mark==1|channel_mark==3)&(mwa<75|mwa>105))) & WZG_trileptonmass>100 & (WZG_dileptonmass>75&WZG_dileptonmass<105) '
+            sel = '((channel_mark==2|channel_mark==4) | ((channel_mark==1|channel_mark==3)&(mwa<75|mwa>105))) & WZG_trileptonmass>100 & (WZG_dileptonmass>75&WZG_dileptonmass<105) & WZG_photon_pt>20 '
 
         if self.channel in [10,11,12,13,14]:
             sel = 'ttZ_trileptonmass>100 & (ttZ_dileptonmass<75|ttZ_dileptonmass>105)'
@@ -391,7 +394,7 @@ class WZG_plot():
             sel = 'ZZ_mllz2>75 & ZZ_mllz2<105'
 
         if self.channel in [30,31,32]:
-            sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105 & nbJets>0'
+            sel = 'ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105 & nbJets>0 & ZGJ_photon_pt>20'
             # sel = '(ZGJ_mlla<75 | ZGJ_mlla>105) & (ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105)'
             # sel = '((ZGJ_mlla + ZGJ_dileptonmass) > 182) & ZGJ_dileptonmass>75 & ZGJ_dileptonmass<105'
             # sel = '(ZGJ_dileptonmass<75 | ZGJ_dileptonmass>105) & ZGJ_photon_pt>20 & nbJets>0'
@@ -400,7 +403,7 @@ class WZG_plot():
         if self.channel in [20,21,22,23,24]:
             sel = 'channel_mark>0'
 
-        arrays = arrays.query(sel)
+        arrays = arrays.query(sel).copy()
 
         return arrays
 
@@ -451,7 +454,7 @@ class WZG_plot():
                         32:lep_gen_cut_ZGJ
         }
         if self.channel in lep_gen_cut_map:
-            return arrays.loc[lep_gen_cut_map[self.channel],:]
+            return arrays.loc[lep_gen_cut_map[self.channel],:].copy()
         else:
             return arrays
 
@@ -475,7 +478,7 @@ class WZG_plot():
                         32:pho_gen_cut_ZGJ
         }
         if self.channel in pho_gen_cut_map:
-            return arrays.loc[pho_gen_cut_map[self.channel],:]
+            return arrays.loc[pho_gen_cut_map[self.channel],:].copy()
         else:
             return arrays
 
@@ -549,7 +552,7 @@ class WZG_plot():
         df = self.HLT_cut(file, df)
         df = self.channel_cut(df)
         region_cut = df.loc[:,'region_mark'] == 1
-        df = df.loc[region_cut,:]
+        df = df.loc[region_cut,:].copy()
 
         if isData:
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
@@ -558,7 +561,7 @@ class WZG_plot():
                 MET_cut = (df.loc[:,'MET'] <= 30)
             else:
                 MET_cut = (df.loc[:,'MET'] >= 0)
-            df = df.loc[MET_cut,:]
+            df = df.loc[MET_cut,:].copy()
             for branch_name in self.branch:
                 if self.branch[branch_name].__contains__('bin_array'):
                     h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, histogram=bh.Histogram, storage=bh.storage.Weight())
@@ -687,7 +690,7 @@ class WZG_plot():
         df = self.HLT_cut(file, df)
         df = self.channel_cut(df)
         region_cut = df.loc[:,'region_mark'] == 2
-        df = df.loc[region_cut,:]
+        df = df.loc[region_cut,:].copy()
 
         if isData:
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
@@ -696,7 +699,7 @@ class WZG_plot():
                 MET_cut = (df.loc[:,'MET'] <= 30)
             else:
                 MET_cut = (df.loc[:,'MET'] >= 0)
-            df = df.loc[MET_cut,:]
+            df = df.loc[MET_cut,:].copy()
             for branch_name in self.branch:
                 if self.branch[branch_name].__contains__('bin_array'):
                     h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_lepton_weight'],histogram=bh.Histogram, storage=bh.storage.Weight())
@@ -759,15 +762,15 @@ class WZG_plot():
             return hists
 
     def AddHist_FakePho(self, file, hists={}, isData=True, xsec=0, **kwargs):
+        _unc_list = self._fakepho_unc_list
         time_init = time.time()
-        init_branches = ['fake_photon_weight', \
-                        'fake_photon_weight_statup', \
-                        'fake_photon_weight_statdown', \
-                        'WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie',\
-                        'ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie',\
-                        'ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie',\
+        init_branches = [
+                        'WZG_photon_pt','WZG_photon_eta','WZG_photon_pfRelIso03_chg','WZG_photon_sieie','WZG_photon_vidNestedWPBitmap',\
+                        'ttG_photon_pt','ttG_photon_eta','ttG_photon_pfRelIso03_chg','ttG_photon_sieie','ttG_photon_vidNestedWPBitmap',\
+                        'ZGJ_photon_pt','ZGJ_photon_eta','ZGJ_photon_pfRelIso03_chg','ZGJ_photon_sieie','ZGJ_photon_vidNestedWPBitmap',\
                         ]
         init_branches = self.init_branch(init_branches)
+        init_branches.extend(uproot.open(f'{file}:Events').keys(filter_name='fake_photon_weight*'))
 
         if isData:
             print('FakePho Data')
@@ -784,19 +787,33 @@ class WZG_plot():
         df = self.HLT_cut(file, df)
         df = self.channel_cut(df)
         region_cut = df.loc[:,'region_mark'] == 3
-        df = df.loc[region_cut,:]
+        df = df.loc[region_cut,:].copy()
 
+        mask_mediumID = (1<<1) | (1<<3) | (1<<5) | (1<<7) | (1<<9) | (1<<11) | (1<<13)
         if ((self.channel >= 0) and (self.channel <=4)):
-            chg_cut = ((df.loc[:,"WZG_photon_pfRelIso03_chg"]*df.loc[:,"WZG_photon_pt"]) > 4) & ((df.loc[:,"WZG_photon_pfRelIso03_chg"]*df.loc[:,"WZG_photon_pt"]) < 10)
-            sieie_sel = '(WZG_photon_sieie>0.01015 & WZG_photon_sieie<0.05030 & WZG_photon_eta<1.4442) | (WZG_photon_sieie>0.0272 & WZG_photon_sieie<0.1360 & WZG_photon_eta>1.566)'
+            df['mediumID'] = df['WZG_photon_vidNestedWPBitmap'] & mask_mediumID
+            # chg_cut = ((df.loc[:,"WZG_photon_pfRelIso03_chg"]*df.loc[:,"WZG_photon_pt"]) > 4) & ((df.loc[:,"WZG_photon_pfRelIso03_chg"]*df.loc[:,"WZG_photon_pt"]) < 10)
+            # sieie_sel = '(WZG_photon_sieie>0.01015 & WZG_photon_sieie<0.05030 & WZG_photon_eta<1.4442) | (WZG_photon_sieie>0.0272 & WZG_photon_sieie<0.1360 & WZG_photon_eta>1.566)'
         elif ((self.channel >= 20) and (self.channel <=24)):
-            chg_cut = ((df.loc[:,"ttG_photon_pfRelIso03_chg"]*df.loc[:,"ttG_photon_pt"]) > 4) & ((df.loc[:,"ttG_photon_pfRelIso03_chg"]*df.loc[:,"ttG_photon_pt"]) < 10)
-            sieie_sel = '(ttG_photon_sieie>0.01015 & ttG_photon_sieie<0.05030 & ttG_photon_eta<1.4442) | (ttG_photon_sieie>0.0272 & ttG_photon_sieie<0.1360 & ttG_photon_eta>1.566)'
+            df['mediumID'] = df['ttG_photon_vidNestedWPBitmap'] & mask_mediumID
+            # chg_cut = ((df.loc[:,"ttG_photon_pfRelIso03_chg"]*df.loc[:,"ttG_photon_pt"]) > 4) & ((df.loc[:,"ttG_photon_pfRelIso03_chg"]*df.loc[:,"ttG_photon_pt"]) < 10)
+            # sieie_sel = '(ttG_photon_sieie>0.01015 & ttG_photon_sieie<0.05030 & ttG_photon_eta<1.4442) | (ttG_photon_sieie>0.0272 & ttG_photon_sieie<0.1360 & ttG_photon_eta>1.566)'
         elif ((self.channel >= 30) and (self.channel <=32)):
-            chg_cut = ((df.loc[:,"ZGJ_photon_pfRelIso03_chg"]*df.loc[:,"ZGJ_photon_pt"]) > 4) & ((df.loc[:,"ZGJ_photon_pfRelIso03_chg"]*df.loc[:,"ZGJ_photon_pt"]) < 10)
-            sieie_sel = '(ZGJ_photon_sieie>0.01015 & ZGJ_photon_sieie<0.05030 & ZGJ_photon_eta<1.4442) | (ZGJ_photon_sieie>0.0272 & ZGJ_photon_sieie<0.1360 & ZGJ_photon_eta>1.566)'
-        df = df.query(sieie_sel)
-        df = df.loc[chg_cut,:]
+            df['mediumID'] = df['ZGJ_photon_vidNestedWPBitmap'] & mask_mediumID
+            # chg_cut = ((df.loc[:,"ZGJ_photon_pfRelIso03_chg"]*df.loc[:,"ZGJ_photon_pt"]) > 4) & ((df.loc[:,"ZGJ_photon_pfRelIso03_chg"]*df.loc[:,"ZGJ_photon_pt"]) < 10)
+            # sieie_sel = '(ZGJ_photon_sieie>0.01015 & ZGJ_photon_sieie<0.05030 & ZGJ_photon_eta<1.4442) | (ZGJ_photon_sieie>0.0272 & ZGJ_photon_sieie<0.1360 & ZGJ_photon_eta>1.566)'
+        # df = df.query(sieie_sel)
+        # df = df.loc[chg_cut,:]
+        mask_invert_IsoChg = (1<<1) | (1<<3) | (1<<5) | (1<<7) | (1<<11) | (1<<13)
+        mask_invert_sieie  = (1<<1) | (1<<3) | (1<<5) | (1<<9)  | (1<<11) | (1<<13)
+        mask_invert_neuiso = (1<<1) | (1<<3) | (1<<5) | (1<<7)  | (1<<9) | (1<<13)
+        mask_invert_phoiso = (1<<1) | (1<<3) | (1<<5) | (1<<7)  | (1<<9) | (1<<11)
+        cut_fail_IsoChg = (df.loc[:,'mediumID'] == mask_invert_IsoChg)
+        cut_fail_Sieie  = (df.loc[:,'mediumID'] == mask_invert_sieie)
+        cut_fail_neuiso = (df.loc[:,'mediumID'] == mask_invert_neuiso)
+        cut_fail_phoiso = (df.loc[:,'mediumID'] == mask_invert_phoiso)
+        cut_fail_medium = (cut_fail_IsoChg | cut_fail_Sieie | cut_fail_neuiso | cut_fail_phoiso)
+        df = df.loc[cut_fail_medium,:].copy()
 
         if isData:
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
@@ -805,30 +822,33 @@ class WZG_plot():
                 MET_cut = (df.loc[:,'MET'] <= 30)
             else:
                 MET_cut = (df.loc[:,'MET'] >= 0)
-            df = df.loc[MET_cut,:]
+            df = df.loc[MET_cut,:].copy()
             for branch_name in self.branch:
+                h_temp = {}
                 if self.branch[branch_name].__contains__('bin_array'):
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp['nom'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            h_temp[f'{_unc}_{_suffix}'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=df[f'fake_photon_weight_{_unc}_{_suffix}'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 else:
                     xbins = self.branch[branch_name]['xbins']
                     xleft = self.branch[branch_name]['xleft']
                     xright = self.branch[branch_name]['xright']
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp['nom'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            h_temp[f'{_unc}_{_suffix}'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=df[f'fake_photon_weight_{_unc}_{_suffix}'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 if f'{branch_name}' in hists.keys():
-                    hists[branch_name] += h_temp
-                    hists[f'{branch_name}_fractionUp'] += h_temp_up
-                    hists[f'{branch_name}_fractionDown'] += h_temp_down
+                    hists[branch_name] += h_temp['nom']
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            hists[f'{branch_name}_{_unc}_{_suffix}'] += h_temp[f'{_unc}_{_suffix}']
                 else:
-                    hists[branch_name] = deepcopy(h_temp)
-                    hists[f'{branch_name}_fractionUp'] = deepcopy(h_temp_up)
-                    hists[f'{branch_name}_fractionDown'] = deepcopy(h_temp_down)
+                    hists[branch_name] = deepcopy(h_temp['nom'])
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            hists[f'{branch_name}_{_unc}_{_suffix}'] = deepcopy(h_temp[f'{_unc}_{_suffix}'])
                 del h_temp
-                del h_temp_up
-                del h_temp_down
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
         
@@ -844,29 +864,32 @@ class WZG_plot():
             df['true_weight'] = df['unc_product'] * self.lumi * xsec * 1000 * df['Generator_weight_sgn'] / true_events
 
             for branch_name in self.branch:
+                h_temp = {}
                 if self.branch[branch_name].__contains__('bin_array'):
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp['nom'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            h_temp[f'{_unc}_{_suffix}'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=self.branch[branch_name]['bin_array'], density=False, weights=-1*df['true_weight']*df[f'fake_photon_weight_{_unc}_{_suffix}'], histogram=bh.Histogram, storage=bh.storage.Weight())
 
                 else:
                     xbins = self.branch[branch_name]['xbins']
                     xleft = self.branch[branch_name]['xleft']
                     xright = self.branch[branch_name]['xright']
-                    h_temp = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_up = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statup'], histogram=bh.Histogram, storage=bh.storage.Weight())
-                    h_temp_down = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight_statdown'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    h_temp['nom'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df['fake_photon_weight'], histogram=bh.Histogram, storage=bh.storage.Weight())
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            h_temp[f'{_unc}_{_suffix}'] = bh.numpy.histogram(df[self.branch[branch_name]['name']], bins=xbins, range=(xleft, xright), density=False, weights=-1*df['true_weight']*df[f'fake_photon_weight_{_unc}_{_suffix}'], histogram=bh.Histogram, storage=bh.storage.Weight())
                 if f'{branch_name}' in hists.keys():
-                    hists[branch_name] += h_temp
-                    hists[f'{branch_name}_fractionUp'] += h_temp_up
-                    hists[f'{branch_name}_fractionDown'] += h_temp_down
+                    hists[branch_name] += h_temp['nom']
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            hists[f'{branch_name}_{_unc}_{_suffix}'] += h_temp[f'{_unc}_{_suffix}']
                 else:
-                    hists[branch_name] = deepcopy(h_temp)
-                    hists[f'{branch_name}_fractionUp'] = deepcopy(h_temp_up)
-                    hists[f'{branch_name}_fractionDown'] = deepcopy(h_temp_down)
+                    hists[branch_name] = deepcopy(h_temp['nom'])
+                    for _unc in _unc_list:
+                        for _suffix in ['up','down']:
+                            hists[f'{branch_name}_{_unc}_{_suffix}'] = deepcopy(h_temp[f'{_unc}_{_suffix}'])
                 del h_temp
-                del h_temp_up
-                del h_temp_down
             print (f'Time Cost for {file.split("/")[len(file.split("/"))-1]}: {time.time()-time_init}s')
             return hists
 
@@ -934,8 +957,12 @@ class WZG_plot():
             if self.channel in [0,1,2,3,4,20,21,22,23,24,30,31,32]:
                 # store fakepho
                 output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_None'] = hists_fpho[branch_name]
-                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_fakefraction_{year_suffix}Up'] = hists_fpho[f'{branch_name}_fractionUp']
-                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_fakefraction_{year_suffix}Down'] = hists_fpho[f'{branch_name}_fractionDown']
+                for _unc in self._fakepho_unc_list:
+                    for _suffix in ['Up','Down']:
+                        if _unc == 'stat':
+                            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}_{year_suffix}{_suffix}'] = hists_fpho[f'{branch_name}_{_unc}_{_suffix.lower()}']
+                        else:
+                            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}{_suffix}'] = hists_fpho[f'{branch_name}_{_unc}_{_suffix.lower()}']
     
     # manually fold over/under flow bin for better workflow
     def _fold_flow(self):
@@ -1078,6 +1105,8 @@ class WZG_plot():
             axs[1].grid(axis='y', which='major', linestyle='--', linewidth=1.0, alpha=0.9)
             axs[0].set_ylabel(f'Events / bin', fontsize=25)
             axs[1].set_xlabel(f'{self.branch[branch_name]["axis_name"]}', fontsize=25)
+            axs[1].xaxis.set_minor_locator(mpl.ticker.AutoMinorLocator(5))
+            axs[0].xaxis.set_minor_locator(mpl.ticker.AutoMinorLocator(5))
             axs[1].set_ylabel(f'Data / Pred.', fontsize=25)
             hep.cms.label('Preliminary', data=True, lumi=self.lumi, year=self.year, ax=axs[0])
 
@@ -1086,38 +1115,39 @@ class WZG_plot():
             del hist_pred
             del pred_err_box_proxy
 
-    def prepare_condor(self):
-        if not os.path.exists(f'condor_hist_{self.year}'):
-            os.mkdir(f'condor_hist_{self.year}')
-        if not os.path.exists(f'condor_hist_{self.year}/log'):
-            os.mkdir(f'condor_hist_{self.year}/log')
-        logging.info(f'-------> Preparing condor code for {self.year} {self.region} region')
-        for file in self.filelist_MC:
-            _name = self.filelist_MC[file]['name']
-            _xsec = self.filelist_MC[file]['xsec']
-            with open(f'condor_hist_{self.year}/submit_hist_{self.filelist_MC[file]["name"]}.jdl', 'w+') as f:
-                submit_string = \
-                f'''universe = vanilla
-executable = Prepare_hist_turbo.py
-requirements = (OpSysAndVer =?= "CentOS7")
+# Deprecated part
+#     def prepare_condor(self):
+#         if not os.path.exists(f'condor_hist_{self.year}'):
+#             os.mkdir(f'condor_hist_{self.year}')
+#         if not os.path.exists(f'condor_hist_{self.year}/log'):
+#             os.mkdir(f'condor_hist_{self.year}/log')
+#         logging.info(f'-------> Preparing condor code for {self.year} {self.region} region')
+#         for file in self.filelist_MC:
+#             _name = self.filelist_MC[file]['name']
+#             _xsec = self.filelist_MC[file]['xsec']
+#             with open(f'condor_hist_{self.year}/submit_hist_{self.filelist_MC[file]["name"]}.jdl', 'w+') as f:
+#                 submit_string = \
+#                 f'''universe = vanilla
+# executable = Prepare_hist_turbo.py
+# requirements = (OpSysAndVer =?= "CentOS7")
 
-Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
-name={_name} 
-arguments = $(name) {self.year} {self.region} $(Cluster) $(Process)
-use_x509userproxy  = true
-+JobFlavour = "testmatch"
+# Proxy_path=/afs/cern.ch/user/s/sdeng/.krb5/x509up_u109738
+# name={_name} 
+# arguments = $(name) {self.year} {self.region} $(Cluster) $(Process)
+# use_x509userproxy  = true
+# +JobFlavour = "testmatch"
 
-should_transfer_files = YES
-transfer_input_files = $(Proxy_path)
+# should_transfer_files = YES
+# transfer_input_files = $(Proxy_path)
 
-RequestCpus = 4
-error = log/{self.region}_{_name}_{self.year}.err
-output = log/{self.region}_{_name}_{self.year}.out
-log = log/{self.region}_{_name}_{self.year}.log
-when_to_transfer_output = ON_EXIT
-queue 1'''
-                f.write(submit_string)
-            pass
+# RequestCpus = 4
+# error = log/{self.region}_{_name}_{self.year}.err
+# output = log/{self.region}_{_name}_{self.year}.out
+# log = log/{self.region}_{_name}_{self.year}.log
+# when_to_transfer_output = ON_EXIT
+# queue 1'''
+#                 f.write(submit_string)
+#             pass
 
     def run(self, mode='prepare', iscondor=False, input=None, **kwargs):
         # logging.basicConfig(filename=f'{self.region}_{self.year}.log', level=logging.INFO)
