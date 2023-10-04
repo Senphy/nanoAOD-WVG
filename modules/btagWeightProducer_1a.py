@@ -9,8 +9,26 @@ import math
 import os
 
 class btagWeightProducer_1a(Module):
-    def __init__(self):
+    def __init__(self, year):
+        self.year = year
+        self.effPath = '%s/src/PhysicsTools/NanoAODTools/data/btagSF/btag_eff%s.root' % (os.environ['CMSSW_BASE'], str(self.year))
         pass
+
+    # Make sys symmetric with conservative unc
+    def symmConservative(self, nom=None, ups=[], downs=[]):
+        ups_symm = []
+        downs_symm = []
+        for _i in range(len(ups)):
+            unc = max(abs(ups[_i]-nom), abs(downs[_i]-nom)) 
+            ups_symm.append(nom+unc)
+            downs_symm.append(max(0, nom-unc))
+        return ups_symm, downs_symm
+
+    # prevent unc coming from too low stat region to become so large
+    def unc_correct(self, weight):
+        if weight > 2: return 2.0
+        elif weight < 0: return 0.
+        else: return weight
 
     def Cal_temp_weight(self, pt, eta, hist):
         BinX = hist.GetXaxis().FindBin(pt)
@@ -31,12 +49,13 @@ class btagWeightProducer_1a(Module):
             raise e
 
     def beginJob(self):
-        self.h_btag_bjet = ROOT.TH2D()
-        self.h_btag_cjet = ROOT.TH2D()
-        self.h_btag_ljet = ROOT.TH2D()
-        self.h_bjet = ROOT.TH2D()
-        self.h_cjet = ROOT.TH2D()
-        self.h_ljet = ROOT.TH2D()
+        self.fileEff = ROOT.TFile.Open(self.effPath)
+        self.h_btag_bjet = self.fileEff.Get('h_btag_bjet')
+        self.h_btag_cjet = self.fileEff.Get('h_btag_cjet')
+        self.h_btag_ljet = self.fileEff.Get('h_btag_ljet')
+        self.h_bjet = self.fileEff.Get('h_bjet')
+        self.h_cjet = self.fileEff.Get('h_cjet')
+        self.h_ljet = self.fileEff.Get('h_ljet')
         pass
 
     def endJob(self):
@@ -139,39 +158,55 @@ class btagWeightProducer_1a(Module):
                         temp_weight = self.divi(self.Cal_temp_weight(jets[i].pt, jets[i].eta, self.h_btag_bjet), self.Cal_temp_weight(jets[i].pt, jets[i].eta, self.h_bjet))
                     elif jets[i].hadronFlavour == 4:
                         temp_weight = self.divi(self.Cal_temp_weight(jets[i].pt, jets[i].eta, self.h_btag_cjet), self.Cal_temp_weight(jets[i].pt, jets[i].eta, self.h_cjet))
-                    pdata_bc_up *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up")[i] * temp_weight)
-                    pdata_bc_down *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down")[i] * temp_weight)
-                    pdata_bc_up_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_correlated")[i] * temp_weight)
-                    pdata_bc_down_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_correlated")[i] * temp_weight)
-                    pdata_bc_up_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_uncorrelated")[i] * temp_weight)
-                    pdata_bc_down_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_uncorrelated")[i] * temp_weight)
+                    pdata_bc_up *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down")[i] * temp_weight)
+                    pdata_bc_down *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up")[i] * temp_weight)
+                    pdata_bc_up_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_correlated")[i] * temp_weight)
+                    pdata_bc_down_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_correlated")[i] * temp_weight)
+                    pdata_bc_up_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_uncorrelated")[i] * temp_weight)
+                    pdata_bc_down_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_uncorrelated")[i] * temp_weight)
 
                 elif jets[i].hadronFlavour == 0:
                     temp_weight = self.divi(self.Cal_temp_weight(jets[i].pt, jets[i].eta, self.h_btag_ljet), self.Cal_temp_weight(jets[i].pt, jets[i].eta, self.h_ljet))
                     # notice the sign here
-                    pdata_l_up *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up")[i] * temp_weight)
-                    pdata_l_down *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down")[i] * temp_weight)
-                    pdata_l_up_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_correlated")[i] * temp_weight)
-                    pdata_l_down_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_correlated")[i] * temp_weight)
-                    pdata_l_up_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_uncorrelated")[i] * temp_weight)
-                    pdata_l_down_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_uncorrelated")[i] * temp_weight)
+                    pdata_l_up *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down")[i] * temp_weight)
+                    pdata_l_down *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up")[i] * temp_weight)
+                    pdata_l_up_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_correlated")[i] * temp_weight)
+                    pdata_l_down_corr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_correlated")[i] * temp_weight)
+                    pdata_l_up_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_down_uncorrelated")[i] * temp_weight)
+                    pdata_l_down_uncorr *= (1 - getattr(event, "Jet_btagSF_deepcsv_T_up_uncorrelated")[i] * temp_weight)
                 pmc *= (1 - temp_weight)
                 pdata *= (1 - getattr(event, "Jet_btagSF_deepcsv_T")[i] * temp_weight)
 
         if pmc != 0: 
-            btagWeight = pdata/pmc
-            btagWeight_bc_up = pdata_bc_up/pmc
-            btagWeight_bc_down = pdata_bc_down/pmc
-            btagWeight_bc_up_corr = pdata_bc_up_corr/pmc
-            btagWeight_bc_down_corr = pdata_bc_down_corr/pmc
-            btagWeight_bc_up_uncorr = pdata_bc_up_uncorr/pmc
-            btagWeight_bc_down_uncorr = pdata_bc_down_uncorr/pmc
-            btagWeight_l_up = pdata_l_up/pmc
-            btagWeight_l_down = pdata_l_down/pmc
-            btagWeight_l_up_corr = pdata_l_up_corr/pmc
-            btagWeight_l_down_corr = pdata_l_down_corr/pmc
-            btagWeight_l_up_uncorr = pdata_l_up_uncorr/pmc
-            btagWeight_l_down_uncorr = pdata_l_down_uncorr/pmc
+            btagWeight = self.unc_correct(pdata/pmc)
+            btagWeight_bc_up = self.unc_correct(pdata_bc_up/pmc)
+            btagWeight_bc_down = self.unc_correct(pdata_bc_down/pmc)
+            btagWeight_bc_up_corr = self.unc_correct(pdata_bc_up_corr/pmc)
+            btagWeight_bc_down_corr = self.unc_correct(pdata_bc_down_corr/pmc)
+            btagWeight_bc_up_uncorr = self.unc_correct(pdata_bc_up_uncorr/pmc)
+            btagWeight_bc_down_uncorr = self.unc_correct(pdata_bc_down_uncorr/pmc)
+            btagWeight_l_up = self.unc_correct(pdata_l_up/pmc)
+            btagWeight_l_down = self.unc_correct(pdata_l_down/pmc)
+            btagWeight_l_up_corr = self.unc_correct(pdata_l_up_corr/pmc)
+            btagWeight_l_down_corr = self.unc_correct(pdata_l_down_corr/pmc)
+            btagWeight_l_up_uncorr = self.unc_correct(pdata_l_up_uncorr/pmc)
+            btagWeight_l_down_uncorr = self.unc_correct(pdata_l_down_uncorr/pmc)
+        
+        up, down = self.symmConservative(nom=btagWeight, ups=[btagWeight_bc_up,btagWeight_bc_up_corr,btagWeight_bc_up_uncorr], downs=[btagWeight_bc_down,btagWeight_bc_down_corr,btagWeight_bc_down_uncorr])
+        btagWeight_bc_up = up[0]
+        btagWeight_bc_up_corr = up[1]
+        btagWeight_bc_up_uncorr = up[2]
+        btagWeight_bc_down = down[0]
+        btagWeight_bc_down_corr = down[1]
+        btagWeight_bc_down_uncorr = down[2]
+
+        up, down = self.symmConservative(nom=btagWeight, ups=[btagWeight_l_up,btagWeight_l_up_corr,btagWeight_l_up_uncorr], downs=[btagWeight_l_down,btagWeight_l_down_corr,btagWeight_l_down_uncorr])
+        btagWeight_l_up = up[0]
+        btagWeight_l_up_corr = up[1]
+        btagWeight_l_up_uncorr = up[2]
+        btagWeight_l_down = down[0]
+        btagWeight_l_down_corr = down[1]
+        btagWeight_l_down_uncorr = down[2]
 
         self.out.fillBranch('btagWeight', btagWeight)
         self.out.fillBranch('btagWeight_bc_up', btagWeight_bc_up)
@@ -189,4 +224,7 @@ class btagWeightProducer_1a(Module):
 
         return True
 
-btagWeight_1a_Module = lambda: btagWeightProducer_1a()
+btagWeight_1a_Module_2016Pre = lambda: btagWeightProducer_1a('2016Pre')
+btagWeight_1a_Module_2016Post = lambda: btagWeightProducer_1a('2016Post')
+btagWeight_1a_Module_2017 = lambda: btagWeightProducer_1a('2017')
+btagWeight_1a_Module_2018 = lambda: btagWeightProducer_1a('2018')

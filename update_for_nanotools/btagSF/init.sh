@@ -8,6 +8,8 @@ echo "Updating btag SF"
 cp $WORKING_PATH/nanoAOD-WVG/update_for_nanotools/btagSF/*DeepCSV*.csv $WORKING_PATH/data/btagSF/
 echo "Updating btagSF module"
 cp $WORKING_PATH/nanoAOD-WVG/update_for_nanotools/btagSF/btagSFProducer.py $WORKING_PATH/python/postprocessing/modules/btv/
+echo "Updating btageff"
+cp $WORKING_PATH/nanoAOD-WVG/update_for_nanotools/btagSF/btag_eff*.root $WORKING_PATH/python/data/btagSF/
 
 echo -e "\nRecompiling..."
 cd $CMSSW_BASE/src
