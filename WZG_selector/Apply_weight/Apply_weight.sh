@@ -14,7 +14,11 @@ cmssw_setup sandbox-CMSSW_10_6_29-WZG.tar.bz2
 export EOS_MGM_URL=root://eosuser.cern.ch
 file="${1}/${3}/${2}"
 eos cp ${file} .
-python Apply_weight_Template_postproc.py -f ${2} -y ${3} ${5}
+if [! $5]; then
+    python Apply_weight_Template_postproc.py -f ${2} -y ${3}
+else
+    python Apply_weight_Template_postproc.py -f ${2} -y ${3} ${5}
+fi
 output="${1}/${3}/test/${2}"
 echo $output
 eos cp ${4} ${output}

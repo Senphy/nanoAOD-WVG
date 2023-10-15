@@ -4,12 +4,12 @@ import os,sys
 import argparse
 
 parser = argparse.ArgumentParser(description='create attachment NanoAOD-like fake photon result')
-parser.add_argument('-p', dest='path', default='/eos/user/s/sdeng/WZG_analysis/final_skim/', help='File path input')
+parser.add_argument('-p', dest='path', default='/eos/user/s/sdeng/WZG_analysis/final_skim/ALP/', help='File path input')
 parser.add_argument('-y', dest='year', default='2016Pre', help='year')
 parser.add_argument('-t', dest='tar', default=False, action='store_true', help='tar CMS env')
 args = parser.parse_args()
 
-def prepare_condor(path=None, file=None, year=None, isdata=None, **kwargs):
+def prepare_condor(path=None, file=None, year=None, isdata='', **kwargs):
     _name = file.split('.root')[0]
     skim_name = f'{_name}_Skim.root'
     with open(f'submit_{_name}.jdl', 'w+') as f:
@@ -18,7 +18,7 @@ def prepare_condor(path=None, file=None, year=None, isdata=None, **kwargs):
 executable = Apply_weight.sh
 requirements = (OpSysAndVer =?= "CentOS7")
 
-arguments = {path} {file} {year} {skim_name} {isdata} $(Cluster) $(Process)
+arguments = {path} {file} {year} {skim_name} {isdata}
 use_x509userproxy  = true
 +JobFlavour = "testmatch"
 
@@ -43,9 +43,9 @@ if __name__ == '__main__':
     for file in os.listdir(f'{args.path}/{args.year}'):
         if file.endswith('.root'):
             if f'Run{args.year}' in file or 'Run2016' in file:
+                # continue
                 prepare_condor(path=args.path, file=file, year=args.year, isdata='-d')
             else:
-                continue
                 # try:
                 prepare_condor(path=args.path, file=file, year=args.year)
                 # except:

@@ -15,11 +15,20 @@ if __name__ == '__main__':
 
     for file in os.listdir(store_path):
         if file.endswith('.root'):
-            try:
-                os.system('python Apply_weight_Template_postproc.py -f {store_path}/{file} -y {year}'.format(store_path=store_path, file=file, year=args.year))
-                new_file = file.rsplit('.root')[0] + '_Skim.root'
-                os.system('mv {new_file} {file}'.format(file=file, new_file=new_file))
-            except:
-                print ('{file} is not an applicable file'.format(file=file))
+            if f'Run{args.year}' in file or 'Run2016' in file:
+                try:
+                    os.system('python Apply_weight_Template_postproc.py -f {store_path}/{file} -y {year} -d'.format(store_path=store_path, file=file, year=args.year))
+                    new_file = file.rsplit('.root')[0] + '_Skim.root'
+                    os.system('mv {new_file} {file}'.format(file=file, new_file=new_file))
+                except:
+                    print ('{file} is not an applicable file'.format(file=file))
+            else:
+                try:
+                    os.system('python Apply_weight_Template_postproc.py -f {store_path}/{file} -y {year}'.format(store_path=store_path, file=file, year=args.year))
+                    new_file = file.rsplit('.root')[0] + '_Skim.root'
+                    os.system('mv {new_file} {file}'.format(file=file, new_file=new_file))
+                except:
+                    print ('{file} is not an applicable file'.format(file=file))
+
         else:
             print ('{file} is not an applicable file'.format(file=file))

@@ -3,7 +3,7 @@ drop *
 keep run
 keep luminosityBlock
 keep event
-keep Generator_weight
+keep Generator*
 keep *Weight*
 keep Flag*
 
@@ -29,3 +29,5 @@ keep *GenJet*
 keep Pileup*
 keep *Corr*
 keep fixedGridRhoFastjetAll
+
+keep btag*

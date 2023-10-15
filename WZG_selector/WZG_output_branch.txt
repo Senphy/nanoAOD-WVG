@@ -3,7 +3,7 @@ drop *
 keep run
 keep luminosityBlock
 keep event
-keep Generator_weight
+keep Generator*
 keep *Weight*
 keep *weight*
 keep Flag*

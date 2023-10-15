@@ -22,15 +22,22 @@ parser.add_argument('-y', dest='year', default='2018', help='year')
 parser.add_argument('-d', dest='isdata', action='store_true', default=False, help='isdata')
 args = parser.parse_args()
 
-if args.year == '2018':
+if str(args.year) == '2018':
     Modules = [ApplyWeightFakeLeptonModule_18(),ApplyWeightFakePhotonModule18()]
-elif args.year == '2017':
+elif str(args.year) == '2017':
     Modules = [ApplyWeightFakeLeptonModule_17(),ApplyWeightFakePhotonModule17()]
-elif args.year == '2016Pre' or args.year == '2016Post':
+elif str(args.year) == '2016Pre' or args.year == '2016Post':
     Modules = [ApplyWeightFakeLeptonModule_16(),ApplyWeightFakePhotonModule16()]
     
 if not args.isdata:
-    Modules.append(btagWeight_1a_Module())
+    if str(args.year) == '2018':
+        Modules.append(btagWeight_1a_Module_2018())
+    elif str(args.year) == '2017':
+        Modules.append(btagWeight_1a_Module_2017())
+    elif str(args.year) == '2016Pre':
+        Modules.append(btagWeight_1a_Module_2016Pre())
+    elif str(args.year) == '2016Post':
+        Modules.append(btagWeight_1a_Module_2016Post())
     Modules.append(theory_unc_Module())
 
 infilelist = [args.file]
