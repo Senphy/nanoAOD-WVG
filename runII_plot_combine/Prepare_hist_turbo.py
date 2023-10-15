@@ -16,16 +16,9 @@ import json
 import numba
 import threading
 import logging
-import ROOT
+# import ROOT
 import warnings
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
-
-parser = argparse.ArgumentParser(description='plot input')
-parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018','RunII'])
-parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG','ttG','ALP'], default='ttZ')
-parser.add_argument('-m', dest='mode', default='prepare')
-parser.add_argument('-c', dest='iscondor', default=False, action='store_true')
-args = parser.parse_args()
 
 hep.style.use("CMS")
 
@@ -53,6 +46,7 @@ class WZG_plot():
         self.filelist_MC = cp.filelist_MC
         self.branch = cp.branch
         self.lumi = cp.lumi
+        self.MET_cut = 30
         self._fakepho_unc_list = ['mc','closure','iso','stat']
         self.unc_special_map = {
             'jesTotal':{
@@ -285,6 +279,31 @@ class WZG_plot():
             }
         }
         self.plot_groups = {
+            "ALP_m50":{
+                "names":["ALP_m50"],
+                "color":'tab:red',
+                "label":"ALP_m50"
+            },
+            "ALP_m90":{
+                "names":["ALP_m90"],
+                "color":'tab:blue',
+                "label":"ALP_m90"
+            },
+            "ALP_m100":{
+                "names":["ALP_m100"],
+                "color":'tab:green',
+                "label":"ALP_m100"
+            },
+            "ALP_m110":{
+                "names":["ALP_m110"],
+                "color":'tab:purple',
+                "label":"ALP_m110"
+            },
+            "ALP_m160":{
+                "names":["ALP_m160"],
+                "color":'tab:orange',
+                "label":"ALP_m160"
+            },
             "VV":{
                 "names":["qqzz","ggzz_2e2mu","ggzz_2e2nu","ggzz_2e2tau","ggzz_2mu2nu","ggzz_2mu2tau","ggzz_4e","ggzz_4mu","ggzz_4tau","wz"],
                 "color":'tab:blue',
@@ -556,9 +575,9 @@ class WZG_plot():
 
         if isData:
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                MET_cut = (df.loc[:,'MET'] > 30)
+                MET_cut = (df.loc[:,'MET'] > self.MET_cut)
             elif self.channel in [5,6,7,8,9,30,31,32]:
-                MET_cut = (df.loc[:,'MET'] <= 30)
+                MET_cut = (df.loc[:,'MET'] <= self.MET_cut)
             else:
                 MET_cut = (df.loc[:,'MET'] >= 0)
             df = df.loc[MET_cut,:].copy()
@@ -601,9 +620,9 @@ class WZG_plot():
             for unc in self.unc_special_map:
                 for suffix in ['Up', 'Down']:
                     if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                        MET_special_cut = (df.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] > 30)
+                        MET_special_cut = (df.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] > self.MET_cut)
                     elif self.channel in [5,6,7,8,9,30,31,32]:
-                        MET_special_cut = (df.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] <= 30)
+                        MET_special_cut = (df.loc[:,f'MET_T1Smear_pt_{self.unc_special_map[unc][suffix]}'] <= self.MET_cut)
                     else:
                         MET_special_cut = None
                     df_special = df.loc[MET_special_cut,:].copy()
@@ -620,10 +639,10 @@ class WZG_plot():
                     del df_special
 
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] > 30)
+                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] > self.MET_cut)
                 df = df.loc[MET_cut,:].copy()
             elif self.channel in [5,6,7,8,9,30,31,32]:
-                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] <= 30)
+                MET_cut = (df.loc[:,f'MET_T1Smear_pt'] <= self.MET_cut)
                 df = df.loc[MET_cut,:].copy()
             else:
                 df = df.copy()
@@ -694,9 +713,9 @@ class WZG_plot():
 
         if isData:
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                MET_cut = (df.loc[:,'MET'] > 30)
+                MET_cut = (df.loc[:,'MET'] > self.MET_cut)
             elif self.channel in [5,6,7,8,9,30,31,32]:
-                MET_cut = (df.loc[:,'MET'] <= 30)
+                MET_cut = (df.loc[:,'MET'] <= self.MET_cut)
             else:
                 MET_cut = (df.loc[:,'MET'] >= 0)
             df = df.loc[MET_cut,:].copy()
@@ -817,9 +836,9 @@ class WZG_plot():
 
         if isData:
             if self.channel in [0,1,2,3,4, 10,11,12,13,14]:
-                MET_cut = (df.loc[:,'MET'] > 30)
+                MET_cut = (df.loc[:,'MET'] > self.MET_cut)
             elif self.channel in [5,6,7,8,9,30,31,32]:
-                MET_cut = (df.loc[:,'MET'] <= 30)
+                MET_cut = (df.loc[:,'MET'] <= self.MET_cut)
             else:
                 MET_cut = (df.loc[:,'MET'] >= 0)
             df = df.loc[MET_cut,:].copy()
@@ -896,7 +915,7 @@ class WZG_plot():
     def file_input(self):
         pass
 
-    def hist_store(self, hists_data={}, hists_mc={}, hists_flep={}, hists_fpho={}, **kwargs):
+    def hist_store(self, hists_data={}, hists_mc={}, hists_flep={}, hists_fpho={}, hists_ALP={}, **kwargs):
         output = uproot.recreate(f'{self.year}/{self.region}_{self.year}.root')
         for branch_name in self.branch:
             plotbranch = self.branch[branch_name]['name']
@@ -964,10 +983,12 @@ class WZG_plot():
                         else:
                             output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}{_suffix}'] = hists_fpho[f'{branch_name}_{_unc}_{_suffix.lower()}']
     
+            if hists_ALP:
+                pass
     # manually fold over/under flow bin for better workflow
-    def _fold_flow(self):
-        file = ROOT.OPEN(f'{self.year}/{self.region}_{self.year}.root')
-        pass
+    # def _fold_flow(self):
+    #     file = ROOT.OPEN(f'{self.year}/{self.region}_{self.year}.root')
+    #     pass
 
 
     def _make_error_boxes(self, hist=None, facecolor='none', edgecolor='grey', alpha=0.9, hatch='\\\\', linewidth=0.05, **kwargs):
@@ -976,9 +997,9 @@ class WZG_plot():
         _y = hist.values() - np.sqrt(hist.variances())
         _y_width = 2 * np.sqrt(hist.variances())
         _err_boxes = [mpl.patches.Rectangle((_x_i, _y_i), _x_width_i, _y_width_i) for _x_i, _y_i, _x_width_i, _y_width_i in zip(_x, _y, _x_width, _y_width)]
-        _pc = mpl.collections.PatchCollection(_err_boxes, facecolor=facecolor, alpha=alpha, edgecolor=edgecolor, label='Stat Unc.', hatch=hatch, linewidth=0.05 )
+        _pc = mpl.collections.PatchCollection(_err_boxes, facecolor=facecolor, alpha=alpha, edgecolor=edgecolor, label='Stat Unc.', hatch=hatch, linewidth=0.00)
 
-        _err_box_proxy = mpl.patches.Patch(facecolor=facecolor, alpha=alpha, hatch=hatch, linewidth=0.05, label='Stat Unc.')
+        _err_box_proxy = mpl.patches.Patch(facecolor=facecolor, alpha=alpha, hatch=hatch, linewidth=0.00, label='Stat Unc.')
         return _pc, _err_box_proxy
     
     def _make_ratio(self, h1, h2):
@@ -1038,7 +1059,7 @@ class WZG_plot():
                     histtype='errorbar',
                     # xerr = True,
                     yerr = True,
-                    binticks = True,
+                    binticks = False,
                     ax = axs[0]
                 )
             # plot stack
@@ -1048,7 +1069,7 @@ class WZG_plot():
                 histtype = 'fill',
                 color = color,
                 label = label,
-                binticks = True,
+                binticks = False,
                 ax = axs[0]
             )
 
@@ -1089,7 +1110,7 @@ class WZG_plot():
                     histtype='errorbar',
                     # xerr = True,
                     yerr = True,
-                    binticks = True,
+                    binticks = False,
                     ax = axs[1]
                 )
             hist_pred_ratio = self._make_ratio(hist_pred, hist_pred)
@@ -1111,6 +1132,7 @@ class WZG_plot():
             hep.cms.label('Preliminary', data=True, lumi=self.lumi, year=self.year, ax=axs[0])
 
             fig.savefig(f'{self.year}/{self.region}/{self.region}_{self.branch[branch_name]["name"]}_None_{self.year}.png', dpi=100)
+            fig.savefig(f'{self.year}/{self.region}/{self.region}_{self.branch[branch_name]["name"]}_None_{self.year}.pdf', dpi=100)
             pass
             del hist_pred
             del pred_err_box_proxy
@@ -1159,10 +1181,10 @@ class WZG_plot():
         hists_fpho = {}
         if mode.lower() == 'prepare':
             if iscondor:
-                if input:
-                    pass
-                else:
-                    self.prepare_condor()
+                # if input:
+                #     pass
+                # else:
+                #     self.prepare_condor()
                 pass
             
             else:
@@ -1207,6 +1229,13 @@ class WZG_plot():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='plot input')
+    parser.add_argument('-y', dest='year', default='2018', choices=['2016Pre','2016Post','2016','2017','2018','RunII'])
+    parser.add_argument('-r', dest='region', choices=['ttZ','ZZ','ZGJ','WZG','ttG','ALP'], default='ttZ')
+    parser.add_argument('-m', dest='mode', default='prepare')
+    parser.add_argument('-c', dest='iscondor', default=False, action='store_true')
+    args = parser.parse_args()
+
     time_total_init = time.time()
     p = WZG_plot(year=args.year, region=args.region)
     p.run(mode=args.mode, iscondor=args.iscondor)
