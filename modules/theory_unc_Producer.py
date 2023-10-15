@@ -59,7 +59,7 @@ class theory_unc_Producer(Module):
 
     def _scaleWeight_cal(self, array):
         # Float_t LHE scale variation weights (w_var / w_nominal); [0] is MUF="0.5" MUR="0.5"; [1] is MUF="1.0" MUR="0.5"; [2] is MUF="2.0" MUR="0.5"; [3] is MUF="0.5" MUR="1.0"; [4] is MUF="1.0" MUR="1.0"; [5] is MUF="2.0" MUR="1.0"; [6] is MUF="0.5" MUR="2.0"; [7] is MUF="1.0" MUR="2.0"; [8] is MUF="2.0" MUR="2.0"*
-        # Remove [6](0.5,2.0) and [2](2.0,0.5)
+        # Remove [6](0.5,2.0)  [2](2.0,0.5)
         rep = [x for x in range(0,9)]
         array = [array[x] for x in rep]
         _weight = [1., 1., 1.]
@@ -79,11 +79,11 @@ class theory_unc_Producer(Module):
         rep = [x for x in range(0,4)]
         array = [array[x] for x in rep]
         _isr_weight = [1, 1, 1]
-        _isr_weight[1] = array[0]
-        _isr_weight[2] = array[2]
+        _isr_weight[1] = max(array[0], array[2])
+        _isr_weight[2] = min(array[0], array[2])
         _fsr_weight = [1, 1, 1]
-        _fsr_weight[1] = array[1]
-        _fsr_weight[2] = array[3]
+        _fsr_weight[1] = max(array[1], array[3])
+        _fsr_weight[2] = min(array[1], array[3])
         for i in range(3):
             if math.fabs(_isr_weight[i]) <= 1e-6:
                 _isr_weight[i] = 1.

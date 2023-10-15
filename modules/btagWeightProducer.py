@@ -113,7 +113,7 @@ class btagWeightProduce(Module):
 
 
         for i in range(0,len(jets)): 
-            if event.Jet_pt_nom[i] < 10:
+            if event.Jet_pt_nom[i] < 30:
                 continue
             if abs(jets[i].eta) > 2.4:
                 continue
@@ -143,14 +143,19 @@ class btagWeightProduce(Module):
 
             tight_jets.append(i)
 
-            if event.Jet_pt_nom[i] >= 30:
-                if self.year == '2017':
-                    if jets[i].btagDeepB > 0.7738:
-                        tight_bjets.append(i)
-                elif self.year == '2018':
-                    if jets[i].btagDeepB > 0.7665:
-                        tight_bjets.append(i)
-        
+            if self.year == '2016Pre':
+                if jets[i].btagDeepB > 0.8819:
+                    tight_bjets.append(i)
+            elif self.year == '2016Post':
+                if jets[i].btagDeepB > 0.8767:
+                    tight_bjets.append(i)
+            elif self.year == '2017':
+                if jets[i].btagDeepB > 0.7738:
+                    tight_bjets.append(i)
+            elif self.year == '2018':
+                if jets[i].btagDeepB > 0.7665:
+                    tight_bjets.append(i)
+            
 
         btag_weight = 1.
         for central_or_syst in self.central_and_systs_shape_corr:
@@ -177,6 +182,7 @@ class btagWeightProduce(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-btagWeightModule_16 = lambda : btagWeightProduce("2016")
+btagWeightModule_16 = lambda : btagWeightProduce("2016Pre")
+btagWeightModule_16 = lambda : btagWeightProduce("2016Post")
 btagWeightModule_17 = lambda : btagWeightProduce("2017")
 btagWeightModule_18 = lambda : btagWeightProduce("2018")

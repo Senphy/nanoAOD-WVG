@@ -75,8 +75,8 @@ class ApplyWeightFakeLeptonProducer(Module):
                 temp_weight = self.FR_M.GetBinContent(BinX, BinY)
                 temp_weight_err = self.FR_M.GetBinError(BinX, BinY)
                 weight = weight*temp_weight/(1 - temp_weight)
-                weight_up = weight_up*(temp_weight+temp_weight_err)/(1 - (temp_weight-temp_weight_err))
-                weight_down = weight_down*(temp_weight-temp_weight_err)/(1 - (temp_weight+temp_weight_err))
+                weight_up = weight_up*(temp_weight+temp_weight_err)/(1 - (temp_weight+temp_weight_err))
+                weight_down = weight_down*(temp_weight-temp_weight_err)/(1 - (temp_weight-temp_weight_err))
                 
             for i in fake_electrons:
                 BinX = self.FR_E.GetXaxis().FindBin(abs(electrons[i].eta))
@@ -88,13 +88,17 @@ class ApplyWeightFakeLeptonProducer(Module):
                 temp_weight = self.FR_E.GetBinContent(BinX, BinY)
                 temp_weight_err = self.FR_E.GetBinError(BinX, BinY)
                 weight = weight*temp_weight/(1 - temp_weight)
-                weight_up = weight_up*(temp_weight+temp_weight_err)/(1 - (temp_weight-temp_weight_err))
-                weight_down = weight_down*(temp_weight-temp_weight_err)/(1 - (temp_weight+temp_weight_err))
+                weight_up = weight_up*(temp_weight+temp_weight_err)/(1 - (temp_weight+temp_weight_err))
+                weight_down = weight_down*(temp_weight-temp_weight_err)/(1 - (temp_weight-temp_weight_err))
 
             if (number_of_loose % 2 > 0):
                 weight = weight
+                weight_up = weight_up
+                weight_down = weight_down
             else:
                 weight = -weight
+                weight_up = -weight_down
+                weight_down = -weight_up
         self.out.fillBranch("fake_lepton_weight", weight)
         self.out.fillBranch("fake_lepton_weight_up", weight_up)
         self.out.fillBranch("fake_lepton_weight_down", weight_down)
