@@ -62,13 +62,15 @@ class theory_unc_Producer(Module):
         # Remove [6](0.5,2.0)  [2](2.0,0.5)
         rep = [x for x in range(0,9)]
         array = [array[x] for x in rep]
-        _weight = [1., 1., 1.]
-        _weight[0] = array[4]
+        _weight = [1., 1., 1., 1., 1., 1., 1.]
+        # _weight[0] = array[4]
         drop_list = [2,6]
         array = np.delete(array, drop_list).tolist()
-        _weight[1] = max(array)
-        _weight[2] = min(array)
-        for i in range(3):
+        for i in range(0,7):
+            _weight[i] = max(array)
+        # _weight[1] = max(array)
+        # _weight[2] = min(array)
+        for i in range(0,7):
             if math.fabs(_weight[i]) <= 1e-6:
                 _weight[i] = 1.
         return _weight
@@ -79,17 +81,20 @@ class theory_unc_Producer(Module):
         rep = [x for x in range(0,4)]
         array = [array[x] for x in rep]
         _isr_weight = [1, 1, 1]
-        _isr_weight[1] = max(array[0], array[2])
-        _isr_weight[2] = min(array[0], array[2])
+        _isr_weight[1] = array[0]
+        _isr_weight[2] = array[2]
         _fsr_weight = [1, 1, 1]
-        _fsr_weight[1] = max(array[1], array[3])
-        _fsr_weight[2] = min(array[1], array[3])
+        _fsr_weight[1] = array[1]
+        _fsr_weight[2] = array[3]
+        _ps_weight = [1, 1, 1]
+        _ps_weight[1] = max(array)
+        _ps_weight[2] = min(array)
         for i in range(3):
             if math.fabs(_isr_weight[i]) <= 1e-6:
                 _isr_weight[i] = 1.
             if math.fabs(_fsr_weight[i]) <= 1e-6:
                 _fsr_weight[i] = 1.
-        return _isr_weight, _fsr_weight
+        return _isr_weight, _fsr_weight, _ps_weight
         pass
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -98,15 +103,18 @@ class theory_unc_Producer(Module):
         self.out.branch("pdf_Weight", "F")
         self.out.branch("pdf_WeightUp", "F")
         self.out.branch("pdf_WeightDown", "F")
-        self.out.branch("scale_Weight", "F")
-        self.out.branch("scale_WeightUp", "F")
-        self.out.branch("scale_WeightDown", "F")
+        self.out.branch("PS_Weight", "F")
+        self.out.branch("PS_WeightUp", "F")
+        self.out.branch("PS_WeightDown", "F")
         self.out.branch("PS_isr_Weight", "F")
         self.out.branch("PS_isr_WeightUp", "F")
         self.out.branch("PS_isr_WeightDown", "F")
         self.out.branch("PS_fsr_Weight", "F")
         self.out.branch("PS_fsr_WeightUp", "F")
         self.out.branch("PS_fsr_WeightDown", "F")
+        self.out.branch("test_photon_pt", "F")
+        for i in range(0, 7):
+            self.out.branch("scale_Weight_%s"%str(i), "F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -116,19 +124,28 @@ class theory_unc_Producer(Module):
 
         pdf_Weight = self._pdfWeight_cal(event.nLHEPdfWeight, event.LHEPdfWeight)
         scale_Weight = self._scaleWeight_cal(event.LHEScaleWeight)
-        PS_isr_Weight, PS_fsr_Weight = self._psWeight_cal(event.PSWeight)
+        PS_isr_Weight, PS_fsr_Weight, PS_Weight = self._psWeight_cal(event.PSWeight)
+        photons = Collection(event, "Photon")
+        if len(photons) > 0:
+            self.out.fillBranch("test_photon_pt", photons[0].pt)
         self.out.fillBranch("pdf_Weight", pdf_Weight[0])
         self.out.fillBranch("pdf_WeightUp", pdf_Weight[1])
         self.out.fillBranch("pdf_WeightDown", pdf_Weight[2])
-        self.out.fillBranch("scale_Weight", scale_Weight[0])
-        self.out.fillBranch("scale_WeightUp", scale_Weight[1])
-        self.out.fillBranch("scale_WeightDown", scale_Weight[2])
+        # self.out.fillBranch("scale_Weight", scale_Weight[0])
+        # self.out.fillBranch("scale_WeightUp", scale_Weight[1])
+        # self.out.fillBranch("scale_WeightDown", scale_Weight[2])
         self.out.fillBranch("PS_isr_Weight", PS_isr_Weight[0])
         self.out.fillBranch("PS_isr_WeightUp", PS_isr_Weight[1])
         self.out.fillBranch("PS_isr_WeightDown", PS_isr_Weight[2])
         self.out.fillBranch("PS_fsr_Weight", PS_fsr_Weight[0])
         self.out.fillBranch("PS_fsr_WeightUp", PS_fsr_Weight[1])
         self.out.fillBranch("PS_fsr_WeightDown", PS_fsr_Weight[2])
+        self.out.fillBranch("PS_Weight", PS_Weight[0])
+        self.out.fillBranch("PS_WeightUp", PS_Weight[1])
+        self.out.fillBranch("PS_WeightDown", PS_Weight[2])
+        print(scale_Weight)
+        for i in range(0, 7):
+            self.out.fillBranch("scale_Weight_%s"%str(i), scale_Weight[i])
 
         return True
 

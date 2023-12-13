@@ -158,7 +158,7 @@ class define_object_Producer(Module):
         # selection on photons, but not requirement on photon number in this module
         for i in range(0,len(photons)):
 
-            if photons[i].pt < 15:
+            if photons[i].pt < 20:
                 continue
 
             if not (photons[i].isScEtaEE or photons[i].isScEtaEB):

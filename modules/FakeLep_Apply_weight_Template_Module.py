@@ -41,8 +41,12 @@ class ApplyWeightFakeLeptonProducer(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("fake_lepton_weight",  "F")
-        self.out.branch("fake_lepton_weight_up",  "F")
-        self.out.branch("fake_lepton_weight_down",  "F")
+        self.out.branch("fake_lepton_weight_stat_up",  "F")
+        self.out.branch("fake_lepton_weight_stat_down",  "F")
+        self.out.branch("fake_lepton_weight_ele_up",  "F")
+        self.out.branch("fake_lepton_weight_ele_down",  "F")
+        self.out.branch("fake_lepton_weight_mu_up",  "F")
+        self.out.branch("fake_lepton_weight_mu_down",  "F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -56,6 +60,10 @@ class ApplyWeightFakeLeptonProducer(Module):
         weight = 1
         weight_up = 1
         weight_down = 1
+        weight_ele_up = 1
+        weight_ele_down = 1
+        weight_mu_up = 1
+        weight_mu_down = 1
         number_of_loose = event.nFakeMuons + event.nFakeElectrons
         fake_muons = []
         fake_electrons = []
@@ -91,17 +99,34 @@ class ApplyWeightFakeLeptonProducer(Module):
                 weight_up = weight_up*(temp_weight+temp_weight_err)/(1 - (temp_weight+temp_weight_err))
                 weight_down = weight_down*(temp_weight-temp_weight_err)/(1 - (temp_weight-temp_weight_err))
 
+            ele_up = 1.3 ** len(fake_electrons)
+            ele_down = 0.7 ** len(fake_electrons)
+            mu_up = 1.3 ** len(fake_muons)
+            mu_down = 0.7 ** len(fake_muons)
+
             if (number_of_loose % 2 > 0):
                 weight = weight
                 weight_up = weight_up
                 weight_down = weight_down
+                weight_ele_up = weight * ele_up
+                weight_ele_down = weight * ele_down
+                weight_mu_up = weight * mu_up
+                weight_mu_down = weight * mu_down
             else:
                 weight = -weight
                 weight_up = -weight_down
                 weight_down = -weight_up
+                weight_ele_up = -weight * ele_down
+                weight_ele_down = -weight * ele_up
+                weight_mu_up = -weight * mu_down
+                weight_mu_down = -weight * mu_up
         self.out.fillBranch("fake_lepton_weight", weight)
-        self.out.fillBranch("fake_lepton_weight_up", weight_up)
-        self.out.fillBranch("fake_lepton_weight_down", weight_down)
+        self.out.fillBranch("fake_lepton_weight_stat_up", weight_up)
+        self.out.fillBranch("fake_lepton_weight_stat_down", weight_down)
+        self.out.fillBranch("fake_lepton_weight_ele_up", weight_ele_up)
+        self.out.fillBranch("fake_lepton_weight_ele_down", weight_ele_down)
+        self.out.fillBranch("fake_lepton_weight_mu_up", weight_mu_up)
+        self.out.fillBranch("fake_lepton_weight_mu_down", weight_mu_down)
 
         return True
 

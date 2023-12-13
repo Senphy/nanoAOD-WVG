@@ -381,7 +381,7 @@ class WZG_multi_Producer(Module):
         # MET > 30
         # 3 leptons with an OSSF lepton pair, mll cloest to mz as z leptons
         # loose lepton veto
-        # pt(lz1) > 25, pt(lz2) > 15, pt(lw) > 25
+        # pt(lz1) > 15, pt(lz2) > 10, pt(lw) > 15
         # |m(lz1,lz2)-mz| <= 15
         # >=1 tight photon
         # |m(lz1,lz2,a)+m(lz1,lz2)| >= 182 !!abandoned!!
@@ -435,9 +435,9 @@ class WZG_multi_Producer(Module):
             if len(tight_muons)==2 and len(tight_electrons)==1:  # emumu channel 
                 if muons[tight_muons[0]].pdgId == -muons[tight_muons[1]].pdgId:
 
-                    if muons[tight_muons[0]].pt < 25:
+                    if muons[tight_muons[0]].pt < 15:
                         return False
-                    if electrons[tight_electrons[0]].pt < 25:
+                    if electrons[tight_electrons[0]].pt < 15:
                         return False
 
                     dileptonmass = (muons[tight_muons[0]].p4() + muons[tight_muons[1]].p4()).M()
@@ -467,9 +467,9 @@ class WZG_multi_Producer(Module):
             if len(tight_muons)==1 and len(tight_electrons)==2:
                 if electrons[tight_electrons[0]].pdgId == -electrons[tight_electrons[1]].pdgId:
 
-                    if muons[tight_muons[0]].pt < 25:
+                    if muons[tight_muons[0]].pt < 15:
                         return False
-                    if electrons[tight_electrons[0]].pt < 25:
+                    if electrons[tight_electrons[0]].pt < 15:
                         return False
 
                     dileptonmass = (electrons[tight_electrons[0]].p4() + electrons[tight_electrons[1]].p4()).M()
@@ -524,9 +524,9 @@ class WZG_multi_Producer(Module):
                     if electrons[tight_electrons[1]].pt < electrons[tight_electrons[2]].pt:
                         tight_electrons[1],tight_electrons[2] = tight_electrons[2],tight_electrons[1]
                 
-                if electrons[tight_electrons[0]].pt < 25:
+                if electrons[tight_electrons[0]].pt < 15:
                     return False
-                if (electrons[tight_electrons[1]].pt < 25) and (electrons[tight_electrons[2]].pt < 25):
+                if (electrons[tight_electrons[1]].pt < 15) and (electrons[tight_electrons[2]].pt < 15):
                     return False
 
                 if len(tight_photons) > 0:
@@ -576,9 +576,9 @@ class WZG_multi_Producer(Module):
                     if muons[tight_muons[1]].pt < muons[tight_muons[2]].pt:
                         tight_muons[1],tight_muons[2] = tight_muons[2], tight_muons[1]
                 
-                if muons[tight_muons[0]].pt < 25:
+                if muons[tight_muons[0]].pt < 15:
                     return False
-                if (muons[tight_muons[1]].pt < 25) and (muons[tight_muons[2]].pt < 25):
+                if (muons[tight_muons[1]].pt < 15) and (muons[tight_muons[2]].pt < 15):
                     return False
                 if len(tight_photons) > 0:
                     m_lla = (muons[tight_muons[1]].p4() + muons[tight_muons[2]].p4() + photons[tight_photons[0]].p4()).M()
