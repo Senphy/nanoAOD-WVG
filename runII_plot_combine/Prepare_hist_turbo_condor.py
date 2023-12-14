@@ -63,6 +63,7 @@ class WZG_plot_condor(WZG_plot):
                     # merge mc
                     unc_total = deepcopy(self.unc_map)
                     unc_total.update(self.unc_special_map)
+                    unc_total.update(self.unc_scale_map)
                     self.branch[branch_name]['hists'] = {}
                     suffix_list = ['Nom']
                     suffix_list.extend([f'{unc}Up' for unc in unc_total])
@@ -88,26 +89,32 @@ class WZG_plot_condor(WZG_plot):
                                 continue
                     # store mc
                     for group in self.plot_groups:
-                        output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_None'] = self.branch[branch_name]['hists'][group]['Nom']
+                        # print(f'{branch_name} {group} {self.channel_map[self.channel]}_{plotbranch}_{group} {self.branch[branch_name]["hists"][group]["Nom"]}')
+                        output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_None'] = self.hist_check(self.branch[branch_name]['hists'][group]['Nom'])
                         for unc in unc_total:
+                            # print(f'{branch_name} {group} {self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Down {self.branch[branch_name]["hists"][group][f"{unc}Down"]}')
                             if unc_total[unc]['corr'] == 1:
-                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Up'] = self.branch[branch_name]['hists'][group][f'{unc}Up']
-                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Down'] = self.branch[branch_name]['hists'][group][f'{unc}Down']
+                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Up'] = self.hist_check(self.branch[branch_name]['hists'][group][f'{unc}Up'])
+                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}Down'] = self.hist_check(self.branch[branch_name]['hists'][group][f'{unc}Down'])
                             else:
-                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}_{year_suffix}Up'] = self.branch[branch_name]['hists'][group][f'{unc}Up']
-                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}_{year_suffix}Down'] = self.branch[branch_name]['hists'][group][f'{unc}Down']
+                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}_{year_suffix}Up'] = self.hist_check(self.branch[branch_name]['hists'][group][f'{unc}Up'])
+                                output[f'{self.channel_map[self.channel]}_{plotbranch}_{group}_{unc}_{year_suffix}Down'] = self.hist_check(self.branch[branch_name]['hists'][group][f'{unc}Down'])
             elif self.plottype == 2:
-                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_None'] = hists[branch_name]
-                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_fakerate_{year_suffix}Up'] = hists[f'{branch_name}_fakerateUp']
-                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_fakerate_{year_suffix}Down'] = hists[f'{branch_name}_fakerateDown']
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_None'] = self.hist_check(hists[branch_name])
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_FakeLep_fakerate_{year_suffix}Up'] = self.hist_check(hists[f'{branch_name}_FakeLep_fakerateUp'])
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_FakeLep_fakerate_{year_suffix}Down'] = self.hist_check(hists[f'{branch_name}_FakeLep_fakerateDown'])
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_FakeLep_eleUp'] = self.hist_check(hists[f'{branch_name}_FakeLep_eleUp'])
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_FakeLep_eleDown'] = self.hist_check(hists[f'{branch_name}_FakeLep_eleDown'])
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_FakeLep_muUp'] = self.hist_check(hists[f'{branch_name}_FakeLep_muUp'])
+                output[f'{self.channel_map[self.channel]}_{plotbranch}_FakeLep_FakeLep_muDown'] = self.hist_check(hists[f'{branch_name}_FakeLep_muDown'])
             elif self.plottype == 3:
                 output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_None'] = hists[branch_name]
                 for _unc in self._fakepho_unc_list:
                     for _suffix in ['Up','Down']:
                         if _unc == 'stat':
-                            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}_{year_suffix}{_suffix}'] = hists[f'{branch_name}_{_unc}_{_suffix.lower()}']
+                            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}_{year_suffix}{_suffix}'] = self.hist_check(hists[f'{branch_name}_{_unc}_{_suffix.lower()}'])
                         else:
-                            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}{_suffix}'] = hists[f'{branch_name}_{_unc}_{_suffix.lower()}']
+                            output[f'{self.channel_map[self.channel]}_{plotbranch}_FakePho_FakePho_{_unc}{_suffix}'] = self.hist_check(hists[f'{branch_name}_{_unc}_{_suffix.lower()}'])
 
     def run(self):
         hists = {}
@@ -120,9 +127,14 @@ class WZG_plot_condor(WZG_plot):
                 hists = self.AddHist_FakePho(self.file, hists=hists, isData=True)
         else:
             if self.plottype == 1:
-                hists[self.mcname] = {}
-                hists[self.mcname]['name'] = self.filelist_MC[self.mcname]['name']
-                hists[self.mcname] = self.AddHist(self.file, hists=hists[self.mcname], isData=False, xsec=self.filelist_MC[self.mcname]['xsec'])
+                if self.region in ['ALP'] and 'ALP' in self.mcname:
+                    hists[self.mcname] = {}
+                    hists[self.mcname]['name'] = self.filelist_ALP[self.mcname]['name']
+                    hists[self.mcname] = self.AddHist(self.file, hists=hists[self.mcname], isData=False, xsec=self.filelist_ALP[self.mcname]['xsec'])
+                else:
+                    hists[self.mcname] = {}
+                    hists[self.mcname]['name'] = self.filelist_MC[self.mcname]['name']
+                    hists[self.mcname] = self.AddHist(self.file, hists=hists[self.mcname], isData=False, xsec=self.filelist_MC[self.mcname]['xsec'])
             elif self.plottype == 2:    
                 hists = self.AddHist_FakeLep(self.file, hists=hists, isData=False, xsec=self.filelist_MC[self.mcname]['xsec'])
             elif self.plottype == 3:    
@@ -174,10 +186,10 @@ def get_filename(file):
     dirt_1, _filename = os.path.split(file)
     return dirt_1, _filename
 
-def hadd_hist(data_list=[], mc_dict={}, region='', year='2018', **kwargs):
+def hadd_hist(data_list=[], mc_dict={}, ALP_dict={}, region='', year='2018', **kwargs):
     store_path = '/eos/user/s/sdeng/WZG_analysis/hists/'
     hadd_list = []
-    if region in ['WZG','ZGJ']:
+    if region in ['WZG','ZGJ','ALP']:
         typelist = [1,2,3]
     else:
         typelist = [1,2]
@@ -198,6 +210,16 @@ def hadd_hist(data_list=[], mc_dict={}, region='', year='2018', **kwargs):
             if not os.path.exists(f'{store_path}/{filename}'):
                 raise FileNotFoundError(f'{filename} not exists in {store_path}')
             hadd_list.append(f'{store_path}/{filename}')
+    if region=='ALP':
+        for ALP in ALP_dict:
+            filepath = ALP_dict[ALP]['path']
+            for _plottype in [1]:
+                path, filename = get_filename(filepath)
+                filename = filename.split('.root')[0]
+                filename = f'{region}_{filename}_{plottype_map[_plottype]}_{year}.root'
+                if not os.path.exists(f'{store_path}/{filename}'):
+                    raise FileNotFoundError(f'{filename} not exists in {store_path}')
+                hadd_list.append(f'{store_path}/{filename}')
     
     hadd_string = ''
     for file in hadd_list:
@@ -221,21 +243,21 @@ if __name__=='__main__':
         import Control_pad as cp
         filelist_data = cp.filelist_data
         filelist_MC = cp.filelist_MC
-        filelist_ALP = cp.filelist_ALP
         for filepath in filelist_data:
             path, filename = get_filename(filepath)
             submit_condor(path=path, file=filename, year=args.year, isdata='-d', plottype=1, region=args.region)
             submit_condor(path=path, file=filename, year=args.year, isdata='-d', plottype=2, region=args.region)
-            if args.region in ['WZG','ZGJ']:
+            if args.region in ['WZG','ZGJ','ALP']:
                 submit_condor(path=path, file=filename, year=args.year, isdata='-d', plottype=3, region=args.region)
         for mc in filelist_MC:
             filepath = filelist_MC[mc]['path']
             path, filename = get_filename(filepath)
             submit_condor(path=path, file=filename, year=args.year, plottype=1, region=args.region, mcname=mc)
             submit_condor(path=path, file=filename, year=args.year, plottype=2, region=args.region, mcname=mc)
-            if args.region in ['WZG','ZGJ']:
+            if args.region in ['WZG','ZGJ','ALP']:
                 submit_condor(path=path, file=filename, year=args.year, plottype=3, region=args.region, mcname=mc)
         if args.region in ['ALP']:
+            filelist_ALP = cp.filelist_ALP
             for mc in filelist_ALP:
                 filepath = filelist_ALP[mc]['path']
                 path, filename = get_filename(filepath)
@@ -251,4 +273,8 @@ if __name__=='__main__':
         import Control_pad as cp
         filelist_data = cp.filelist_data
         filelist_MC = cp.filelist_MC
-        hadd_hist(data_list=filelist_data, mc_dict=filelist_MC, region=args.region, year=args.year)
+        if args.region == 'ALP':
+            filelist_ALP = cp.filelist_ALP
+        else:
+            filelist_ALP = {}
+        hadd_hist(data_list=filelist_data, mc_dict=filelist_MC, ALP_dict=filelist_ALP, region=args.region, year=args.year)
