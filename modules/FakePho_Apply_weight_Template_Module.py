@@ -130,14 +130,14 @@ class ApplyWeightFakePhotonProducer(Module):
                 pt_low = self.endcap_pt_map[self.year]['ptbins'][i]
                 pt_high = self.endcap_pt_map[self.year]['ptbins'][i+1]
                 if (pt >= pt_low) and (pt <= pt_high):
-                    weight = self.barrel_pt_map[self.year]['weight'][i]
+                    weight = self.endcap_pt_map[self.year]['weight'][i]
                     for unc in weight_unc:
                         if unc == 'stat':
-                            weight_unc[unc]['up'] = self.barrel_pt_map[self.year]['weight'][i] + self.barrel_pt_map[self.year]['unc'][unc][i]
-                            weight_unc[unc]['down'] = max(self.barrel_pt_map[self.year]['weight'][i] - self.barrel_pt_map[self.year]['unc'][unc][i], 0)
+                            weight_unc[unc]['up'] = self.endcap_pt_map[self.year]['weight'][i] + self.endcap_pt_map[self.year]['unc'][unc][i]
+                            weight_unc[unc]['down'] = max(self.endcap_pt_map[self.year]['weight'][i] - self.endcap_pt_map[self.year]['unc'][unc][i], 0)
                         else:
-                            weight_unc[unc]['up'] = self.barrel_pt_map[self.year]['weight'][i] + self.barrel_pt_map[self.year]['unc'][unc][i]*self.barrel_pt_map[self.year]['weight'][i]
-                            weight_unc[unc]['down'] = max(self.barrel_pt_map[self.year]['weight'][i] - self.barrel_pt_map[self.year]['unc'][unc][i]*self.barrel_pt_map[self.year]['weight'][i], 0)
+                            weight_unc[unc]['up'] = self.endcap_pt_map[self.year]['weight'][i] + self.endcap_pt_map[self.year]['unc'][unc][i]*self.endcap_pt_map[self.year]['weight'][i]
+                            weight_unc[unc]['down'] = max(self.endcap_pt_map[self.year]['weight'][i] - self.endcap_pt_map[self.year]['unc'][unc][i]*self.endcap_pt_map[self.year]['weight'][i], 0)
 
         return weight, weight_unc
 

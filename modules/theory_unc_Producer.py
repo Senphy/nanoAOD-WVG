@@ -67,7 +67,7 @@ class theory_unc_Producer(Module):
         drop_list = [2,6]
         array = np.delete(array, drop_list).tolist()
         for i in range(0,7):
-            _weight[i] = max(array)
+            _weight[i] = array[i]
         # _weight[1] = max(array)
         # _weight[2] = min(array)
         for i in range(0,7):
