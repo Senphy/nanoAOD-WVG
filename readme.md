@@ -1,4 +1,7 @@
 # WZG selector
+
+**<span style="color:red">This repo is deprecated due to the env upgrade. Used for local test only.</span>**
+
 Based on NanoAOD Tools: <https://github.com/cms-nanoAOD/nanoAOD-tools>
 
 Dedicated for WZG analysis on lxplus environment
